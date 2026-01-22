@@ -60,12 +60,18 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		role, ok := claims["role"].(string)
+		if !ok {
+			c.JSON(401, gin.H{"error": "Role not found in token"})
+		}
 
 		// 9. Добавляем user_id в header для микросервисов
 		c.Request.Header.Set("X-User-ID", userID)
+		c.Request.Header.Set("X-User-Role", role)
 
 		// 10. Сохраняем в контекст Gin
 		c.Set("user_id", userID)
+		c.Set("role", role)
 
 		// 11. Продолжаем обработку
 		c.Next()
