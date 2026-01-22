@@ -23,8 +23,10 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	// STUDENT SERVICE - защищённые эндпоинты
 	// ============================================
 	api.Any("/students/*path",
-		middleware.AuthMiddleware(cfg.JWTSecret),     // ← middleware первый
-		proxy.NewServiceProxy(cfg.StudentServiceUrl), // ← proxy второй
+		middleware.AuthMiddleware(cfg.JWTSecret), // ← middleware первый
+		middleware.RoleMiddleware("student"),     // ← middleware второй
+		proxy.NewServiceProxy(cfg.StudentServiceUrl),
+		// ← proxy второй
 	)
 
 	// ============================================
@@ -32,6 +34,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	// ============================================
 	api.Any("/employers/*path",
 		middleware.AuthMiddleware(cfg.JWTSecret),
+		middleware.RoleMiddleware("employer"),
 		proxy.NewServiceProxy(cfg.EmployerServiceUrl),
 	)
 
