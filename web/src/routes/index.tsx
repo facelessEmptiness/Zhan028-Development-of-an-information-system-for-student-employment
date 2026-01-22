@@ -1,7 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from '../App';
-import { HomePage, LoginPage, RegisterPage } from '../pages';
+import { HomePage, LoginPage, RegisterPage, MySessionsPage } from '../pages';
 import { AuthProvider } from '../context';
+import { ProtectedRoute } from '../components';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <HomePage /> },
+      {
+        path: '/my-sessions',
+        element: <ProtectedRoute><MySessionsPage /></ProtectedRoute>,
+      },
     ],
   },
 ]);

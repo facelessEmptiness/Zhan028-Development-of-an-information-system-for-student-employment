@@ -36,6 +36,32 @@ export interface AuthResponse {
   tokens: TokenResponse;
 }
 
+export interface StudentProfile {
+  iin: string;
+  lastName: string;
+  firstName: string;
+  middleName?: string;
+  email: string;
+  password: string;
+  phone: string;
+  dateOfBirth: string;
+}
+
+export interface EmployerProfile {
+  bin: string;
+  companyName: string;
+  companyEmail: string;
+  contactPhone: string;
+}
+
+export interface UniversityProfile {
+  universityName: string;
+  universityEmail: string;
+  contactPhone: string;
+}
+
+export type RoleProfile = StudentProfile | EmployerProfile | UniversityProfile;
+
 export interface AuthContextType {
   user: User | null;
   accessToken: string | null;

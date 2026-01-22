@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { LoginRequest, RegisterRequest, AuthResponse, User, TokenResponse } from '../types/auth';
+import type { LoginRequest, RegisterRequest, AuthResponse, User, TokenResponse, RoleProfile } from '../types/auth';
 
 // Refresh token request type
 interface RefreshRequest {
@@ -33,6 +33,16 @@ export const authApi = {
     return apiClient.request<TokenResponse>('/api/auth/refresh', {
       method: 'POST',
       body: JSON.stringify({ refresh_token: refreshToken } as RefreshRequest),
+    });
+  },
+
+  async updateProfile(token: string, data: RoleProfile): Promise<User> {
+    return apiClient.request<User>('/api/auth/profile', {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
     });
   },
 };

@@ -15,6 +15,12 @@ const App = () => {
             <nav className="flex items-center space-x-4">
               {isAuthenticated ? (
                 <>
+                  <Link
+                    to="/my-sessions"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                  >
+                    My Sessions
+                  </Link>
                   <span className="text-gray-600">
                     {user?.email}
                   </span>
