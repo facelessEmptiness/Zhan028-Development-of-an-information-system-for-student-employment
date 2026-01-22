@@ -4,26 +4,48 @@ import type { User, LoginRequest, RegisterRequest, AuthContextType } from '../ty
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = 'auth_token';
+const ACCESS_TOKEN_KEY = 'access_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+  const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem(ACCESS_TOKEN_KEY));
+  const [refreshToken, setRefreshToken] = useState<string | null>(() => localStorage.getItem(REFRESH_TOKEN_KEY));
   const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthenticated = !!user && !!token;
+  const isAuthenticated = !!user && !!accessToken;
 
   useEffect(() => {
     const initAuth = async () => {
-      const savedToken = localStorage.getItem(TOKEN_KEY);
-      if (savedToken) {
+      const savedAccessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+      if (savedAccessToken) {
         try {
-          const currentUser = await authApi.getCurrentUser(savedToken);
+          const currentUser = await authApi.getProfile(savedAccessToken);
           setUser(currentUser);
-          setToken(savedToken);
+          setAccessToken(savedAccessToken);
         } catch {
-          localStorage.removeItem(TOKEN_KEY);
-          setToken(null);
+          // Token might be expired, try to refresh
+          const savedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+          if (savedRefreshToken) {
+            try {
+              const newTokens = await authApi.refreshToken(savedRefreshToken);
+              localStorage.setItem(ACCESS_TOKEN_KEY, newTokens.access_token);
+              localStorage.setItem(REFRESH_TOKEN_KEY, newTokens.refresh_token);
+              setAccessToken(newTokens.access_token);
+              setRefreshToken(newTokens.refresh_token);
+              const currentUser = await authApi.getProfile(newTokens.access_token);
+              setUser(currentUser);
+            } catch {
+              // Refresh failed, clear everything
+              localStorage.removeItem(ACCESS_TOKEN_KEY);
+              localStorage.removeItem(REFRESH_TOKEN_KEY);
+              setAccessToken(null);
+              setRefreshToken(null);
+            }
+          } else {
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            setAccessToken(null);
+          }
         }
       }
       setIsLoading(false);
@@ -34,29 +56,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = useCallback(async (data: LoginRequest) => {
     const response = await authApi.login(data);
-    localStorage.setItem(TOKEN_KEY, response.token);
-    setToken(response.token);
+    localStorage.setItem(ACCESS_TOKEN_KEY, response.tokens.access_token);
+    localStorage.setItem(REFRESH_TOKEN_KEY, response.tokens.refresh_token);
+    setAccessToken(response.tokens.access_token);
+    setRefreshToken(response.tokens.refresh_token);
     setUser(response.user);
   }, []);
 
   const register = useCallback(async (data: RegisterRequest) => {
     const response = await authApi.register(data);
-    localStorage.setItem(TOKEN_KEY, response.token);
-    setToken(response.token);
+    localStorage.setItem(ACCESS_TOKEN_KEY, response.tokens.access_token);
+    localStorage.setItem(REFRESH_TOKEN_KEY, response.tokens.refresh_token);
+    setAccessToken(response.tokens.access_token);
+    setRefreshToken(response.tokens.refresh_token);
     setUser(response.user);
   }, []);
 
   const logout = useCallback(() => {
-    if (token) {
-      authApi.logout(token).catch(() => {});
-    }
-    localStorage.removeItem(TOKEN_KEY);
-    setToken(null);
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    setAccessToken(null);
+    setRefreshToken(null);
     setUser(null);
-  }, [token]);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, accessToken, refreshToken, isAuthenticated, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -16,7 +16,7 @@ const App = () => {
               {isAuthenticated ? (
                 <>
                   <span className="text-gray-600">
-                    {user?.firstName} {user?.lastName}
+                    {user?.email}
                   </span>
                   <button
                     onClick={logout}

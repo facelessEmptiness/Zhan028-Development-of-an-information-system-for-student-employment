@@ -12,7 +12,9 @@ const RegisterPage = () => {
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    role: 'student' as 'student' | 'employer' | 'university' | 'admin',
+    role: 'student' as 'student' | 'employer' | 'university',
+    university: '',
+    company: '',
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +32,8 @@ const RegisterPage = () => {
     let strength = 0;
     const tips: string[] = [];
 
-    if (formData.password.length >= 6) strength++;
-    else tips.push('At least 6 characters');
+    if (formData.password.length >= 8) strength++;
+    else tips.push('At least 8 characters');
 
     if (formData.password.length >= 10) strength++;
     if (/[A-Z]/.test(formData.password)) strength++;
@@ -70,19 +72,18 @@ const RegisterPage = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Backend only accepts email, password, role
       await register({
         email: formData.email,
         password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
         role: formData.role,
       });
       navigate('/');
@@ -143,7 +144,7 @@ const RegisterPage = () => {
               {/* Role Selection */}
               <div className="animate-fade-in-up animation-delay-200">
                 <label className="block text-sm font-medium text-emerald-100 mb-3">I am a</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <label
                     className={`relative flex flex-col items-center p-4 rounded-xl cursor-pointer transition-all duration-300 ${
                       formData.role === 'student'
@@ -222,31 +223,6 @@ const RegisterPage = () => {
                     <span className="text-xs text-gray-400 mt-0.5">Managing campus</span>
                   </label>
 
-                  <label
-                    className={`relative flex flex-col items-center p-4 rounded-xl cursor-pointer transition-all duration-300 ${
-                      formData.role === 'admin'
-                        ? 'bg-red-500/30 border-2 border-red-400 shadow-lg shadow-red-500/20'
-                        : 'bg-white/5 border-2 border-white/10 hover:border-white/30'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="role"
-                      value="admin"
-                      checked={formData.role === 'admin'}
-                      onChange={handleChange}
-                      className="sr-only"
-                    />
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
-                      formData.role === 'admin' ? 'bg-red-500 shadow-lg shadow-red-500/50' : 'bg-white/10'
-                    }`}>
-                      <svg className={`w-5 h-5 transition-colors ${formData.role === 'admin' ? 'text-white' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                      </svg>
-                    </div>
-                    <span className={`text-xs font-medium ${formData.role === 'admin' ? 'text-red-300' : 'text-gray-300'}`}>Admin</span>
-                    <span className="text-xs text-gray-400 mt-0.5">System management</span>
-                  </label>
                 </div>
               </div>
 
@@ -317,6 +293,78 @@ const RegisterPage = () => {
                 </div>
               </div>
 
+              {/* University field for students and university role */}
+              {(formData.role === 'student' || formData.role === 'university') && (
+                <div className="animate-fade-in-up animation-delay-350">
+                  <label htmlFor="university" className="block text-sm font-medium text-emerald-100 mb-2">
+                    University
+                  </label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'university' ? (formData.role === 'university' ? 'text-purple-400' : 'text-emerald-400') : 'text-gray-400'}`}>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                      </svg>
+                    </div>
+                    <input
+                      id="university"
+                      name="university"
+                      type="text"
+                      required
+                      value={formData.university}
+                      onChange={handleChange}
+                      onFocus={() => setFocusedField('university')}
+                      onBlur={() => setFocusedField(null)}
+                      className={`w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 ${formData.role === 'university' ? 'focus:ring-purple-500' : 'focus:ring-emerald-500'} focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm`}
+                      placeholder="Enter your university name"
+                    />
+                    {formData.university && (
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                        <svg className={`w-5 h-5 ${formData.role === 'university' ? 'text-purple-400' : 'text-emerald-400'}`} fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Company field for employers */}
+              {formData.role === 'employer' && (
+                <div className="animate-fade-in-up animation-delay-350">
+                  <label htmlFor="company" className="block text-sm font-medium text-emerald-100 mb-2">
+                    Company
+                  </label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'company' ? 'text-blue-400' : 'text-gray-400'}`}>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <input
+                      id="company"
+                      name="company"
+                      type="text"
+                      required
+                      value={formData.company}
+                      onChange={handleChange}
+                      onFocus={() => setFocusedField('company')}
+                      onBlur={() => setFocusedField(null)}
+                      className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
+                      placeholder="Enter your company name"
+                    />
+                    {formData.company && (
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                        <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Email */}
               <div className="animate-fade-in-up animation-delay-400">
                 <label htmlFor="email" className="block text-sm font-medium text-emerald-100 mb-2">
@@ -373,7 +421,7 @@ const RegisterPage = () => {
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
                     className="w-full pl-12 pr-12 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
-                    placeholder="Min. 6 characters"
+                    placeholder="Min. 8 characters"
                   />
                   <button
                     type="button"

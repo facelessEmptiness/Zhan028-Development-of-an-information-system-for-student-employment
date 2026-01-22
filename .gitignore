@@ -1,0 +1,28 @@
+# Environment variables (contain secrets)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+nul
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out

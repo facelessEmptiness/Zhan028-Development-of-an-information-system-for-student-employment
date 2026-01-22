@@ -1,5 +1,10 @@
 import { apiClient } from './client';
-import type { LoginRequest, RegisterRequest, AuthResponse, User } from '../types/auth';
+import type { LoginRequest, RegisterRequest, AuthResponse, User, TokenResponse } from '../types/auth';
+
+// Refresh token request type
+interface RefreshRequest {
+  refresh_token: string;
+}
 
 export const authApi = {
   async login(data: LoginRequest): Promise<AuthResponse> {
@@ -16,7 +21,7 @@ export const authApi = {
     });
   },
 
-  async getCurrentUser(token: string): Promise<User> {
+  async getProfile(token: string): Promise<User> {
     return apiClient.request<User>('/api/auth/me', {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -24,12 +29,10 @@ export const authApi = {
     });
   },
 
-  async logout(token: string): Promise<void> {
-    return apiClient.request<void>('/api/auth/logout', {
+  async refreshToken(refreshToken: string): Promise<TokenResponse> {
+    return apiClient.request<TokenResponse>('/api/auth/refresh', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      body: JSON.stringify({ refresh_token: refreshToken } as RefreshRequest),
     });
   },
 };

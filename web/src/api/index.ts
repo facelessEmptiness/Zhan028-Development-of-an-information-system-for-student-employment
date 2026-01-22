@@ -1,3 +1,3 @@
 // API integration
-export { apiClient } from './client';
+export { apiClient, ApiError } from './client';
 export { authApi } from './auth';
