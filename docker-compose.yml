@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # =============== DATABASES ===============
+  users-db:
+    image: postgres:15-alpine
+    container_name: users-db
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - users-db-data:/var/lib/postgresql/data
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  student-db:
+    image: postgres:15-alpine
+    container_name: student-db
+    environment:
+      POSTGRES_DB: student_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5433:5432"
+    volumes:
+      - student-db-data:/var/lib/postgresql/data
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============== MICROSERVICES (только готовые) ===============
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8081:8080"
+    environment:
+      DB_HOST: users-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: users_db
+      JWT_SECRET: your-secret-key-here
+      SERVICE_PORT: 8080
+    depends_on:
+      users-db:
+        condition: service_healthy
+    networks:
+      - diploma-network
+    restart: unless-stopped
+
+  student-service:
+    build:
+      context: ./services/student-service
+      dockerfile: Dockerfile
+    container_name: student-service
+    ports:
+      - "8082:8080"
+      - "50051:50051"  # gRPC port
+    environment:
+      DB_HOST: student-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: student_db
+      HTTP_PORT: 8080
+      GRPC_PORT: 50051
+    depends_on:
+      student-db:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+    networks:
+      - diploma-network
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+      AUTH_SERVICE_URL: http://auth-service:8080
+      STUDENT_SERVICE_URL: http://student-service:8080
+      # Когда доделаете другие сервисы, раскомментируйте:
+      # EMPLOYER_SERVICE_URL: http://employer-service:8080
+      # VACANCY_SERVICE_URL: http://vacancy-service:8080
+      # REPORT_SERVICE_URL: http://report-service:8080
+    depends_on:
+      - auth-service
+      - student-service
+    networks:
+      - diploma-network
+    restart: unless-stopped
+
+  # =============== FRONTEND ===============
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - diploma-network
+    restart: unless-stopped
+
+networks:
+  diploma-network:
+    driver: bridge
+
+volumes:
+  users-db-data:
+  student-db-data:
