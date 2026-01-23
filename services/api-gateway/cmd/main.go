@@ -15,6 +15,8 @@ func main() {
 	}
 	r := gin.Default()
 	router.SetupRoutes(r, cfg)
-	log.Printf("Starting server at port %d...", cfg.Port)
-	r.Run("localhost:8080")
+
+	address := ":" + cfg.Port // ✅ :8080
+	log.Printf("Starting server at %s...", address)
+	r.Run(address)
 }

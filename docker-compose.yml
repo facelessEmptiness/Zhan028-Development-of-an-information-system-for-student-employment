@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # =============== DATABASES ===============
   users-db:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     container_name: users-db
     environment:
       POSTGRES_DB: postgres
@@ -22,7 +22,7 @@ services:
       retries: 5
 
   student-db:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     container_name: student-db
     environment:
       POSTGRES_DB: student_db
@@ -52,8 +52,8 @@ services:
       DB_HOST: users-db
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: users_db
+      DB_PASSWORD: admin
+      DB_NAME: postgres
       JWT_SECRET: your-secret-key-here
       SERVICE_PORT: 8080
     depends_on:
@@ -75,7 +75,7 @@ services:
       DB_HOST: student-db
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_PASSWORD: admin
       DB_NAME: student_db
       HTTP_PORT: 8080
       GRPC_PORT: 50051
@@ -94,11 +94,12 @@ services:
       dockerfile: Dockerfile
     container_name: api-gateway
     ports:
-      - "8000:8000"
+      - "8000:8080"
     environment:
-      PORT: 8000
-      AUTH_SERVICE_URL: http://auth-service:8080
-      STUDENT_SERVICE_URL: http://student-service:8080
+      PORT: 8080
+      JWT_SECRET: your-secret-key-here
+      AUTH_SERVICE_URL: http://auth-service:8081
+      STUDENT_SERVICE_URL: http://student-service:8082
       # Когда доделаете другие сервисы, раскомментируйте:
       # EMPLOYER_SERVICE_URL: http://employer-service:8080
       # VACANCY_SERVICE_URL: http://vacancy-service:8080
