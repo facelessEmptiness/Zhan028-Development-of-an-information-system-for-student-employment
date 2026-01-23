@@ -1,19 +1,17 @@
 import { useState, type FormEvent } from 'react';
-import type { StudentProfile } from '../types/auth';
+import type { CreateStudentProfileRequest } from '../types/auth';
 
 interface StudentProfileFormProps {
-  onSubmit: (data: StudentProfile) => Promise<void>;
+  onSubmit: (data: CreateStudentProfileRequest) => Promise<void>;
   isLoading?: boolean;
 }
 
 export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfileFormProps) => {
-  const [formData, setFormData] = useState<StudentProfile>({
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
     iin: '',
-    lastName: '',
-    firstName: '',
-    middleName: '',
-    phone: '',
-    dateOfBirth: '',
+    university_id: '',
   });
   const [error, setError] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -32,13 +30,19 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       return;
     }
 
-    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.dateOfBirth) {
+    if (!formData.first_name || !formData.last_name) {
       setError('Please fill in all required fields');
       return;
     }
 
     try {
-      await onSubmit(formData);
+      const requestData: CreateStudentProfileRequest = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        iin: formData.iin,
+        ...(formData.university_id && { university_id: formData.university_id }),
+      };
+      await onSubmit(requestData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile');
     }
@@ -63,7 +67,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
         <div className="relative">
           <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'iin' ? 'text-emerald-400' : 'text-gray-400'}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v10a2 2 0 002 2h5m0 0h5a2 2 0 002-2V8a2 2 0 00-2-2h-5m0 0V5a2 2 0 012-2h3.28a1 1 0 00.948-.684l1.498-4.493a1 1 0 00-.502-1.21l-.306-.102A1 1 0 009.07 1.695l-1.414 4.242" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
             </svg>
           </div>
           <input
@@ -90,60 +94,29 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       </div>
 
       {/* Name Fields */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-emerald-100 mb-2">
-            Last Name *
-          </label>
-          <div className="relative">
-            <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'lastName' ? 'text-emerald-400' : 'text-gray-400'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <input
-              id="lastName"
-              name="lastName"
-              type="text"
-              placeholder="Doe"
-              value={formData.lastName}
-              onChange={handleChange}
-              onFocus={() => setFocusedField('lastName')}
-              onBlur={() => setFocusedField(null)}
-              className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
-            />
-            {formData.lastName && (
-              <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-                <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-emerald-100 mb-2">
+          <label htmlFor="first_name" className="block text-sm font-medium text-emerald-100 mb-2">
             First Name *
           </label>
           <div className="relative">
-            <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'firstName' ? 'text-emerald-400' : 'text-gray-400'}`}>
+            <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'first_name' ? 'text-emerald-400' : 'text-gray-400'}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
             <input
-              id="firstName"
-              name="firstName"
+              id="first_name"
+              name="first_name"
               type="text"
               placeholder="John"
-              value={formData.firstName}
+              value={formData.first_name}
               onChange={handleChange}
-              onFocus={() => setFocusedField('firstName')}
+              onFocus={() => setFocusedField('first_name')}
               onBlur={() => setFocusedField(null)}
               className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
             />
-            {formData.firstName && (
+            {formData.first_name && (
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
                 <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -154,27 +127,27 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
         </div>
 
         <div>
-          <label htmlFor="middleName" className="block text-sm font-medium text-emerald-100 mb-2">
-            Middle Name (Optional)
+          <label htmlFor="last_name" className="block text-sm font-medium text-emerald-100 mb-2">
+            Last Name *
           </label>
           <div className="relative">
-            <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'middleName' ? 'text-emerald-400' : 'text-gray-400'}`}>
+            <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'last_name' ? 'text-emerald-400' : 'text-gray-400'}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
             <input
-              id="middleName"
-              name="middleName"
+              id="last_name"
+              name="last_name"
               type="text"
-              placeholder="Michael"
-              value={formData.middleName}
+              placeholder="Doe"
+              value={formData.last_name}
               onChange={handleChange}
-              onFocus={() => setFocusedField('middleName')}
+              onFocus={() => setFocusedField('last_name')}
               onBlur={() => setFocusedField(null)}
               className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
             />
-            {formData.middleName && (
+            {formData.last_name && (
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
                 <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -185,60 +158,30 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
         </div>
       </div>
 
-      {/* Phone */}
+      {/* University ID (Optional) */}
       <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-emerald-100 mb-2">
-          Phone Number *
+        <label htmlFor="university_id" className="block text-sm font-medium text-emerald-100 mb-2">
+          University ID (Optional)
         </label>
         <div className="relative">
-          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'phone' ? 'text-emerald-400' : 'text-gray-400'}`}>
+          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'university_id' ? 'text-emerald-400' : 'text-gray-400'}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 00.948.684l1.498 4.493a1 1 0 00-.502 1.21l-.306.102A1 1 0 009.07 14.695l1.414-4.242" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
             </svg>
           </div>
           <input
-            id="phone"
-            name="phone"
-            type="tel"
-            placeholder="+7 (700) 123-45-67"
-            value={formData.phone}
+            id="university_id"
+            name="university_id"
+            type="text"
+            placeholder="Enter university ID (UUID)"
+            value={formData.university_id}
             onChange={handleChange}
-            onFocus={() => setFocusedField('phone')}
+            onFocus={() => setFocusedField('university_id')}
             onBlur={() => setFocusedField(null)}
             className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
           />
-          {formData.phone && (
-            <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-              <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Date of Birth */}
-      <div>
-        <label htmlFor="dateOfBirth" className="block text-sm font-medium text-emerald-100 mb-2">
-          Date of Birth *
-        </label>
-        <div className="relative">
-          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'dateOfBirth' ? 'text-emerald-400' : 'text-gray-400'}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <input
-            id="dateOfBirth"
-            name="dateOfBirth"
-            type="date"
-            value={formData.dateOfBirth}
-            onChange={handleChange}
-            onFocus={() => setFocusedField('dateOfBirth')}
-            onBlur={() => setFocusedField(null)}
-            className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
-          />
-          {formData.dateOfBirth && (
+          {formData.university_id && (
             <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
               <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

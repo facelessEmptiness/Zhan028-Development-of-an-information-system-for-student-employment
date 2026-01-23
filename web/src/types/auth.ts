@@ -36,15 +36,32 @@ export interface AuthResponse {
   tokens: TokenResponse;
 }
 
-export interface StudentProfile {
+// Student profile types matching backend DTOs (snake_case)
+export interface CreateStudentProfileRequest {
+  first_name: string;
+  last_name: string;
   iin: string;
-  lastName: string;
-  firstName: string;
-  middleName?: string;
-  phone: string;
-  dateOfBirth: string;
+  university_id?: string;
 }
 
+export interface UpdateStudentProfileRequest {
+  first_name?: string;
+  last_name?: string;
+  university_id?: string;
+}
+
+export interface StudentProfileResponse {
+  id: string;
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  iin: string;
+  university_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Employer profile types (backend not implemented yet)
 export interface EmployerProfile {
   bin: string;
   companyName: string;
@@ -52,13 +69,12 @@ export interface EmployerProfile {
   contactPhone: string;
 }
 
+// University profile types (backend not implemented yet)
 export interface UniversityProfile {
   universityName: string;
   universityEmail: string;
   contactPhone: string;
 }
-
-export type RoleProfile = StudentProfile | EmployerProfile | UniversityProfile;
 
 export interface AuthContextType {
   user: User | null;

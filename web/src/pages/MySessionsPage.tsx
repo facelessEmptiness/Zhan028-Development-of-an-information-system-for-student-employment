@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context';
-import { authApi } from '../api';
+import { studentApi } from '../api/auth';
 import { StudentProfileForm, EmployerProfileForm, UniversityProfileForm } from '../components';
-import type { StudentProfile, EmployerProfile, UniversityProfile } from '../types/auth';
+import type { CreateStudentProfileRequest, EmployerProfile, UniversityProfile } from '../types/auth';
 
 const MySessionsPage = () => {
   const navigate = useNavigate();
@@ -16,17 +16,27 @@ const MySessionsPage = () => {
     return null;
   }
 
-  const handleProfileSubmit = async (data: StudentProfile | EmployerProfile | UniversityProfile) => {
+  const handleProfileSubmit = async (data: CreateStudentProfileRequest | EmployerProfile | UniversityProfile) => {
     setIsLoading(true);
     setSuccessMessage('');
     try {
-      await authApi.updateProfile(accessToken, data);
-      setSuccessMessage('Profile updated successfully!');
+      if (user.role === 'student') {
+        await studentApi.createProfile(accessToken, data as CreateStudentProfileRequest);
+      } else if (user.role === 'employer') {
+        // TODO: Implement employer API when backend is ready
+        console.warn('Employer profile API not implemented yet');
+        throw new Error('Employer profile creation not available yet');
+      } else if (user.role === 'university') {
+        // TODO: Implement university API when backend is ready
+        console.warn('University profile API not implemented yet');
+        throw new Error('University profile creation not available yet');
+      }
+      setSuccessMessage('Profile created successfully!');
       setTimeout(() => {
         navigate('/');
       }, 2000);
     } catch (error) {
-      console.error('Profile update failed:', error);
+      console.error('Profile creation failed:', error);
       throw error;
     } finally {
       setIsLoading(false);

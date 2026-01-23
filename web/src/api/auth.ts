@@ -1,5 +1,14 @@
 import { apiClient } from './client';
-import type { LoginRequest, RegisterRequest, AuthResponse, User, TokenResponse, RoleProfile } from '../types/auth';
+import type {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  User,
+  TokenResponse,
+  CreateStudentProfileRequest,
+  UpdateStudentProfileRequest,
+  StudentProfileResponse,
+} from '../types/auth';
 
 // Refresh token request type
 interface RefreshRequest {
@@ -35,9 +44,30 @@ export const authApi = {
       body: JSON.stringify({ refresh_token: refreshToken } as RefreshRequest),
     });
   },
+};
 
-  async updateProfile(token: string, data: RoleProfile): Promise<User> {
-    return apiClient.request<User>('/api/auth/profile', {
+// Student profile API - calls /api/students/profile
+export const studentApi = {
+  async createProfile(token: string, data: CreateStudentProfileRequest): Promise<StudentProfileResponse> {
+    return apiClient.request<StudentProfileResponse>('/api/students/profile', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getProfile(token: string): Promise<StudentProfileResponse> {
+    return apiClient.request<StudentProfileResponse>('/api/students/profile', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async updateProfile(token: string, data: UpdateStudentProfileRequest): Promise<StudentProfileResponse> {
+    return apiClient.request<StudentProfileResponse>('/api/students/profile', {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
