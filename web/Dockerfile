@@ -1,28 +1,37 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Копируем package.json и package-lock.json
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm ci
-
-# Copy source code
+# Копируем весь код
 COPY . .
 
-# Build the application
+# Собираем production build
 RUN npm run build
 
 # Production stage
 FROM nginx:alpine
 
-# Copy built files to nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
+WORKDIR /usr/share/nginx/html
 
-# Copy nginx configuration (optional)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Используем shell скрипт для определения папки сборки
+COPY --from=builder /app /tmp/app
+
+RUN if [ -d "/tmp/app/dist" ]; then \
+        cp -r /tmp/app/dist/* /usr/share/nginx/html/; \
+    elif [ -d "/tmp/app/build" ]; then \
+        cp -r /tmp/app/build/* /usr/share/nginx/html/; \
+    else \
+        echo "Error: Neither dist nor build folder found!" && exit 1; \
+    fi && \
+    rm -rf /tmp/app
+
+# Копируем конфигурацию nginx из исходников (не из builder)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
