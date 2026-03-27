@@ -1,0 +1,78 @@
+syntax = "proto3";
+package student;
+option go_package = "student-service/internal/grpc/pb;pb";
+
+service StudentService {
+  rpc CreateProfile(CreateProfileRequest) returns (StudentResponse);
+  rpc GetProfile(GetProfileRequest) returns (StudentResponse);
+  rpc GetByID(GetByIDRequest) returns (StudentResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (StudentResponse);
+  rpc GetStudentStats(StatsEmpty) returns (StudentStatsResponse);
+}
+
+message StatsEmpty {}
+
+message SpecializationCount {
+  string specialization = 1;
+  int32  count          = 2;
+}
+
+message StudentStatsResponse {
+  int32                     total              = 1;
+  repeated SpecializationCount by_specialization = 2;
+}
+
+message CreateProfileRequest {
+  string user_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string iin = 4;
+  string university_id = 5;
+  string skills = 6;
+  double gpa = 7;
+  string specialization = 8;
+  int32 graduation_year = 9;
+  string bio = 10;
+  string phone = 11;
+  string location_city = 12;
+}
+
+message GetProfileRequest {
+  string user_id = 1;
+}
+
+message GetByIDRequest {
+  string id = 1;
+}
+
+message UpdateProfileRequest {
+  string user_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string university_id = 4;
+  string skills = 5;
+  double gpa = 6;
+  string specialization = 7;
+  int32 graduation_year = 8;
+  string bio = 9;
+  string phone = 10;
+  string location_city = 11;
+}
+
+message StudentResponse {
+  string id = 1;
+  string user_id = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string iin = 5;
+  string university_id = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  string skills = 9;
+  double gpa = 10;
+  string specialization = 11;
+  int32 graduation_year = 12;
+  string bio = 13;
+  string phone = 14;
+  string location_city = 15;
+}

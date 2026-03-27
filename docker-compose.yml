@@ -8,11 +8,30 @@ services:
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - users-db-data:/var/lib/postgresql/data
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  employer-db:
+    image: postgres:18-alpine
+    container_name: employer-db
+    environment:
+      POSTGRES_DB: employer_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - employer-db-data:/var/lib/postgresql/data
     networks:
       - diploma-network
     healthcheck:
@@ -27,7 +46,7 @@ services:
     environment:
       POSTGRES_DB: student_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
@@ -40,7 +59,45 @@ services:
       timeout: 5s
       retries: 5
 
-  # =============== MICROSERVICES (только готовые) ===============
+  university-db:
+    image: postgres:18-alpine
+    container_name: university-db
+    environment:
+      POSTGRES_DB: university_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - university-db-data:/var/lib/postgresql/data
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  application-db:
+    image: postgres:18-alpine
+    container_name: application-db
+    environment:
+      POSTGRES_DB: application_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5436:5432"
+    volumes:
+      - application-db-data:/var/lib/postgresql/data
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============== MICROSERVICES ===============
   auth-service:
     build:
       context: ./services/auth-service
@@ -52,10 +109,15 @@ services:
       DB_HOST: users-db
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: postgres
-      JWT_SECRET: your-secret-key-here
+      JWT_SECRET: ${JWT_SECRET}
       SERVICE_PORT: 8080
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: "587"
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
     depends_on:
       users-db:
         condition: service_healthy
@@ -69,21 +131,85 @@ services:
       dockerfile: Dockerfile
     container_name: student-service
     ports:
-      - "8082:8080"
-      - "50051:50051"  # gRPC port
+      - "50051:50051"
+      - "8082:8082"
     environment:
       DB_HOST: student-db
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: student_db
-      HTTP_PORT: 8080
       GRPC_PORT: 50051
+      SERVER_PORT: 8082
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       student-db:
         condition: service_healthy
       auth-service:
         condition: service_started
+    networks:
+      - diploma-network
+    restart: unless-stopped
+
+  employer-service:
+    build:
+      context: ./services/employer-service
+      dockerfile: Dockerfile
+    container_name: employer-service
+    ports:
+      - "50052:50052"
+    environment:
+      DB_HOST: employer-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: employer_db
+      GRPC_PORT: 50052
+    depends_on:
+      employer-db:
+        condition: service_healthy
+    networks:
+      - diploma-network
+    restart: unless-stopped
+
+  university-service:
+    build:
+      context: ./services/university-service
+      dockerfile: Dockerfile
+    container_name: university-service
+    ports:
+      - "50053:50053"
+    environment:
+      DB_HOST: university-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: university_db
+      GRPC_PORT: 50053
+    depends_on:
+      university-db:
+        condition: service_healthy
+    networks:
+      - diploma-network
+    restart: unless-stopped
+
+  application-service:
+    build:
+      context: ./services/application-service
+      dockerfile: Dockerfile
+    container_name: application-service
+    ports:
+      - "50054:50054"
+    environment:
+      DB_HOST: application-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: application_db
+      GRPC_PORT: 50054
+    depends_on:
+      application-db:
+        condition: service_healthy
     networks:
       - diploma-network
     restart: unless-stopped
@@ -97,16 +223,19 @@ services:
       - "8000:8080"
     environment:
       PORT: 8080
-      JWT_SECRET: your-secret-key-here
+      JWT_SECRET: ${JWT_SECRET}
       AUTH_SERVICE_URL: http://auth-service:8081
-      STUDENT_SERVICE_URL: http://student-service:8082
-      # Когда доделаете другие сервисы, раскомментируйте:
-      # EMPLOYER_SERVICE_URL: http://employer-service:8080
-      # VACANCY_SERVICE_URL: http://vacancy-service:8080
-      # REPORT_SERVICE_URL: http://report-service:8080
+      DOCUMENT_SERVICE_URL: http://student-service:8082
+      STUDENT_GRPC_URL: student-service:50051
+      EMPLOYER_GRPC_URL: employer-service:50052
+      UNIVERSITY_GRPC_URL: university-service:50053
+      APPLICATION_GRPC_URL: application-service:50054
     depends_on:
       - auth-service
       - student-service
+      - employer-service
+      - university-service
+      - application-service
     networks:
       - diploma-network
     restart: unless-stopped
@@ -132,3 +261,6 @@ networks:
 volumes:
   users-db-data:
   student-db-data:
+  employer-db-data:
+  university-db-data:
+  application-db-data:

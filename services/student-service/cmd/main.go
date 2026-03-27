@@ -2,38 +2,73 @@ package main
 
 import (
 	"log"
+	"net"
 
+	grpcserver "student-service/internal/grpc"
+	"student-service/internal/grpc/pb"
 	"student-service/internal/config"
 	"student-service/internal/http/handler"
 	"student-service/internal/http/router"
 	"student-service/internal/repository"
 	"student-service/internal/service"
+
+	"google.golang.org/grpc"
 )
 
 func main() {
-	// 1. Загрузка конфигурации
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
+		log.Fatalf("config error: %v", err)
 	}
 
-	// 2. Подключение к базе данных
 	db, err := config.ConnectDatabase(cfg)
 	if err != nil {
-		log.Fatalf("Ошибка подключения к базе данных: %v", err)
+		log.Fatalf("db error: %v", err)
 	}
 
-	// 3. Инициализация слоёв
+	// Repositories
 	studentRepo := repository.NewStudentRepository(db)
-	studentService := service.NewStudentService(studentRepo)
-	studentHandler := handler.NewStudentHandler(studentService)
+	docRepo := repository.NewDocumentRepository(db)
+	notifRepo := repository.NewNotificationRepository(db)
 
-	// 4. Создание роутера
-	r := router.SetupRouter(studentHandler)
+	// Services
+	studentSvc := service.NewStudentService(studentRepo)
 
-	// 5. Запуск сервера
-	log.Printf("🚀 Student Service запущен на порту %s", cfg.ServerPort)
-	if err := r.Run(":" + cfg.ServerPort); err != nil {
-		log.Fatalf("Ошибка запуска сервера: %v", err)
+	// gRPC server
+	grpcSrv := grpcserver.NewStudentGRPCServer(studentSvc)
+
+	grpcPort := cfg.GRPCPort
+	if grpcPort == "" {
+		grpcPort = "50051"
+	}
+
+	lis, err := net.Listen("tcp", ":"+grpcPort)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	s := grpc.NewServer()
+	pb.RegisterStudentServiceServer(s, grpcSrv)
+
+	// HTTP server (documents + student REST) in background
+	go func() {
+		studentHandler := handler.NewStudentHandler(studentSvc)
+		docHandler := handler.NewDocumentHandler(docRepo, notifRepo)
+		notifHandler := handler.NewNotificationHandler(notifRepo)
+		r := router.SetupRouter(studentHandler, docHandler, notifHandler)
+
+		httpPort := cfg.ServerPort
+		if httpPort == "" {
+			httpPort = "8082"
+		}
+		log.Printf("Student Service HTTP running on :%s", httpPort)
+		if err := r.Run(":" + httpPort); err != nil {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+	}()
+
+	log.Printf("Student Service gRPC running on :%s", grpcPort)
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
 	}
 }

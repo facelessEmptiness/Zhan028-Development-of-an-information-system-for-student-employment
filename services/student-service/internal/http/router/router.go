@@ -6,24 +6,43 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(h *handler.StudentHandler) *gin.Engine {
+func SetupRouter(sh *handler.StudentHandler, dh *handler.DocumentHandler, nh *handler.NotificationHandler) *gin.Engine {
 	r := gin.Default()
 
-	// Health check
 	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "ok",
-			"service": "student-service",
-		})
+		c.JSON(200, gin.H{"status": "ok", "service": "student-service"})
 	})
 
-	// API routes
-	api := r.Group("/api/students")
+	// Student routes
+	students := r.Group("/api/students")
 	{
-		api.POST("/profile", h.CreateProfile)
-		api.GET("/profile", h.GetProfile)
-		api.PUT("/profile", h.UpdateProfile)
-		api.GET("/:id", h.GetByID)
+		students.POST("/profile", sh.CreateProfile)
+		students.GET("/profile", sh.GetProfile)
+		students.PUT("/profile", sh.UpdateProfile)
+		students.GET("/:id", sh.GetByID)
+	}
+
+	// Document routes — role checks rely on X-User-Role set by API Gateway
+	docs := r.Group("/api/documents")
+	{
+		docs.POST("/upload", dh.Upload)
+		docs.GET("/my", dh.ListMy)
+		docs.GET("/student/:user_id", dh.ListByStudent)
+		docs.GET("/:id/download", dh.Download)
+		docs.PUT("/:id/verify", dh.Verify)
+		docs.PUT("/:id/reject", dh.Reject)
+		docs.DELETE("/:id", dh.Delete)
+	}
+
+	// Notification routes
+	notifs := r.Group("/api/notifications")
+	{
+		notifs.GET("", nh.ListMy)
+		notifs.GET("/unread-count", nh.UnreadCount)
+		notifs.PUT("/read-all", nh.MarkAllRead)
+		notifs.PUT("/:id/read", nh.MarkRead)
+		// Internal endpoint called by API Gateway — no JWT check here (gateway already validated)
+		notifs.POST("/internal", nh.CreateInternal)
 	}
 
 	return r

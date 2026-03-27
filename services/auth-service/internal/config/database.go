@@ -58,6 +58,11 @@ func runMigrations(db *gorm.DB) error {
 		return fmt.Errorf("ошибка миграции модели User: %w", err)
 	}
 
+	// Миграция модели VerificationCode
+	if err := db.AutoMigrate(&models.VerificationCode{}); err != nil {
+		return fmt.Errorf("ошибка миграции модели VerificationCode: %w", err)
+	}
+
 	log.Println("Миграции выполнены успешно")
 	return nil
 }

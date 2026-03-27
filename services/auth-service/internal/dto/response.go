@@ -9,12 +9,14 @@ import (
 
 // UserResponse представляет ответ с данными пользователя
 type UserResponse struct {
-	ID        uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
-	Email     string          `json:"email" example:"user@example.com"`
-	Role      models.UserRole `json:"role" example:"student"`
-	IsActive  bool            `json:"is_active" example:"true"`
-	CreatedAt time.Time       `json:"created_at" example:"2024-01-15T10:30:00Z"`
-	UpdatedAt time.Time       `json:"updated_at" example:"2024-01-15T10:30:00Z"`
+	ID              uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
+	Email           string          `json:"email" example:"user@example.com"`
+	Role            models.UserRole `json:"role" example:"student"`
+	UniversityID    string          `json:"university_id,omitempty"`
+	IsActive        bool            `json:"is_active" example:"true"`
+	IsEmailVerified bool            `json:"is_email_verified" example:"true"`
+	CreatedAt       time.Time       `json:"created_at" example:"2024-01-15T10:30:00Z"`
+	UpdatedAt       time.Time       `json:"updated_at" example:"2024-01-15T10:30:00Z"`
 }
 
 // TokenResponse представляет ответ с JWT токенами
@@ -43,14 +45,26 @@ type SuccessResponse struct {
 	Message string `json:"message" example:"Операция выполнена успешно"`
 }
 
+// MessageResponse представляет ответ с сообщением и email
+type MessageResponse struct {
+	Message string `json:"message"`
+	Email   string `json:"email,omitempty"`
+}
+
 // ToUserResponse преобразует модель User в UserResponse
 func ToUserResponse(user *models.User) UserResponse {
+	uniIDStr := ""
+	if user.UniversityID != nil {
+		uniIDStr = user.UniversityID.String()
+	}
 	return UserResponse{
-		ID:        user.ID,
-		Email:     user.Email,
-		Role:      user.Role,
-		IsActive:  user.IsActive,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
+		ID:              user.ID,
+		Email:           user.Email,
+		Role:            user.Role,
+		UniversityID:    uniIDStr,
+		IsActive:        user.IsActive,
+		IsEmailVerified: user.IsEmailVerified,
+		CreatedAt:       user.CreatedAt,
+		UpdatedAt:       user.UpdatedAt,
 	}
 }

@@ -29,6 +29,14 @@ func SetupRouter(authHandler *handler.AuthHandler, jwtManager *jwt.JWTManager) *
 			auth.POST("/login", authHandler.Login)
 			auth.POST("/refresh", authHandler.RefreshToken)
 
+			// Email подтверждение
+			auth.POST("/verify-email", authHandler.VerifyEmail)
+			auth.POST("/resend-verification", authHandler.ResendVerification)
+
+			// Сброс пароля
+			auth.POST("/forgot-password", authHandler.ForgotPassword)
+			auth.POST("/reset-password", authHandler.ResetPassword)
+
 			// Защищённые маршруты (требуют JWT токен)
 			protected := auth.Group("")
 			protected.Use(authMiddleware(jwtManager))

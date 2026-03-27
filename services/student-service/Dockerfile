@@ -24,6 +24,6 @@ COPY --from=builder /app/main .
 # Если есть конфигурационные файлы
 # COPY --from=builder /app/config ./config
 
-EXPOSE 8082
+EXPOSE 50051
 
 CMD ["./main"]

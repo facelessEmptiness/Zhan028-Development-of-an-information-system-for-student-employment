@@ -1,0 +1,75 @@
+syntax = "proto3";
+package application;
+option go_package = "application-service/internal/grpc/pb;pb";
+
+service ApplicationService {
+  rpc Apply(ApplyRequest) returns (ApplicationMessage);
+  rpc GetMyApplications(GetMyApplicationsRequest) returns (ApplicationsResponse);
+  rpc GetVacancyApplications(GetVacancyApplicationsRequest) returns (ApplicationsResponse);
+  rpc UpdateStatus(UpdateStatusRequest) returns (ApplicationMessage);
+  rpc Withdraw(WithdrawRequest) returns (DeleteResponse);
+  rpc GetApplicationStats(AppStatsEmpty) returns (ApplicationStatsResponse);
+}
+
+message AppStatsEmpty {}
+
+message StatusCount {
+  string status = 1;
+  int32  count  = 2;
+}
+
+message ApplicationStatsResponse {
+  int32                total         = 1;
+  int32                offered_count = 2;
+  repeated StatusCount by_status     = 3;
+}
+
+message ApplicationMessage {
+  string id = 1;
+  string student_id = 2;
+  string vacancy_id = 3;
+  string status = 4;
+  string cover_letter = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  string student_first_name = 8;
+  string student_last_name = 9;
+  string student_iin = 10;
+  string university_id = 11;
+  int32 match_score = 12;
+}
+
+message ApplyRequest {
+  string student_id = 1;
+  string vacancy_id = 2;
+  string cover_letter = 3;
+  int32 match_score = 4;
+}
+
+message GetMyApplicationsRequest {
+  string student_id = 1;
+}
+
+message GetVacancyApplicationsRequest {
+  string vacancy_id = 1;
+  string employer_id = 2;
+}
+
+message UpdateStatusRequest {
+  string id = 1;
+  string employer_id = 2;
+  string status = 3;
+}
+
+message WithdrawRequest {
+  string id = 1;
+  string student_id = 2;
+}
+
+message ApplicationsResponse {
+  repeated ApplicationMessage applications = 1;
+}
+
+message DeleteResponse {
+  string message = 1;
+}

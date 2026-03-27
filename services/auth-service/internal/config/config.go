@@ -24,6 +24,13 @@ type Config struct {
 	// Настройки JWT
 	JWTSecret          string
 	JWTExpirationHours int
+
+	// Настройки SMTP (email)
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUser     string
+	SMTPPassword string
+	SMTPFrom     string
 }
 
 // LoadConfig загружает конфигурацию из переменных окружения
@@ -39,7 +46,12 @@ func LoadConfig() (*Config, error) {
 		DBPassword: getEnv("DB_PASSWORD", "admin"),
 		DBName:     getEnv("DB_NAME", "postgres"),
 		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
-		JWTSecret:  getEnv("JWT_SECRET", "some_jwt_secret"),
+		JWTSecret:    getEnv("JWT_SECRET", "some_jwt_secret"),
+		SMTPHost:     getEnv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort:     getEnv("SMTP_PORT", "587"),
+		SMTPUser:     getEnv("SMTP_USER", ""),
+		SMTPPassword: getEnv("SMTP_PASSWORD", ""),
+		SMTPFrom:     getEnv("SMTP_FROM", ""),
 	}
 
 	// Проверка обязательных переменных

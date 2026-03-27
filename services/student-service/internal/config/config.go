@@ -12,6 +12,7 @@ import (
 type Config struct {
 	// Настройки сервера
 	ServerPort string
+	GRPCPort   string
 
 	// Настройки базы данных PostgreSQL
 	DBHost     string
@@ -33,10 +34,11 @@ func LoadConfig() (*Config, error) {
 
 	config := &Config{
 		ServerPort: getEnv("SERVER_PORT", "8082"),
+		GRPCPort:   getEnv("GRPC_PORT", "50051"),
 		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "5432"),
+		DBPort:     getEnv("DB_PORT", "5433"),
 		DBUser:     getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", "admin"),
+		DBPassword: getEnv("DB_PASSWORD", "Supoga80"),
 		DBName:     getEnv("DB_NAME", "student_db"),
 		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
 		JWTSecret:  getEnv("JWT_SECRET", "some_jwt_secret"),

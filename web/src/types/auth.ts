@@ -5,9 +5,31 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
+  university_id?: string;
   is_active: boolean;
+  is_email_verified: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface RegisterResponse {
+  message: string;
+  email: string;
+}
+
+export interface VerifyEmailRequest {
+  email: string;
+  code: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  code: string;
+  new_password: string;
 }
 
 export interface LoginRequest {
@@ -20,6 +42,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   role: UserRole;
+  university_id?: string;
 }
 
 // Token response from backend
@@ -83,6 +106,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (data: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<RegisterResponse>;
+  loginWithTokens: (tokens: TokenResponse, user: User) => void;
   logout: () => void;
 }

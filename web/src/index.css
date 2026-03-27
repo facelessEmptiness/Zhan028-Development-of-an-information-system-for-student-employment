@@ -318,3 +318,263 @@ body {
   animation: float 7s ease-in-out infinite;
   animation-delay: 1s;
 }
+
+/* Job Portal Specific Styles */
+.job-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.job-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.category-card {
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  background-color: #f0f9ff;
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.filter-chip {
+  transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+  background-color: #f3f4f6;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.search-input {
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Header divider */
+header {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive improvements for mobile */
+@media (max-width: 640px) {
+  .line-clamp-2 {
+    -webkit-line-clamp: 2;
+  }
+
+  .grid {
+    gap: 1rem;
+  }
+}
+
+/* Match Index specific styles */
+.match-index-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.match-index-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: 50%;
+}
+
+.match-index-bar {
+  width: 100%;
+  border-radius: 9999px;
+  height: 0.375rem;
+  transition: all 0.3s ease;
+}
+
+/* Card animations */
+.job-card-hover,
+.category-card,
+.candidate-card-hover {
+  will-change: transform, box-shadow;
+}
+
+/* Form improvements */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #d1d5db;
+}
+
+/* Table-like layout for analytics */
+.analytics-table {
+  display: grid;
+  gap: 1rem;
+}
+
+.analytics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Responsive tabs */
+.tab-container {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Skill chips */
+.skill-chip {
+  transition: all 0.2s ease;
+}
+
+.skill-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Progress bar animations */
+.progress-bar {
+  transition: width 0.6s ease;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+/* Sticky positioning */
+@media (min-width: 1024px) {
+  .sticky-sidebar {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+/* Modal improvements */
+.modal-overlay {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal-content {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Truncate text utilities */
+.truncate-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.truncate-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.truncate-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Link hover effects */
+a {
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: inherit;
+}
+
+/* Button improvements */
+button {
+  cursor: pointer;
+  user-select: none;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Checkbox and radio improvements */
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+/* Search input styling */
+.search-input {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive container */
+@container (max-width: 640px) {
+  .container-responsive {
+    padding: 1rem;
+  }
+}
+
+/* Dark mode consideration */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}

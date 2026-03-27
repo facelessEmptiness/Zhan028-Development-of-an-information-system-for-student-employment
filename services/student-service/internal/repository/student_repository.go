@@ -15,6 +15,11 @@ var (
 )
 
 // StudentRepository интерфейс для работы со студентами
+type SpecializationCount struct {
+	Specialization string
+	Count          int64
+}
+
 type StudentRepository interface {
 	Create(student *models.Student) error
 	FindByID(id uuid.UUID) (*models.Student, error)
@@ -23,6 +28,12 @@ type StudentRepository interface {
 	Delete(id uuid.UUID) error
 	ExistsByIIN(iin string) (bool, error)
 	ExistsByUserID(userID uuid.UUID) (bool, error)
+	CountAll() (int64, error)
+	CountBySpecialization() ([]SpecializationCount, error)
+	// University-scoped queries
+	CountAllByUniversityID(universityID uuid.UUID) (int64, error)
+	CountBySpecializationAndUniversityID(universityID uuid.UUID) ([]SpecializationCount, error)
+	ListByUniversityID(universityID uuid.UUID) ([]*models.Student, error)
 }
 
 // studentRepository реализует StudentRepository
@@ -107,4 +118,49 @@ func (r *studentRepository) ExistsByUserID(userID uuid.UUID) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// CountAll возвращает общее количество студентов
+func (r *studentRepository) CountAll() (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Student{}).Count(&count).Error
+	return count, err
+}
+
+// CountBySpecialization возвращает количество студентов по специализациям
+func (r *studentRepository) CountBySpecialization() ([]SpecializationCount, error) {
+	var results []SpecializationCount
+	err := r.db.Model(&models.Student{}).
+		Select("specialization, count(*) as count").
+		Where("specialization != ''").
+		Group("specialization").
+		Order("count desc").
+		Scan(&results).Error
+	return results, err
+}
+
+// CountAllByUniversityID возвращает количество студентов конкретного университета
+func (r *studentRepository) CountAllByUniversityID(universityID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Student{}).Where("university_id = ?", universityID).Count(&count).Error
+	return count, err
+}
+
+// CountBySpecializationAndUniversityID возвращает студентов по специализации для конкретного университета
+func (r *studentRepository) CountBySpecializationAndUniversityID(universityID uuid.UUID) ([]SpecializationCount, error) {
+	var results []SpecializationCount
+	err := r.db.Model(&models.Student{}).
+		Select("specialization, count(*) as count").
+		Where("university_id = ? AND specialization != ''", universityID).
+		Group("specialization").
+		Order("count desc").
+		Scan(&results).Error
+	return results, err
+}
+
+// ListByUniversityID возвращает список студентов конкретного университета
+func (r *studentRepository) ListByUniversityID(universityID uuid.UUID) ([]*models.Student, error) {
+	var students []*models.Student
+	err := r.db.Where("university_id = ?", universityID).Order("created_at desc").Find(&students).Error
+	return students, err
 }

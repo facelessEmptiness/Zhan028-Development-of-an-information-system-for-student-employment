@@ -28,13 +28,15 @@ func (r UserRole) IsValid() bool {
 
 // User представляет модель пользователя в системе
 type User struct {
-	ID           uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Email        string    `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
-	PasswordHash string    `gorm:"type:varchar(255);not null" json:"-"` // json:"-" скрывает поле при сериализации
-	Role         UserRole  `gorm:"type:user_role;not null;default:'student'" json:"role"`
-	IsActive     bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt    time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt    time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	ID           uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Email        string     `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
+	PasswordHash string     `gorm:"type:varchar(255);not null" json:"-"` // json:"-" скрывает поле при сериализации
+	Role         UserRole   `gorm:"type:user_role;not null;default:'student'" json:"role"`
+	UniversityID *uuid.UUID `gorm:"type:uuid;default:null" json:"university_id,omitempty"`
+	IsActive        bool       `gorm:"default:true" json:"is_active"`
+	IsEmailVerified bool       `gorm:"default:false" json:"is_email_verified"`
+	CreatedAt       time.Time  `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt       time.Time  `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 // TableName возвращает имя таблицы для модели User

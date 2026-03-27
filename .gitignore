@@ -26,3 +26,6 @@ nul
 *.dylib
 *.test
 *.out
+bin/
+tmp/
+temp/

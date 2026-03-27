@@ -6,6 +6,7 @@ import (
 	"auth-service/internal/repository"
 	"auth-service/internal/router"
 	"auth-service/internal/service"
+	"auth-service/pkg/email"
 	"auth-service/pkg/jwt"
 	"log"
 )
@@ -32,9 +33,19 @@ func main() {
 	// Инициализация JWT менеджера
 	jwtManager := jwt.NewJWTManager(cfg.JWTSecret, cfg.JWTExpirationHours)
 
+	// Инициализация email сервиса
+	emailService := email.NewEmailService(
+		cfg.SMTPHost,
+		cfg.SMTPPort,
+		cfg.SMTPUser,
+		cfg.SMTPPassword,
+		cfg.SMTPFrom,
+	)
+
 	// Инициализация слоёв приложения
 	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo, jwtManager)
+	codeRepo := repository.NewVerificationCodeRepository(db)
+	authService := service.NewAuthService(userRepo, codeRepo, jwtManager, emailService)
 	authHandler := handler.NewAuthHandler(authService)
 
 	// Создание и настройка роутера

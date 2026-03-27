@@ -1,0 +1,54 @@
+syntax = "proto3";
+package university;
+option go_package = "university-service/internal/grpc/pb;pb";
+
+service UniversityService {
+  rpc CreateUniversity(CreateUniversityRequest) returns (UniversityMessage);
+  rpc GetAllUniversities(Empty) returns (UniversitiesResponse);
+  rpc GetUniversityByID(GetByIDRequest) returns (UniversityMessage);
+  rpc UpdateUniversity(UpdateUniversityRequest) returns (UniversityMessage);
+  rpc DeleteUniversity(DeleteUniversityRequest) returns (DeleteResponse);
+}
+
+message Empty {}
+
+message UniversityMessage {
+  string id = 1;
+  string name = 2;
+  string city = 3;
+  string country = 4;
+  string website = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message CreateUniversityRequest {
+  string name = 1;
+  string city = 2;
+  string country = 3;
+  string website = 4;
+}
+
+message GetByIDRequest {
+  string id = 1;
+}
+
+message UpdateUniversityRequest {
+  string id = 1;
+  string name = 2;
+  string city = 3;
+  string country = 4;
+  string website = 5;
+}
+
+message DeleteUniversityRequest {
+  string id = 1;
+}
+
+message UniversitiesResponse {
+  repeated UniversityMessage universities = 1;
+}
+
+message DeleteResponse {
+  string message = 1;
+}

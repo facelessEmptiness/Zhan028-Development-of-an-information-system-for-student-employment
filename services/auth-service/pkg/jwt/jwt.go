@@ -24,10 +24,11 @@ const (
 
 // Claims представляет данные, хранящиеся в JWT токене
 type Claims struct {
-	UserID    uuid.UUID `json:"user_id"`
-	Email     string    `json:"email"`
-	Role      string    `json:"role"`
-	TokenType TokenType `json:"token_type"`
+	UserID       uuid.UUID `json:"user_id"`
+	Email        string    `json:"email"`
+	Role         string    `json:"role"`
+	UniversityID string    `json:"university_id,omitempty"`
+	TokenType    TokenType `json:"token_type"`
 	jwt.RegisteredClaims
 }
 
@@ -48,23 +49,23 @@ func NewJWTManager(secretKey string, accessExpirationHours int) *JWTManager {
 }
 
 // GenerateAccessToken создаёт новый access токен
-func (m *JWTManager) GenerateAccessToken(userID uuid.UUID, email, role string) (string, error) {
-	return m.generateToken(userID, email, role, AccessToken, m.accessDuration)
+func (m *JWTManager) GenerateAccessToken(userID uuid.UUID, email, role, universityID string) (string, error) {
+	return m.generateToken(userID, email, role, universityID, AccessToken, m.accessDuration)
 }
 
 // GenerateRefreshToken создаёт новый refresh токен
-func (m *JWTManager) GenerateRefreshToken(userID uuid.UUID, email, role string) (string, error) {
-	return m.generateToken(userID, email, role, RefreshToken, m.refreshDuration)
+func (m *JWTManager) GenerateRefreshToken(userID uuid.UUID, email, role, universityID string) (string, error) {
+	return m.generateToken(userID, email, role, universityID, RefreshToken, m.refreshDuration)
 }
 
 // GenerateTokenPair создаёт пару access и refresh токенов
-func (m *JWTManager) GenerateTokenPair(userID uuid.UUID, email, role string) (accessToken, refreshToken string, err error) {
-	accessToken, err = m.GenerateAccessToken(userID, email, role)
+func (m *JWTManager) GenerateTokenPair(userID uuid.UUID, email, role, universityID string) (accessToken, refreshToken string, err error) {
+	accessToken, err = m.GenerateAccessToken(userID, email, role, universityID)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err = m.GenerateRefreshToken(userID, email, role)
+	refreshToken, err = m.GenerateRefreshToken(userID, email, role, universityID)
 	if err != nil {
 		return "", "", err
 	}
@@ -131,14 +132,15 @@ func (m *JWTManager) GetAccessDuration() int64 {
 }
 
 // generateToken создаёт JWT токен с указанными параметрами
-func (m *JWTManager) generateToken(userID uuid.UUID, email, role string, tokenType TokenType, duration time.Duration) (string, error) {
+func (m *JWTManager) generateToken(userID uuid.UUID, email, role, universityID string, tokenType TokenType, duration time.Duration) (string, error) {
 	now := time.Now()
 
 	claims := &Claims{
-		UserID:    userID,
-		Email:     email,
-		Role:      role,
-		TokenType: tokenType,
+		UserID:       userID,
+		Email:        email,
+		Role:         role,
+		UniversityID: universityID,
+		TokenType:    tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
 			IssuedAt:  jwt.NewNumericDate(now),

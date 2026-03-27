@@ -25,20 +25,9 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 }
 
 // Register обрабатывает запрос на регистрацию нового пользователя
-// @Summary Регистрация пользователя
-// @Description Создаёт нового пользователя и возвращает JWT токены
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param request body dto.RegisterRequest true "Данные регистрации"
-// @Success 201 {object} dto.AuthResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 409 {object} dto.ErrorResponse
-// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 
-	// Парсинг и валидация запроса
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error:   "Ошибка валидации",
@@ -47,7 +36,6 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Вызов сервиса регистрации
 	response, err := h.authService.Register(&req)
 	if err != nil {
 		handleServiceError(c, err)
@@ -58,20 +46,9 @@ func (h *AuthHandler) Register(c *gin.Context) {
 }
 
 // Login обрабатывает запрос на аутентификацию
-// @Summary Вход в систему
-// @Description Аутентифицирует пользователя и возвращает JWT токены
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param request body dto.LoginRequest true "Данные для входа"
-// @Success 200 {object} dto.AuthResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 401 {object} dto.ErrorResponse
-// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 
-	// Парсинг и валидация запроса
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error:   "Ошибка валидации",
@@ -80,7 +57,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Вызов сервиса аутентификации
 	response, err := h.authService.Login(&req)
 	if err != nil {
 		handleServiceError(c, err)
@@ -91,17 +67,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 // GetProfile возвращает профиль текущего пользователя
-// @Summary Получение профиля
-// @Description Возвращает профиль текущего аутентифицированного пользователя
-// @Tags auth
-// @Produce json
-// @Security BearerAuth
-// @Success 200 {object} dto.UserResponse
-// @Failure 401 {object} dto.ErrorResponse
-// @Failure 404 {object} dto.ErrorResponse
-// @Router /auth/me [get]
 func (h *AuthHandler) GetProfile(c *gin.Context) {
-	// Получение ID пользователя из контекста (установлен middleware)
 	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
@@ -111,7 +77,6 @@ func (h *AuthHandler) GetProfile(c *gin.Context) {
 		return
 	}
 
-	// Преобразование ID в UUID
 	id, ok := userID.(uuid.UUID)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
@@ -121,7 +86,6 @@ func (h *AuthHandler) GetProfile(c *gin.Context) {
 		return
 	}
 
-	// Получение профиля
 	response, err := h.authService.GetProfile(id)
 	if err != nil {
 		handleServiceError(c, err)
@@ -132,20 +96,9 @@ func (h *AuthHandler) GetProfile(c *gin.Context) {
 }
 
 // RefreshToken обновляет JWT токены
-// @Summary Обновление токена
-// @Description Обновляет access токен используя refresh токен
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param request body dto.RefreshRequest true "Refresh токен"
-// @Success 200 {object} dto.TokenResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 401 {object} dto.ErrorResponse
-// @Router /auth/refresh [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	var req dto.RefreshRequest
 
-	// Парсинг и валидация запроса
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error:   "Ошибка валидации",
@@ -154,7 +107,6 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	// Вызов сервиса обновления токена
 	response, err := h.authService.RefreshToken(req.RefreshToken)
 	if err != nil {
 		handleServiceError(c, err)
@@ -164,7 +116,92 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// handleServiceError обрабатывает ошибки сервиса и возвращает соответствующий HTTP ответ
+// VerifyEmail подтверждает email по коду
+func (h *AuthHandler) VerifyEmail(c *gin.Context) {
+	var req dto.VerifyEmailRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Ошибка валидации",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	response, err := h.authService.VerifyEmail(&req)
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+// ResendVerification повторно отправляет код подтверждения email
+func (h *AuthHandler) ResendVerification(c *gin.Context) {
+	var req dto.ResendVerificationRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Ошибка валидации",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.SendEmailVerification(req.Email); err != nil {
+		handleServiceError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.SuccessResponse{
+		Message: "Код подтверждения отправлен на вашу почту",
+	})
+}
+
+// ForgotPassword отправляет код сброса пароля
+func (h *AuthHandler) ForgotPassword(c *gin.Context) {
+	var req dto.ForgotPasswordRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Ошибка валидации",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	_ = h.authService.ForgotPassword(&req)
+
+	// Всегда возвращаем успех (не раскрываем существование email)
+	c.JSON(http.StatusOK, dto.SuccessResponse{
+		Message: "Если аккаунт с таким email существует, мы отправили код для сброса пароля",
+	})
+}
+
+// ResetPassword сбрасывает пароль по коду
+func (h *AuthHandler) ResetPassword(c *gin.Context) {
+	var req dto.ResetPasswordRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Ошибка валидации",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.ResetPassword(&req); err != nil {
+		handleServiceError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.SuccessResponse{
+		Message: "Пароль успешно изменён",
+	})
+}
+
+// handleServiceError обрабатывает ошибки сервиса
 func handleServiceError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, repository.ErrUserAlreadyExists):
@@ -191,6 +228,21 @@ func handleServiceError(c *gin.Context, err error) {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error:   "Ошибка валидации",
 			Message: "Недопустимая роль пользователя",
+		})
+	case errors.Is(err, service.ErrEmailNotVerified):
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{
+			Error:   "Email не подтверждён",
+			Message: "Пожалуйста, подтвердите ваш email. Новый код отправлен.",
+		})
+	case errors.Is(err, service.ErrInvalidCode):
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Неверный код",
+			Message: "Код неверный или срок его действия истёк",
+		})
+	case errors.Is(err, service.ErrEmailAlreadyVerified):
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Уже подтверждён",
+			Message: "Email уже подтверждён",
 		})
 	case errors.Is(err, jwt.ErrInvalidToken):
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{

@@ -4,93 +4,148 @@ import (
 	"auth-service/internal/dto"
 	"auth-service/internal/models"
 	"auth-service/internal/repository"
+	"auth-service/pkg/email"
 	"auth-service/pkg/jwt"
 	"errors"
+	"fmt"
+	"log"
+	"math/rand"
+	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
+// universityIDFromRequest parses optional university_id string into *uuid.UUID
+func universityIDFromRequest(raw string) *uuid.UUID {
+	if raw == "" {
+		return nil
+	}
+	id, err := uuid.Parse(raw)
+	if err != nil {
+		return nil
+	}
+	return &id
+}
+
 // Ошибки сервиса аутентификации
 var (
-	ErrInvalidCredentials = errors.New("неверный email или пароль")
-	ErrUserNotActive      = errors.New("учётная запись деактивирована")
-	ErrInvalidRole        = errors.New("недопустимая роль пользователя")
+	ErrInvalidCredentials  = errors.New("неверный email или пароль")
+	ErrUserNotActive       = errors.New("учётная запись деактивирована")
+	ErrInvalidRole         = errors.New("недопустимая роль пользователя")
+	ErrEmailNotVerified    = errors.New("email не подтверждён")
+	ErrInvalidCode         = errors.New("неверный или просроченный код")
+	ErrEmailAlreadyVerified = errors.New("email уже подтверждён")
 )
 
 // AuthService определяет интерфейс сервиса аутентификации
 type AuthService interface {
-	Register(req *dto.RegisterRequest) (*dto.AuthResponse, error)
+	Register(req *dto.RegisterRequest) (*dto.MessageResponse, error)
 	Login(req *dto.LoginRequest) (*dto.AuthResponse, error)
 	GetProfile(userID uuid.UUID) (*dto.UserResponse, error)
 	RefreshToken(refreshToken string) (*dto.TokenResponse, error)
+	SendEmailVerification(emailAddr string) error
+	VerifyEmail(req *dto.VerifyEmailRequest) (*dto.AuthResponse, error)
+	ForgotPassword(req *dto.ForgotPasswordRequest) error
+	ResetPassword(req *dto.ResetPasswordRequest) error
 }
 
 // authService реализует AuthService
 type authService struct {
-	userRepo   repository.UserRepository
-	jwtManager *jwt.JWTManager
+	userRepo     repository.UserRepository
+	codeRepo     repository.VerificationCodeRepository
+	jwtManager   *jwt.JWTManager
+	emailService *email.EmailService
 }
 
 // NewAuthService создаёт новый экземпляр сервиса аутентификации
-func NewAuthService(userRepo repository.UserRepository, jwtManager *jwt.JWTManager) AuthService {
+func NewAuthService(
+	userRepo repository.UserRepository,
+	codeRepo repository.VerificationCodeRepository,
+	jwtManager *jwt.JWTManager,
+	emailService *email.EmailService,
+) AuthService {
 	return &authService{
-		userRepo:   userRepo,
-		jwtManager: jwtManager,
+		userRepo:     userRepo,
+		codeRepo:     codeRepo,
+		jwtManager:   jwtManager,
+		emailService: emailService,
 	}
 }
 
-// Register регистрирует нового пользователя и возвращает JWT токены
-func (s *authService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, error) {
+// generateCode генерирует 6-значный числовой код
+func generateCode() string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return fmt.Sprintf("%06d", r.Intn(1000000))
+}
+
+// Register регистрирует нового пользователя и отправляет код подтверждения
+func (s *authService) Register(req *dto.RegisterRequest) (*dto.MessageResponse, error) {
 	// Валидация роли
 	if !req.Role.IsValid() {
 		return nil, ErrInvalidRole
 	}
 
-	// Хеширование пароля с использованием bcrypt
+	// Хеширование пароля
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
-	// Создание нового пользователя
+	uniID := universityIDFromRequest(req.UniversityID)
 	user := &models.User{
-		Email:        req.Email,
-		PasswordHash: string(hashedPassword),
-		Role:         req.Role,
-		IsActive:     true,
+		Email:           req.Email,
+		PasswordHash:    string(hashedPassword),
+		Role:            req.Role,
+		UniversityID:    uniID,
+		IsActive:        true,
+		IsEmailVerified: false,
 	}
 
-	// Сохранение в базе данных
 	if err := s.userRepo.Create(user); err != nil {
 		return nil, err
 	}
 
-	// Генерация JWT токенов
-	accessToken, refreshToken, err := s.jwtManager.GenerateTokenPair(
-		user.ID,
-		user.Email,
-		string(user.Role),
-	)
-	if err != nil {
-		return nil, err
+	// Отправка кода подтверждения
+	if err := s.sendCode(req.Email, models.CodeTypeEmailVerification); err != nil {
+		// Не блокируем регистрацию, но логируем
+		_ = err
 	}
 
-	// Формирование ответа
-	return &dto.AuthResponse{
-		User: dto.ToUserResponse(user),
-		Tokens: dto.TokenResponse{
-			AccessToken:  accessToken,
-			RefreshToken: refreshToken,
-			TokenType:    "Bearer",
-			ExpiresIn:    s.jwtManager.GetAccessDuration(),
-		},
+	return &dto.MessageResponse{
+		Message: "Регистрация успешна. Проверьте вашу почту для подтверждения email.",
+		Email:   req.Email,
 	}, nil
+}
+
+// sendCode создаёт и отправляет код подтверждения
+func (s *authService) sendCode(emailAddr string, codeType models.CodeType) error {
+	// Инвалидируем старые коды
+	_ = s.codeRepo.InvalidateAll(emailAddr, codeType)
+
+	code := generateCode()
+	vc := &models.VerificationCode{
+		Email:     emailAddr,
+		Code:      code,
+		Type:      codeType,
+		ExpiresAt: time.Now().Add(15 * time.Minute),
+	}
+
+	if err := s.codeRepo.Create(vc); err != nil {
+		return err
+	}
+
+	switch codeType {
+	case models.CodeTypeEmailVerification:
+		return s.emailService.SendVerificationCode(emailAddr, code)
+	case models.CodeTypePasswordReset:
+		return s.emailService.SendPasswordResetCode(emailAddr, code)
+	}
+	return nil
 }
 
 // Login аутентифицирует пользователя и возвращает JWT токены
 func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
-	// Поиск пользователя по email
 	user, err := s.userRepo.FindByEmail(req.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
@@ -99,36 +154,22 @@ func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 		return nil, err
 	}
 
-	// Проверка активности учётной записи
 	if !user.IsActive {
 		return nil, ErrUserNotActive
 	}
 
-	// Проверка пароля
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
 		return nil, ErrInvalidCredentials
 	}
 
-	// Генерация JWT токенов
-	accessToken, refreshToken, err := s.jwtManager.GenerateTokenPair(
-		user.ID,
-		user.Email,
-		string(user.Role),
-	)
-	if err != nil {
-		return nil, err
+	// Проверка подтверждения email
+	if !user.IsEmailVerified {
+		// Отправляем новый код
+		_ = s.sendCode(req.Email, models.CodeTypeEmailVerification)
+		return nil, ErrEmailNotVerified
 	}
 
-	// Формирование ответа
-	return &dto.AuthResponse{
-		User: dto.ToUserResponse(user),
-		Tokens: dto.TokenResponse{
-			AccessToken:  accessToken,
-			RefreshToken: refreshToken,
-			TokenType:    "Bearer",
-			ExpiresIn:    s.jwtManager.GetAccessDuration(),
-		},
-	}, nil
+	return s.buildAuthResponse(user)
 }
 
 // GetProfile возвращает профиль пользователя по ID
@@ -137,35 +178,33 @@ func (s *authService) GetProfile(userID uuid.UUID) (*dto.UserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	response := dto.ToUserResponse(user)
 	return &response, nil
 }
 
-// RefreshToken обновляет access токен используя refresh токен
+// RefreshToken обновляет access токен
 func (s *authService) RefreshToken(refreshToken string) (*dto.TokenResponse, error) {
-	// Валидация refresh токена
 	claims, err := s.jwtManager.ValidateRefreshToken(refreshToken)
 	if err != nil {
 		return nil, err
 	}
 
-	// Проверка существования пользователя
 	user, err := s.userRepo.FindByID(claims.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Проверка активности учётной записи
 	if !user.IsActive {
 		return nil, ErrUserNotActive
 	}
 
-	// Генерация новой пары токенов
+	refreshUniIDStr := ""
+	if user.UniversityID != nil {
+		refreshUniIDStr = user.UniversityID.String()
+	}
+
 	newAccessToken, newRefreshToken, err := s.jwtManager.GenerateTokenPair(
-		user.ID,
-		user.Email,
-		string(user.Role),
+		user.ID, user.Email, string(user.Role), refreshUniIDStr,
 	)
 	if err != nil {
 		return nil, err
@@ -176,5 +215,153 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.TokenResponse, err
 		RefreshToken: newRefreshToken,
 		TokenType:    "Bearer",
 		ExpiresIn:    s.jwtManager.GetAccessDuration(),
+	}, nil
+}
+
+// SendEmailVerification повторно отправляет код подтверждения email
+func (s *authService) SendEmailVerification(emailAddr string) error {
+	user, err := s.userRepo.FindByEmail(emailAddr)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			// Не раскрываем существование email
+			return nil
+		}
+		return err
+	}
+
+	if user.IsEmailVerified {
+		return ErrEmailAlreadyVerified
+	}
+
+	// Инвалидируем старые коды и создаём новый
+	_ = s.codeRepo.InvalidateAll(emailAddr, models.CodeTypeEmailVerification)
+	code := generateCode()
+	vc := &models.VerificationCode{
+		Email:     emailAddr,
+		Code:      code,
+		Type:      models.CodeTypeEmailVerification,
+		ExpiresAt: time.Now().Add(15 * time.Minute),
+	}
+	if err := s.codeRepo.Create(vc); err != nil {
+		return err
+	}
+
+	// SMTP ошибки не блокируют ответ — код уже сохранён в БД
+	_ = s.emailService.SendVerificationCode(emailAddr, code)
+	return nil
+}
+
+// VerifyEmail подтверждает email по коду и возвращает JWT токены
+func (s *authService) VerifyEmail(req *dto.VerifyEmailRequest) (*dto.AuthResponse, error) {
+	_, err := s.codeRepo.FindValidCode(req.Email, req.Code, models.CodeTypeEmailVerification)
+	if err != nil {
+		if errors.Is(err, repository.ErrCodeNotFound) {
+			return nil, ErrInvalidCode
+		}
+		return nil, err
+	}
+
+	// Находим пользователя
+	user, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	// Помечаем email как подтверждённый
+	user.IsEmailVerified = true
+	if err := s.userRepo.Update(user); err != nil {
+		return nil, err
+	}
+
+	// Инвалидируем все коды подтверждения email
+	_ = s.codeRepo.InvalidateAll(req.Email, models.CodeTypeEmailVerification)
+
+	return s.buildAuthResponse(user)
+}
+
+// ForgotPassword отправляет код сброса пароля
+func (s *authService) ForgotPassword(req *dto.ForgotPasswordRequest) error {
+	log.Printf("[ForgotPassword] Запрос для email: %s", req.Email)
+	_, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil {
+		log.Printf("[ForgotPassword] Пользователь не найден: %s — %v", req.Email, err)
+		// Не раскрываем существование email
+		return nil
+	}
+	log.Printf("[ForgotPassword] Пользователь найден, генерируем код для: %s", req.Email)
+
+	_ = s.codeRepo.InvalidateAll(req.Email, models.CodeTypePasswordReset)
+	code := generateCode()
+	vc := &models.VerificationCode{
+		Email:     req.Email,
+		Code:      code,
+		Type:      models.CodeTypePasswordReset,
+		ExpiresAt: time.Now().Add(15 * time.Minute),
+	}
+	if err := s.codeRepo.Create(vc); err != nil {
+		log.Printf("[ForgotPassword] Ошибка сохранения кода: %v", err)
+		return err
+	}
+	log.Printf("[ForgotPassword] Код сохранён в БД, отправляем email на: %s", req.Email)
+
+	if smtpErr := s.emailService.SendPasswordResetCode(req.Email, code); smtpErr != nil {
+		log.Printf("[ForgotPassword] SMTP ошибка: %v", smtpErr)
+	}
+	return nil
+}
+
+// ResetPassword сбрасывает пароль по коду
+func (s *authService) ResetPassword(req *dto.ResetPasswordRequest) error {
+	_, err := s.codeRepo.FindValidCode(req.Email, req.Code, models.CodeTypePasswordReset)
+	if err != nil {
+		if errors.Is(err, repository.ErrCodeNotFound) {
+			return ErrInvalidCode
+		}
+		return err
+	}
+
+	user, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil {
+		return err
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user.PasswordHash = string(hashedPassword)
+	if err := s.userRepo.Update(user); err != nil {
+		return err
+	}
+
+	// Инвалидируем все коды сброса пароля
+	_ = s.codeRepo.InvalidateAll(req.Email, models.CodeTypePasswordReset)
+
+	return nil
+}
+
+// buildAuthResponse формирует ответ с токенами
+func (s *authService) buildAuthResponse(user *models.User) (*dto.AuthResponse, error) {
+	uniIDStr := ""
+	if user.UniversityID != nil {
+		uniIDStr = user.UniversityID.String()
+	}
+
+	accessToken, refreshToken, err := s.jwtManager.GenerateTokenPair(
+		user.ID, user.Email, string(user.Role), uniIDStr,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.AuthResponse{
+		User: dto.ToUserResponse(user),
+		Tokens: dto.TokenResponse{
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			TokenType:    "Bearer",
+			ExpiresIn:    s.jwtManager.GetAccessDuration(),
+		},
 	}, nil
 }

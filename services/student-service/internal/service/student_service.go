@@ -17,10 +17,11 @@ var (
 
 type StudentService struct {
 	repo repository.StudentRepository
+	Repo repository.StudentRepository
 }
 
 func NewStudentService(repo repository.StudentRepository) *StudentService {
-	return &StudentService{repo: repo}
+	return &StudentService{repo: repo, Repo: repo}
 }
 
 // CreateProfile создаёт профиль студента
@@ -45,10 +46,17 @@ func (s *StudentService) CreateProfile(userID uuid.UUID, req dto.CreateProfileRe
 
 	// Создаём студента
 	student := &models.Student{
-		UserID:    userID,
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		IIN:       req.IIN,
+		UserID:         userID,
+		FirstName:      req.FirstName,
+		LastName:       req.LastName,
+		IIN:            req.IIN,
+		Skills:         req.Skills,
+		GPA:            req.GPA,
+		Specialization: req.Specialization,
+		GraduationYear: req.GraduationYear,
+		Bio:            req.Bio,
+		Phone:          req.Phone,
+		LocationCity:   req.LocationCity,
 	}
 
 	// Если указан университет
@@ -95,6 +103,27 @@ func (s *StudentService) UpdateProfile(userID uuid.UUID, req dto.UpdateProfileRe
 		if err == nil {
 			student.UniversityID = &uniID
 		}
+	}
+	if req.Skills != "" {
+		student.Skills = req.Skills
+	}
+	if req.GPA > 0 {
+		student.GPA = req.GPA
+	}
+	if req.Specialization != "" {
+		student.Specialization = req.Specialization
+	}
+	if req.GraduationYear > 0 {
+		student.GraduationYear = req.GraduationYear
+	}
+	if req.Bio != "" {
+		student.Bio = req.Bio
+	}
+	if req.Phone != "" {
+		student.Phone = req.Phone
+	}
+	if req.LocationCity != "" {
+		student.LocationCity = req.LocationCity
 	}
 
 	if err := s.repo.Update(student); err != nil {

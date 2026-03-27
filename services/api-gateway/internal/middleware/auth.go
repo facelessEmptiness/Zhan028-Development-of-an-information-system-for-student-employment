@@ -65,13 +65,20 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			c.JSON(401, gin.H{"error": "Role not found in token"})
 		}
 
+		// Extract optional university_id (only present for university-role users)
+		universityID, _ := claims["university_id"].(string)
+
 		// 9. Добавляем user_id в header для микросервисов
 		c.Request.Header.Set("X-User-ID", userID)
 		c.Request.Header.Set("X-User-Role", role)
+		if universityID != "" {
+			c.Request.Header.Set("X-University-ID", universityID)
+		}
 
 		// 10. Сохраняем в контекст Gin
 		c.Set("user_id", userID)
 		c.Set("role", role)
+		c.Set("university_id", universityID)
 
 		// 11. Продолжаем обработку
 		c.Next()

@@ -28,8 +28,8 @@ func ConnectDatabase(cfg *Config) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 
-	// Миграция модели Student
-	if err := db.AutoMigrate(&models.Student{}); err != nil {
+	// Миграция моделей
+	if err := db.AutoMigrate(&models.Student{}, &models.Document{}, &models.Notification{}); err != nil {
 		return nil, fmt.Errorf("ошибка миграции: %w", err)
 	}
 

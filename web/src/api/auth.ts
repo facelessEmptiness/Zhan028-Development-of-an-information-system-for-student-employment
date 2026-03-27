@@ -2,9 +2,13 @@ import { apiClient } from './client';
 import type {
   LoginRequest,
   RegisterRequest,
+  RegisterResponse,
   AuthResponse,
   User,
   TokenResponse,
+  VerifyEmailRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
   CreateStudentProfileRequest,
   UpdateStudentProfileRequest,
   StudentProfileResponse,
@@ -23,8 +27,36 @@ export const authApi = {
     });
   },
 
-  async register(data: RegisterRequest): Promise<AuthResponse> {
-    return apiClient.request<AuthResponse>('/api/auth/register', {
+  async register(data: RegisterRequest): Promise<RegisterResponse> {
+    return apiClient.request<RegisterResponse>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async verifyEmail(data: VerifyEmailRequest): Promise<AuthResponse> {
+    return apiClient.request<AuthResponse>('/api/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async resendVerification(email: string): Promise<{ message: string }> {
+    return apiClient.request<{ message: string }>('/api/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async forgotPassword(data: ForgotPasswordRequest): Promise<{ message: string }> {
+    return apiClient.request<{ message: string }>('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async resetPassword(data: ResetPasswordRequest): Promise<{ message: string }> {
+    return apiClient.request<{ message: string }>('/api/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify(data),
     });

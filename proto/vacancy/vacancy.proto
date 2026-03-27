@@ -1,0 +1,135 @@
+syntax = "proto3";
+package vacancy;
+option go_package = "employer-service/internal/grpc/pb;pb";
+
+service VacancyService {
+  rpc CreateVacancy(CreateVacancyRequest) returns (VacancyMessage);
+  rpc GetAllVacancies(GetAllVacanciesRequest) returns (VacanciesResponse);
+  rpc GetVacancyByID(GetByIDRequest) returns (VacancyMessage);
+  rpc GetMyVacancies(GetMyVacanciesRequest) returns (VacanciesResponse);
+  rpc UpdateVacancy(UpdateVacancyRequest) returns (VacancyMessage);
+  rpc DeleteVacancy(DeleteVacancyRequest) returns (DeleteResponse);
+
+  // Employer profile
+  rpc GetEmployerProfile(GetEmployerProfileRequest) returns (EmployerProfileMessage);
+  rpc CreateEmployerProfile(CreateEmployerProfileRequest) returns (EmployerProfileMessage);
+  rpc UpdateEmployerProfile(UpdateEmployerProfileRequest) returns (EmployerProfileMessage);
+}
+
+// ---------- Vacancy messages ----------
+
+message GetAllVacanciesRequest {
+  string search   = 1;
+  string job_type = 2;
+  string location = 3;
+  int32  page      = 4;
+  int32  page_size = 5;
+}
+
+message VacancyMessage {
+  string id           = 1;
+  string employer_id  = 2;
+  string title        = 3;
+  string description  = 4;
+  string location     = 5;
+  double salary_min   = 6;
+  double salary_max   = 7;
+  string job_type     = 8;
+  string skills       = 9;
+  string status       = 10;
+  string created_at   = 11;
+  string updated_at   = 12;
+  string company_name = 13;
+}
+
+message CreateVacancyRequest {
+  string employer_id   = 1;
+  string employer_role = 2;
+  string title         = 3;
+  string description   = 4;
+  string location      = 5;
+  double salary_min    = 6;
+  double salary_max    = 7;
+  string job_type      = 8;
+  string skills        = 9;
+}
+
+message GetByIDRequest {
+  string id = 1;
+}
+
+message GetMyVacanciesRequest {
+  string employer_id = 1;
+}
+
+message UpdateVacancyRequest {
+  string id          = 1;
+  string employer_id = 2;
+  string title       = 3;
+  string description = 4;
+  string location    = 5;
+  double salary_min  = 6;
+  double salary_max  = 7;
+  string job_type    = 8;
+  string skills      = 9;
+  string status      = 10;
+}
+
+message DeleteVacancyRequest {
+  string id            = 1;
+  string employer_id   = 2;
+  string employer_role = 3;
+}
+
+message VacanciesResponse {
+  repeated VacancyMessage vacancies = 1;
+  int32                   total     = 2;
+}
+
+message DeleteResponse {
+  string message = 1;
+}
+
+// ---------- Employer profile messages ----------
+
+message EmployerProfileMessage {
+  string employer_id          = 1;
+  string company_name         = 2;
+  string company_description  = 3;
+  string industry             = 4;
+  string company_size         = 5;
+  string website              = 6;
+  string location             = 7;
+  string contact_email        = 8;
+  string contact_phone        = 9;
+  string created_at           = 10;
+  string updated_at           = 11;
+}
+
+message GetEmployerProfileRequest {
+  string employer_id = 1;
+}
+
+message CreateEmployerProfileRequest {
+  string employer_id         = 1;
+  string company_name        = 2;
+  string company_description = 3;
+  string industry            = 4;
+  string company_size        = 5;
+  string website             = 6;
+  string location            = 7;
+  string contact_email       = 8;
+  string contact_phone       = 9;
+}
+
+message UpdateEmployerProfileRequest {
+  string employer_id         = 1;
+  string company_name        = 2;
+  string company_description = 3;
+  string industry            = 4;
+  string company_size        = 5;
+  string website             = 6;
+  string location            = 7;
+  string contact_email       = 8;
+  string contact_phone       = 9;
+}

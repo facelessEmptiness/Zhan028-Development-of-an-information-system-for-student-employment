@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import type { CreateStudentProfileRequest } from '../types/auth';
+import { getUniversities, type University } from '../services/universityService';
 
 interface StudentProfileFormProps {
   onSubmit: (data: CreateStudentProfileRequest) => Promise<void>;
@@ -15,6 +16,20 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
   });
   const [error, setError] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [universities, setUniversities] = useState<University[]>([]);
+
+  useEffect(() => {
+    getUniversities().then(setUniversities);
+  }, []);
+
+  const groupedByCity = universities
+    .sort((a, b) => a.city.localeCompare(b.city, 'ru'))
+    .reduce<Record<string, University[]>>((acc, u) => {
+      if (!acc[u.city]) acc[u.city] = [];
+      acc[u.city].push(u);
+      return acc;
+    }, {});
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -62,7 +77,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       {/* IIN */}
       <div>
         <label htmlFor="iin" className="block text-sm font-medium text-emerald-100 mb-2">
-          Individual Identification Number (IIN) *
+          ИИН (Индивидуальный идентификационный номер) *
         </label>
         <div className="relative">
           <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'iin' ? 'text-emerald-400' : 'text-gray-400'}`}>
@@ -97,7 +112,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="first_name" className="block text-sm font-medium text-emerald-100 mb-2">
-            First Name *
+            Имя *
           </label>
           <div className="relative">
             <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'first_name' ? 'text-emerald-400' : 'text-gray-400'}`}>
@@ -128,7 +143,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
 
         <div>
           <label htmlFor="last_name" className="block text-sm font-medium text-emerald-100 mb-2">
-            Last Name *
+            Фамилия *
           </label>
           <div className="relative">
             <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'last_name' ? 'text-emerald-400' : 'text-gray-400'}`}>
@@ -158,36 +173,41 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
         </div>
       </div>
 
-      {/* University ID (Optional) */}
+      {/* University (Optional) */}
       <div>
-        <label htmlFor="university_id" className="block text-sm font-medium text-emerald-100 mb-2">
-          University ID (Optional)
+        <label className="block text-sm font-medium text-emerald-100 mb-2">
+          Университет (необязательно)
         </label>
         <div className="relative">
-          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'university_id' ? 'text-emerald-400' : 'text-gray-400'}`}>
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
             </svg>
           </div>
-          <input
-            id="university_id"
-            name="university_id"
-            type="text"
-            placeholder="Enter university ID (UUID)"
+          <select
             value={formData.university_id}
-            onChange={handleChange}
+            onChange={(e) => setFormData(prev => ({ ...prev, university_id: e.target.value }))}
             onFocus={() => setFocusedField('university_id')}
             onBlur={() => setFocusedField(null)}
-            className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 input-animated backdrop-blur-sm"
-          />
-          {formData.university_id && (
-            <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-              <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-          )}
+            className="w-full pl-12 pr-4 py-3.5 bg-slate-800 border border-white/20 rounded-xl text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 appearance-none cursor-pointer"
+          >
+            <option value="" className="bg-slate-800 text-gray-400">— Выберите университет —</option>
+            {Object.entries(groupedByCity).map(([city, unis]) => (
+              <optgroup key={city} label={`📍 ${city}`} className="bg-slate-800">
+                {unis.sort((a, b) => a.name.localeCompare(b.name, 'ru')).map((uni) => (
+                  <option key={uni.id} value={uni.id} className="bg-slate-800 text-white">
+                    {uni.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -203,11 +223,11 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>Saving...</span>
+            <span>Сохранение...</span>
           </>
         ) : (
           <>
-            <span>Complete Profile</span>
+            <span>Сохранить профиль</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
