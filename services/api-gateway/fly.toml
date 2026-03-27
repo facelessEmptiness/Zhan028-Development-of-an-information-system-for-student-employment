@@ -1,0 +1,26 @@
+app = 'careerbond-gateway'
+primary_region = 'ams'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  PORT = '8080'
+  AUTH_SERVICE_URL = 'http://careerbond-auth.internal:8080'
+  DOCUMENT_SERVICE_URL = 'http://careerbond-student.internal:8082'
+  STUDENT_GRPC_URL = 'careerbond-student.internal:50051'
+  EMPLOYER_GRPC_URL = 'careerbond-employer.internal:50052'
+  UNIVERSITY_GRPC_URL = 'careerbond-university.internal:50053'
+  APPLICATION_GRPC_URL = 'careerbond-application.internal:50054'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1

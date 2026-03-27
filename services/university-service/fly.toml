@@ -1,0 +1,25 @@
+app = 'careerbond-university'
+primary_region = 'ams'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  DB_PORT = '5432'
+  DB_USER = 'postgres'
+  DB_NAME = 'university_db'
+  GRPC_PORT = '50053'
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 50053
+
+  [[services.ports]]
+    port = 50053
+    handlers = ['tls']
+    tls_options = { alpn = ['h2'] }
+
+[[vm]]
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1
