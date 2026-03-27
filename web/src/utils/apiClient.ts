@@ -1,5 +1,6 @@
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 let isRefreshing = false;
 // Queue of requests waiting for token refresh
@@ -15,7 +16,7 @@ async function tryRefresh(): Promise<string | null> {
   if (!refreshToken) return null;
 
   try {
-    const res = await fetch('/api/auth/refresh', {
+    const res = await fetch(`${API_BASE}/api/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: refreshToken }),
@@ -44,7 +45,8 @@ function clearSession() {
  *  - On 401: refreshes the token once, then retries
  *  - On refresh failure: clears session and redirects to /login
  */
-export async function apiFetch(input: RequestInfo, init: RequestInit = {}): Promise<Response> {
+export async function apiFetch(input: string, init: RequestInit = {}): Promise<Response> {
+  if (input.startsWith('/')) input = `${API_BASE}${input}`;
   const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
   const headers = new Headers(init.headers);
