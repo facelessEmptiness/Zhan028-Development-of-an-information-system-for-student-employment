@@ -34,6 +34,8 @@ const emptyProfile: Omit<EmployerProfile, 'employer_id' | 'created_at' | 'update
   location: '',
   contact_email: '',
   contact_phone: '',
+  bin: '',
+  bin_status: '',
 };
 
 const INDUSTRIES = [
@@ -111,6 +113,8 @@ const EmployerDashboardPage = () => {
         location: p.location,
         contact_email: p.contact_email,
         contact_phone: p.contact_phone,
+        bin: p.bin ?? '',
+        bin_status: p.bin_status ?? '',
       });
       setProfileExists(true);
     } catch (err: unknown) {
@@ -313,6 +317,11 @@ const EmployerDashboardPage = () => {
                             className="text-blue-600 hover:underline">
                             🌐 {profile.website}
                           </a>
+                        )}
+                        {profile.bin && (
+                          <span className={`font-medium ${profile.bin_status === 'verified' ? 'text-green-600' : 'text-yellow-600'}`}>
+                            🏢 БИН: {profile.bin} {profile.bin_status === 'verified' ? '✅' : '⏳'}
+                          </span>
                         )}
                       </div>
                       {profile.company_description && (
@@ -563,6 +572,38 @@ const EmployerDashboardPage = () => {
                   )}
 
                   <div className="space-y-5">
+                    {/* BIN */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        БИН (Бизнес-идентификационный номер) *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="bin"
+                          value={profile.bin}
+                          onChange={handleProfileChange}
+                          placeholder="12-значный номер"
+                          maxLength={12}
+                          inputMode="numeric"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-32"
+                        />
+                        {profile.bin_status === 'verified' && (
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                            ✅ Подтверждён
+                          </span>
+                        )}
+                        {profile.bin_status === 'pending' && profile.bin && (
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
+                            ⏳ На проверке
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        БИН используется для верификации компании. Должен содержать ровно 12 цифр.
+                      </p>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Название компании *</label>
                       <input

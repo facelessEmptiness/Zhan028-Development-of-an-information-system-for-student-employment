@@ -8,12 +8,16 @@ import (
 	"gorm.io/gorm"
 )
 
-var ErrProfileNotFound = errors.New("employer profile not found")
+var (
+	ErrProfileNotFound = errors.New("employer profile not found")
+	ErrBINTaken        = errors.New("БИН уже зарегистрирован другим работодателем")
+)
 
 type EmployerProfileRepository interface {
 	GetByEmployerID(employerID uuid.UUID) (*models.EmployerProfile, error)
 	Create(profile *models.EmployerProfile) error
 	Update(profile *models.EmployerProfile) error
+	ExistsByBIN(bin string, excludeEmployerID uuid.UUID) (bool, error)
 }
 
 type employerProfileRepository struct {
@@ -39,4 +43,15 @@ func (r *employerProfileRepository) Create(profile *models.EmployerProfile) erro
 
 func (r *employerProfileRepository) Update(profile *models.EmployerProfile) error {
 	return r.db.Save(profile).Error
+}
+
+func (r *employerProfileRepository) ExistsByBIN(bin string, excludeEmployerID uuid.UUID) (bool, error) {
+	if bin == "" {
+		return false, nil
+	}
+	var count int64
+	err := r.db.Model(&models.EmployerProfile{}).
+		Where("bin = ? AND employer_id != ?", bin, excludeEmployerID).
+		Count(&count).Error
+	return count > 0, err
 }

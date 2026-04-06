@@ -12,6 +12,8 @@ export interface EmployerProfile {
   location: string;
   contact_email: string;
   contact_phone: string;
+  bin: string;
+  bin_status: string;
   created_at: string;
   updated_at: string;
 }

@@ -54,6 +54,7 @@ func (h *EmployerProfileHandler) CreateProfile(c *gin.Context) {
 		Location           string `json:"location"`
 		ContactEmail       string `json:"contact_email"`
 		ContactPhone       string `json:"contact_phone"`
+		BIN                string `json:"bin"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -73,6 +74,7 @@ func (h *EmployerProfileHandler) CreateProfile(c *gin.Context) {
 		Location:           req.Location,
 		ContactEmail:       req.ContactEmail,
 		ContactPhone:       req.ContactPhone,
+		Bin:                req.BIN,
 	})
 	if err != nil {
 		handleGRPCError(c, err)
@@ -94,6 +96,7 @@ func (h *EmployerProfileHandler) UpdateProfile(c *gin.Context) {
 		Location           string `json:"location"`
 		ContactEmail       string `json:"contact_email"`
 		ContactPhone       string `json:"contact_phone"`
+		BIN                string `json:"bin"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -113,6 +116,7 @@ func (h *EmployerProfileHandler) UpdateProfile(c *gin.Context) {
 		Location:           req.Location,
 		ContactEmail:       req.ContactEmail,
 		ContactPhone:       req.ContactPhone,
+		Bin:                req.BIN,
 	})
 	if err != nil {
 		handleGRPCError(c, err)

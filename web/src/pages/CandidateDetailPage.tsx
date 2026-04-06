@@ -240,7 +240,7 @@ const CandidateDetailPage = () => {
               {documents.map(doc => (
                 <div key={doc.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
                   <span className="text-xl mt-0.5">
-                    {doc.type === 'cv' ? '📄' : doc.type === 'diploma' ? '🎓' : '📜'}
+                    {doc.type === 'cv' ? '📄' : '📜'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{doc.file_name}</p>

@@ -33,8 +33,8 @@ func (h *DocumentHandler) Upload(c *gin.Context) {
 	}
 
 	docType := c.PostForm("type")
-	if docType != models.DocTypeCV && docType != models.DocTypeDiploma && docType != models.DocTypeCertificate {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "type must be cv, diploma, or certificate"})
+	if docType != models.DocTypeCV && docType != models.DocTypeCertificate {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "type must be cv or certificate"})
 		return
 	}
 
@@ -202,7 +202,6 @@ func (h *DocumentHandler) setStatus(c *gin.Context, newStatus string) {
 		var notifType, title, body string
 		docTypeLabel := map[string]string{
 			models.DocTypeCV:          "CV",
-			models.DocTypeDiploma:     "Диплом",
 			models.DocTypeCertificate: "Сертификат",
 		}[doc.Type]
 		if docTypeLabel == "" {

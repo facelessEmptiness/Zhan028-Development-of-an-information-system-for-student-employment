@@ -195,10 +195,14 @@ func (s *VacancyGRPCServer) CreateEmployerProfile(ctx context.Context, req *pb.C
 		Location:           req.Location,
 		ContactEmail:       req.ContactEmail,
 		ContactPhone:       req.ContactPhone,
+		BIN:                req.Bin,
 	}
 
 	created, err := s.profileSvc.CreateProfile(profile)
 	if err != nil {
+		if errors.Is(err, service.ErrBINInvalidFormat) || errors.Is(err, service.ErrBINInvalidValue) || errors.Is(err, service.ErrBINTaken) {
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		}
 		return nil, status.Errorf(codes.Internal, "failed to create profile: %v", err)
 	}
 
@@ -220,12 +224,16 @@ func (s *VacancyGRPCServer) UpdateEmployerProfile(ctx context.Context, req *pb.U
 		Location:           req.Location,
 		ContactEmail:       req.ContactEmail,
 		ContactPhone:       req.ContactPhone,
+		BIN:                req.Bin,
 	}
 
 	updated, err := s.profileSvc.UpdateProfile(employerID, updates)
 	if err != nil {
 		if errors.Is(err, repository.ErrProfileNotFound) {
 			return nil, status.Errorf(codes.NotFound, "profile not found")
+		}
+		if errors.Is(err, service.ErrBINInvalidFormat) || errors.Is(err, service.ErrBINInvalidValue) || errors.Is(err, service.ErrBINTaken) {
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to update profile: %v", err)
 	}
@@ -271,6 +279,8 @@ func toProtoProfile(p *models.EmployerProfile) *pb.EmployerProfileMessage {
 		Location:           p.Location,
 		ContactEmail:       p.ContactEmail,
 		ContactPhone:       p.ContactPhone,
+		Bin:                p.BIN,
+		BinStatus:          p.BINStatus,
 		CreatedAt:          p.CreatedAt.String(),
 		UpdatedAt:          p.UpdatedAt.String(),
 	}

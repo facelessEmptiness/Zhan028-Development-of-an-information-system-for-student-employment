@@ -1,6 +1,4 @@
-// API client configuration
-// In development, Vite proxy handles /api requests, so we use empty string
-// In production, use the configured API URL
+
 const API_URL = import.meta.env.VITE_API_URL || '';
 const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL || '';
 

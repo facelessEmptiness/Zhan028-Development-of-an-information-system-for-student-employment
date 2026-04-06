@@ -1,6 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
+
+/** Проверяет казахстанский ИИН (12 цифр + контрольная сумма) */
+function validateIIN(iin: string): string | null {
+  if (iin.length !== 12 || !/^\d{12}$/.test(iin)) {
+    return 'ИИН должен содержать ровно 12 цифр';
+  }
+  const d = iin.split('').map(Number);
+  const w1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  let sum = w1.reduce((acc, w, i) => acc + d[i] * w, 0);
+  let check = sum % 11;
+  if (check === 10) {
+    const w2 = [3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2];
+    sum = w2.reduce((acc, w, i) => acc + d[i] * w, 0);
+    check = sum % 11;
+  }
+  if (check === 10 || check !== d[11]) {
+    return 'ИИН не прошёл проверку контрольной суммы';
+  }
+  return null;
+}
 import { applicationService, type Application } from '../services/applicationService';
 import { getUniversities, type University } from '../services/universityService';
 import { documentService, type Document, type DocumentType, getTypeLabel } from '../services/documentService';
@@ -224,6 +244,11 @@ const StudentProfilePage = () => {
           toast.error('Имя, фамилия и ИИН обязательны');
           return;
         }
+        const iinError = validateIIN(formData.iin);
+        if (iinError) {
+          toast.error(iinError);
+          return;
+        }
         updated = await studentService.createProfile(payload as Parameters<typeof studentService.createProfile>[0]);
         setProfileExists(true);
         setIsCreating(false);
@@ -323,6 +348,21 @@ const StudentProfilePage = () => {
                       <p className="text-gray-700 text-sm">{profile.bio}</p>
                     </div>
                   )}
+
+                  {/* Diploma verification status */}
+                  <div className={`rounded-lg p-4 border flex items-center gap-3 ${profile?.diploma_verified ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                    <span className="text-2xl">{profile?.diploma_verified ? '🎓' : '📋'}</span>
+                    <div>
+                      <p className="font-semibold text-sm text-gray-900">
+                        {profile?.diploma_verified ? 'Диплом подтверждён ✅' : 'Диплом не подтверждён'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {profile?.diploma_verified
+                          ? `Автоматически верифицирован ${profile.diploma_verified_at ? new Date(profile.diploma_verified_at).toLocaleDateString('ru-RU') : ''}`
+                          : 'Заполните университет, специализацию и год выпуска для автоматической верификации'}
+                      </p>
+                    </div>
+                  </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     {profile?.phone && (
@@ -561,8 +601,8 @@ const StudentProfilePage = () => {
               </div>
 
               {/* Upload buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {(['cv', 'diploma', 'certificate'] as DocumentType[]).map(type => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {(['cv', 'certificate'] as DocumentType[]).map(type => (
                   <button
                     key={type}
                     onClick={() => handleUploadClick(type)}
@@ -570,7 +610,7 @@ const StudentProfilePage = () => {
                     className="flex flex-col items-center gap-2 p-5 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50"
                   >
                     <span className="text-3xl">
-                      {type === 'cv' ? '📄' : type === 'diploma' ? '🎓' : '📜'}
+                      {type === 'cv' ? '📄' : '📜'}
                     </span>
                     <span className="font-medium text-gray-700">
                       {uploadingType === type ? 'Загрузка...' : `Загрузить ${getTypeLabel(type)}`}
@@ -598,7 +638,7 @@ const StudentProfilePage = () => {
                 <div key={doc.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="flex items-center gap-4">
                     <span className="text-2xl">
-                      {doc.type === 'cv' ? '📄' : doc.type === 'diploma' ? '🎓' : '📜'}
+                      {doc.type === 'cv' ? '📄' : '📜'}
                     </span>
                     <div>
                       <p className="font-medium text-gray-900">{doc.file_name}</p>

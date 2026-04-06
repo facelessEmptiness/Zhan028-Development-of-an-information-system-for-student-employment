@@ -104,6 +104,8 @@ message EmployerProfileMessage {
   string contact_phone        = 9;
   string created_at           = 10;
   string updated_at           = 11;
+  string bin                  = 12;
+  string bin_status           = 13;
 }
 
 message GetEmployerProfileRequest {
@@ -120,6 +122,7 @@ message CreateEmployerProfileRequest {
   string location            = 7;
   string contact_email       = 8;
   string contact_phone       = 9;
+  string bin                 = 10;
 }
 
 message UpdateEmployerProfileRequest {
@@ -132,4 +135,5 @@ message UpdateEmployerProfileRequest {
   string location            = 7;
   string contact_email       = 8;
   string contact_phone       = 9;
+  string bin                 = 10;
 }

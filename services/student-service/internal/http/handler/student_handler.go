@@ -58,6 +58,10 @@ func (h *StudentHandler) CreateProfile(c *gin.Context) {
 			c.JSON(http.StatusConflict, dto.ErrorResponse{Error: err.Error()})
 			return
 		}
+		if errors.Is(err, service.ErrIINInvalidFormat) || errors.Is(err, service.ErrIINInvalidChecksum) {
+			c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Ошибка создания профиля"})
 		return
 	}
@@ -150,13 +154,15 @@ func (h *StudentHandler) UpdateProfile(c *gin.Context) {
 // toStudentResponse конвертирует модель в DTO
 func toStudentResponse(s *models.Student) dto.StudentResponse {
 	resp := dto.StudentResponse{
-		ID:        s.ID.String(),
-		UserID:    s.UserID.String(),
-		FirstName: s.FirstName,
-		LastName:  s.LastName,
-		IIN:       s.IIN,
-		CreatedAt: s.CreatedAt,
-		UpdatedAt: s.UpdatedAt,
+		ID:                s.ID.String(),
+		UserID:            s.UserID.String(),
+		FirstName:         s.FirstName,
+		LastName:          s.LastName,
+		IIN:               s.IIN,
+		DiplomaVerified:   s.DiplomaVerified,
+		DiplomaVerifiedAt: s.DiplomaVerifiedAt,
+		CreatedAt:         s.CreatedAt,
+		UpdatedAt:         s.UpdatedAt,
 	}
 	if s.UniversityID != nil {
 		resp.UniversityID = s.UniversityID.String()

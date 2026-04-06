@@ -5,6 +5,8 @@ import (
 	"student-service/internal/dto"
 	"student-service/internal/models"
 	"student-service/internal/repository"
+	"time"
+	"unicode"
 
 	"github.com/google/uuid"
 )
@@ -13,7 +15,60 @@ var (
 	ErrProfileAlreadyExists = errors.New("профиль студента уже существует")
 	ErrProfileNotFound      = errors.New("профиль студента не найден")
 	ErrIINAlreadyTaken      = errors.New("ИИН уже зарегистрирован")
+	ErrIINInvalidFormat     = errors.New("ИИН должен содержать ровно 12 цифр")
+	ErrIINInvalidChecksum   = errors.New("ИИН не прошёл проверку контрольной суммы")
 )
+
+// autoVerifyDiploma автоматически верифицирует диплом студента,
+// если заполнены ключевые академические данные: университет, год выпуска и специализация.
+func autoVerifyDiploma(s *models.Student) {
+	if s.UniversityID != nil && s.GraduationYear > 0 && s.Specialization != "" {
+		if !s.DiplomaVerified {
+			now := time.Now()
+			s.DiplomaVerified = true
+			s.DiplomaVerifiedAt = &now
+		}
+	} else {
+		s.DiplomaVerified = false
+		s.DiplomaVerifiedAt = nil
+	}
+}
+
+// validateIIN проверяет казахстанский ИИН (12 цифр + контрольная сумма).
+func validateIIN(iin string) error {
+	if len(iin) != 12 {
+		return ErrIINInvalidFormat
+	}
+	digits := make([]int, 12)
+	for i, ch := range iin {
+		if !unicode.IsDigit(ch) {
+			return ErrIINInvalidFormat
+		}
+		digits[i] = int(ch - '0')
+	}
+
+	weights1 := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+	sum := 0
+	for i := 0; i < 11; i++ {
+		sum += digits[i] * weights1[i]
+	}
+	check := sum % 11
+	if check == 10 {
+		weights2 := []int{3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2}
+		sum = 0
+		for i := 0; i < 11; i++ {
+			sum += digits[i] * weights2[i]
+		}
+		check = sum % 11
+	}
+	if check == 10 {
+		return ErrIINInvalidChecksum
+	}
+	if check != digits[11] {
+		return ErrIINInvalidChecksum
+	}
+	return nil
+}
 
 type StudentService struct {
 	repo repository.StudentRepository
@@ -33,6 +88,11 @@ func (s *StudentService) CreateProfile(userID uuid.UUID, req dto.CreateProfileRe
 	}
 	if exists {
 		return nil, ErrProfileAlreadyExists
+	}
+
+	// Валидируем ИИН (формат + контрольная сумма)
+	if err := validateIIN(req.IIN); err != nil {
+		return nil, err
 	}
 
 	// Проверяем что ИИН не занят
@@ -66,6 +126,9 @@ func (s *StudentService) CreateProfile(userID uuid.UUID, req dto.CreateProfileRe
 			student.UniversityID = &uniID
 		}
 	}
+
+	// Автоматически верифицируем диплом если данные полные
+	autoVerifyDiploma(student)
 
 	if err := s.repo.Create(student); err != nil {
 		return nil, err
@@ -125,6 +188,9 @@ func (s *StudentService) UpdateProfile(userID uuid.UUID, req dto.UpdateProfileRe
 	if req.LocationCity != "" {
 		student.LocationCity = req.LocationCity
 	}
+
+	// Автоматически верифицируем/снимаем диплом при изменении академических данных
+	autoVerifyDiploma(student)
 
 	if err := s.repo.Update(student); err != nil {
 		return nil, err

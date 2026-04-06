@@ -31,6 +31,8 @@ export interface BackendStudentProfile {
   bio: string;
   phone: string;
   location_city: string;
+  diploma_verified: boolean;
+  diploma_verified_at?: string;
   created_at: string;
   updated_at: string;
 }

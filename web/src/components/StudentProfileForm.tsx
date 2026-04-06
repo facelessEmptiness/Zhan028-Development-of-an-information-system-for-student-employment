@@ -2,6 +2,26 @@ import { useState, useEffect, type FormEvent } from 'react';
 import type { CreateStudentProfileRequest } from '../types/auth';
 import { getUniversities, type University } from '../services/universityService';
 
+/** Проверяет казахстанский ИИН (12 цифр + контрольная сумма) */
+function validateIIN(iin: string): string | null {
+  if (iin.length !== 12 || !/^\d{12}$/.test(iin)) {
+    return 'ИИН должен содержать ровно 12 цифр';
+  }
+  const d = iin.split('').map(Number);
+  const w1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  let sum = w1.reduce((acc, w, i) => acc + d[i] * w, 0);
+  let check = sum % 11;
+  if (check === 10) {
+    const w2 = [3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2];
+    sum = w2.reduce((acc, w, i) => acc + d[i] * w, 0);
+    check = sum % 11;
+  }
+  if (check === 10 || check !== d[11]) {
+    return 'ИИН не прошёл проверку контрольной суммы';
+  }
+  return null;
+}
+
 interface StudentProfileFormProps {
   onSubmit: (data: CreateStudentProfileRequest) => Promise<void>;
   isLoading?: boolean;
@@ -40,8 +60,9 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
     e.preventDefault();
     setError('');
 
-    if (!formData.iin || formData.iin.length !== 12) {
-      setError('IIN must be 12 digits');
+    const iinError = validateIIN(formData.iin);
+    if (iinError) {
+      setError(iinError);
       return;
     }
 

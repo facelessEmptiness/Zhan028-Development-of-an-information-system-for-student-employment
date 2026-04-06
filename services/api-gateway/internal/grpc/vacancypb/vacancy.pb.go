@@ -718,6 +718,8 @@ type EmployerProfileMessage struct {
 	ContactPhone       string                 `protobuf:"bytes,9,opt,name=contact_phone,json=contactPhone,proto3" json:"contact_phone,omitempty"`
 	CreatedAt          string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt          string                 `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Bin                string                 `protobuf:"bytes,12,opt,name=bin,proto3" json:"bin,omitempty"`
+	BinStatus          string                 `protobuf:"bytes,13,opt,name=bin_status,json=binStatus,proto3" json:"bin_status,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -829,6 +831,20 @@ func (x *EmployerProfileMessage) GetUpdatedAt() string {
 	return ""
 }
 
+func (x *EmployerProfileMessage) GetBin() string {
+	if x != nil {
+		return x.Bin
+	}
+	return ""
+}
+
+func (x *EmployerProfileMessage) GetBinStatus() string {
+	if x != nil {
+		return x.BinStatus
+	}
+	return ""
+}
+
 type GetEmployerProfileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EmployerId    string                 `protobuf:"bytes,1,opt,name=employer_id,json=employerId,proto3" json:"employer_id,omitempty"`
@@ -884,6 +900,7 @@ type CreateEmployerProfileRequest struct {
 	Location           string                 `protobuf:"bytes,7,opt,name=location,proto3" json:"location,omitempty"`
 	ContactEmail       string                 `protobuf:"bytes,8,opt,name=contact_email,json=contactEmail,proto3" json:"contact_email,omitempty"`
 	ContactPhone       string                 `protobuf:"bytes,9,opt,name=contact_phone,json=contactPhone,proto3" json:"contact_phone,omitempty"`
+	Bin                string                 `protobuf:"bytes,10,opt,name=bin,proto3" json:"bin,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -981,6 +998,13 @@ func (x *CreateEmployerProfileRequest) GetContactPhone() string {
 	return ""
 }
 
+func (x *CreateEmployerProfileRequest) GetBin() string {
+	if x != nil {
+		return x.Bin
+	}
+	return ""
+}
+
 type UpdateEmployerProfileRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	EmployerId         string                 `protobuf:"bytes,1,opt,name=employer_id,json=employerId,proto3" json:"employer_id,omitempty"`
@@ -992,6 +1016,7 @@ type UpdateEmployerProfileRequest struct {
 	Location           string                 `protobuf:"bytes,7,opt,name=location,proto3" json:"location,omitempty"`
 	ContactEmail       string                 `protobuf:"bytes,8,opt,name=contact_email,json=contactEmail,proto3" json:"contact_email,omitempty"`
 	ContactPhone       string                 `protobuf:"bytes,9,opt,name=contact_phone,json=contactPhone,proto3" json:"contact_phone,omitempty"`
+	Bin                string                 `protobuf:"bytes,10,opt,name=bin,proto3" json:"bin,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -1089,6 +1114,13 @@ func (x *UpdateEmployerProfileRequest) GetContactPhone() string {
 	return ""
 }
 
+func (x *UpdateEmployerProfileRequest) GetBin() string {
+	if x != nil {
+		return x.Bin
+	}
+	return ""
+}
+
 var File_vacancy_proto protoreflect.FileDescriptor
 
 const file_vacancy_proto_rawDesc = "" +
@@ -1162,7 +1194,7 @@ const file_vacancy_proto_rawDesc = "" +
 	"\tvacancies\x18\x01 \x03(\v2\x17.vacancy.VacancyMessageR\tvacancies\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"*\n" +
 	"\x0eDeleteResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"\x8a\x03\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xbb\x03\n" +
 	"\x16EmployerProfileMessage\x12\x1f\n" +
 	"\vemployer_id\x18\x01 \x01(\tR\n" +
 	"employerId\x12!\n" +
@@ -1178,10 +1210,13 @@ const file_vacancy_proto_rawDesc = "" +
 	"created_at\x18\n" +
 	" \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\v \x01(\tR\tupdatedAt\"<\n" +
+	"updated_at\x18\v \x01(\tR\tupdatedAt\x12\x10\n" +
+	"\x03bin\x18\f \x01(\tR\x03bin\x12\x1d\n" +
+	"\n" +
+	"bin_status\x18\r \x01(\tR\tbinStatus\"<\n" +
 	"\x19GetEmployerProfileRequest\x12\x1f\n" +
 	"\vemployer_id\x18\x01 \x01(\tR\n" +
-	"employerId\"\xd2\x02\n" +
+	"employerId\"\xe4\x02\n" +
 	"\x1cCreateEmployerProfileRequest\x12\x1f\n" +
 	"\vemployer_id\x18\x01 \x01(\tR\n" +
 	"employerId\x12!\n" +
@@ -1192,7 +1227,9 @@ const file_vacancy_proto_rawDesc = "" +
 	"\awebsite\x18\x06 \x01(\tR\awebsite\x12\x1a\n" +
 	"\blocation\x18\a \x01(\tR\blocation\x12#\n" +
 	"\rcontact_email\x18\b \x01(\tR\fcontactEmail\x12#\n" +
-	"\rcontact_phone\x18\t \x01(\tR\fcontactPhone\"\xd2\x02\n" +
+	"\rcontact_phone\x18\t \x01(\tR\fcontactPhone\x12\x10\n" +
+	"\x03bin\x18\n" +
+	" \x01(\tR\x03bin\"\xe4\x02\n" +
 	"\x1cUpdateEmployerProfileRequest\x12\x1f\n" +
 	"\vemployer_id\x18\x01 \x01(\tR\n" +
 	"employerId\x12!\n" +
@@ -1203,7 +1240,9 @@ const file_vacancy_proto_rawDesc = "" +
 	"\awebsite\x18\x06 \x01(\tR\awebsite\x12\x1a\n" +
 	"\blocation\x18\a \x01(\tR\blocation\x12#\n" +
 	"\rcontact_email\x18\b \x01(\tR\fcontactEmail\x12#\n" +
-	"\rcontact_phone\x18\t \x01(\tR\fcontactPhone2\xea\x05\n" +
+	"\rcontact_phone\x18\t \x01(\tR\fcontactPhone\x12\x10\n" +
+	"\x03bin\x18\n" +
+	" \x01(\tR\x03bin2\xea\x05\n" +
 	"\x0eVacancyService\x12G\n" +
 	"\rCreateVacancy\x12\x1d.vacancy.CreateVacancyRequest\x1a\x17.vacancy.VacancyMessage\x12N\n" +
 	"\x0fGetAllVacancies\x12\x1f.vacancy.GetAllVacanciesRequest\x1a\x1a.vacancy.VacanciesResponse\x12B\n" +

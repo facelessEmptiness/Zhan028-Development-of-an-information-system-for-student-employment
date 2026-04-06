@@ -2,7 +2,7 @@ import { apiFetch } from '../utils/apiClient';
 
 const BASE = '/api/documents';
 
-export type DocumentType = 'cv' | 'diploma' | 'certificate';
+export type DocumentType = 'cv' | 'certificate';
 export type DocumentStatus = 'pending' | 'verified' | 'rejected';
 
 export interface Document {
@@ -22,7 +22,6 @@ export interface Document {
 
 const TYPE_LABELS: Record<DocumentType, string> = {
   cv: 'CV / Резюме',
-  diploma: 'Диплом',
   certificate: 'Сертификат',
 };
 
