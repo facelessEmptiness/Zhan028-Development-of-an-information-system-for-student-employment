@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context';
 import { studentApi } from '../api/auth';
@@ -6,6 +7,7 @@ import { StudentProfileForm, EmployerProfileForm, UniversityProfileForm } from '
 import type { CreateStudentProfileRequest, EmployerProfile, UniversityProfile } from '../types/auth';
 
 const MySessionsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, accessToken, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +33,7 @@ const MySessionsPage = () => {
         console.warn('University profile API not implemented yet');
         throw new Error('University profile creation not available yet');
       }
-      setSuccessMessage('Profile created successfully!');
+      setSuccessMessage(t('sessions.successMessage'));
       setTimeout(() => {
         navigate('/');
       }, 2000);
@@ -46,26 +48,26 @@ const MySessionsPage = () => {
   const getRoleTitle = () => {
     switch (user.role) {
       case 'student':
-        return 'Complete Your Student Profile';
+        return t('sessions.titles.student');
       case 'employer':
-        return 'Complete Your Employer Profile';
+        return t('sessions.titles.employer');
       case 'university':
-        return 'Complete Your University Profile';
+        return t('sessions.titles.university');
       default:
-        return 'Complete Your Profile';
+        return t('sessions.titles.default');
     }
   };
 
   const getRoleDescription = () => {
     switch (user.role) {
       case 'student':
-        return 'Provide your personal information to get started with finding opportunities';
+        return t('sessions.descriptions.student');
       case 'employer':
-        return 'Enter your company details to start posting job opportunities';
+        return t('sessions.descriptions.employer');
       case 'university':
-        return 'Provide your university information to manage campus activities';
+        return t('sessions.descriptions.university');
       default:
-        return 'Complete your profile information';
+        return t('sessions.descriptions.default');
     }
   };
 
@@ -129,7 +131,7 @@ const MySessionsPage = () => {
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Logged in as</p>
+                  <p className="text-sm text-gray-400">{t('sessions.loggedInAs')}</p>
                   <p className="text-white font-semibold">{user.email}</p>
                 </div>
               </div>
@@ -137,7 +139,7 @@ const MySessionsPage = () => {
                 onClick={logout}
                 className="text-sm px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
               >
-                Logout
+                {t('sessions.logout')}
               </button>
             </div>
 

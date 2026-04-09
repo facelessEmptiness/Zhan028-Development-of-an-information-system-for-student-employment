@@ -1,11 +1,14 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context';
+import LanguageSelector from '../components/LanguageSelector';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +22,8 @@ const LoginPage = () => {
       await login({ email, password });
       navigate('/');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Ошибка входа');
+      const status = (err as { statusCode?: number })?.statusCode;
+      toast.error(status === 401 ? t('auth.login.invalidCredentials') : t('auth.login.error'));
     } finally {
       setIsLoading(false);
     }
@@ -28,7 +32,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Nav */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2 w-fit">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,6 +41,7 @@ const LoginPage = () => {
           </div>
           <span className="text-xl font-bold text-gray-900">CareerBond</span>
         </Link>
+        <LanguageSelector />
       </div>
 
       <div className="flex-1 flex">
@@ -44,18 +49,18 @@ const LoginPage = () => {
         <div className="hidden lg:flex lg:w-2/5 bg-gradient-to-r from-blue-600 to-indigo-600 p-12 flex-col justify-between">
           <div>
             <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-              Найдите работу<br />своей мечты
+              {t('home.hero.title')}
             </h1>
             <p className="text-blue-100 text-lg leading-relaxed">
-              Тысячи вакансий для студентов и выпускников Казахстана
+              {t('home.hero.subtitle')}
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             {[
-              { value: '500+', label: 'Компаний' },
-              { value: '10 000+', label: 'Студентов' },
-              { value: '2 000+', label: 'Вакансий' },
+              { value: '500+', label: t('auth.login.stats.companies') },
+              { value: '10 000+', label: t('auth.login.stats.students') },
+              { value: '2 000+', label: t('auth.login.stats.vacancies') },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/20 rounded-xl p-4 text-white text-center">
                 <div className="text-2xl font-bold">{stat.value}</div>
@@ -80,14 +85,14 @@ const LoginPage = () => {
 
             {/* Form Card */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Вход в аккаунт</h2>
-              <p className="text-gray-500 text-sm mb-6">Введите email и пароль для входа</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('auth.login.title')}</h2>
+              <p className="text-gray-500 text-sm mb-6">{t('auth.login.subtitle')}</p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Email
+                    {t('auth.login.email')}
                   </label>
                   <input
                     id="email"
@@ -98,14 +103,14 @@ const LoginPage = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    placeholder="example@mail.com"
+                    placeholder={t('auth.login.emailPlaceholder')}
                   />
                 </div>
 
                 {/* Password */}
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Пароль
+                    {t('auth.login.password')}
                   </label>
                   <div className="relative">
                     <input
@@ -117,7 +122,7 @@ const LoginPage = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="Введите пароль"
+                      placeholder={t('auth.login.passwordPlaceholder')}
                     />
                     <button
                       type="button"
@@ -141,7 +146,7 @@ const LoginPage = () => {
                 {/* Forgot password */}
                 <div className="flex justify-end">
                   <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                    Забыли пароль?
+                    {t('auth.login.forgotPassword')}
                   </Link>
                 </div>
 
@@ -157,18 +162,18 @@ const LoginPage = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <span>Входим...</span>
+                      <span>{t('auth.login.submitting')}</span>
                     </>
                   ) : (
-                    <span>Войти</span>
+                    <span>{t('auth.login.submit')}</span>
                   )}
                 </button>
               </form>
 
               <p className="mt-6 text-center text-sm text-gray-500">
-                Нет аккаунта?{' '}
+                {t('auth.login.noAccount')}{' '}
                 <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-700">
-                  Зарегистрироваться
+                  {t('auth.login.register')}
                 </Link>
               </p>
             </div>

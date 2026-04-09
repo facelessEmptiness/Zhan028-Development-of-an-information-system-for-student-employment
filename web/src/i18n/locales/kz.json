@@ -1,0 +1,843 @@
+{
+  "common": {
+    "save": "Сақтау",
+    "saving": "Сақталуда...",
+    "cancel": "Болдырмау",
+    "loading": "Жүктелуде...",
+    "delete": "Жою",
+    "download": "Жүктеп алу",
+    "edit": "Өңдеу",
+    "create": "Жасау",
+    "back": "← Артқа",
+    "error": "Қате",
+    "confirm": "Растау",
+    "reject": "Бас тарту",
+    "send": "Жіберу",
+    "search": "Іздеу",
+    "close": "Жабу",
+    "update": "Жаңарту",
+    "profile": "Профиль",
+    "employees": "қызметкерлер",
+    "employees_count": "{{count}} қызметкерлер",
+    "notSpecified": "Көрсетілмеген"
+  },
+  "nav": {
+    "jobs": "Жұмыс орындары",
+    "myProfile": "Менің профилім",
+    "dashboard": "Басқару панелі",
+    "analytics": "Аналитика",
+    "login": "Кіру",
+    "register": "Тіркелу",
+    "logout": "Шығу",
+    "notifications": "Хабарландырулар",
+    "noNotifications": "Хабарландырулар жоқ",
+    "markAllRead": "Барлығын оқылған деп белгілеу",
+    "loggedInAs": "Кірген ретінде",
+    "language": "Тіл"
+  },
+  "role": {
+    "student": "Студент",
+    "employer": "Жұмыс беруші",
+    "university": "Университет",
+    "admin": "Әкімші"
+  },
+  "home": {
+    "hero": {
+      "title": "Арман жұмысыңызды табыңыз",
+      "subtitle": "Қазақстан студенттері мен түлектері үшін мыңдаған бос жұмыс орындары",
+      "searchPlaceholder": "Лауазым, кілт сөздер",
+      "searchBtn": "Іздеу",
+      "register": "Тіркелу",
+      "login": "Кіру"
+    },
+    "categories": {
+      "title": "Мамандық бойынша жұмыс орындары",
+      "openPositions": "ашық орындар"
+    },
+    "welcome": {
+      "greeting": "Қош келдіңіз, {{name}}!",
+      "subtitle": "Дағдыларыңызға сәйкес жұмыс орындарын табыңыз және өтініш беріңіз"
+    },
+    "student": {
+      "searchTitle": "Жұмыс орындарын іздеу",
+      "searchPlaceholder": "Жұмыс атауы немесе кілт сөздер",
+      "profileCompletion": "Профиль толтырылуы",
+      "fillProfile": "Профильді толтыру →",
+      "myApplications": "Менің өтініштерім",
+      "viewAll": "Барлығын қарау →",
+      "profileCard": "Менің профилім",
+      "profileDesc": "Резюме мен ақпаратты толтырыңыз",
+      "jobsCard": "Жұмыс орындары",
+      "jobsDesc": "Қолжетімді бос орындарды қараңыз",
+      "applicationsCard": "Менің өтініштерім",
+      "applicationsDesc": "Өтініш статусын бақылаңыз",
+      "recommended": "Ұсынылатын жұмыс орындары",
+      "fillProfileForRec": "Жеке ұсыныстар алу үшін профильді толтырыңыз",
+      "viewAllJobs": "Барлық жұмыс орындарын қарау"
+    },
+    "employer": {
+      "subtitle": "Бос орындарды басқарыңыз және үздік кандидаттарды табыңыз",
+      "title": "Жұмыс беруші панелі",
+      "description": "Жұмыс орындарын жариялаңыз, кандидаттарды қараңыз және өтініштерді басқарыңыз",
+      "goToDashboard": "Панельге өту"
+    },
+    "university": {
+      "subtitle": "Түлектердің жұмысқа орналасу статистикасын бақылаңыз",
+      "title": "Жұмысқа орналасу аналитикасы",
+      "description": "Студенттердің жұмысқа орналасуы бойынша толық статистика және сұранысқа ие дағдылардың талдауы",
+      "goToAnalytics": "Аналитикаға өту"
+    },
+    "categories_list": {
+      "it": "IT және әзірлеу",
+      "sales": "Сату және маркетинг",
+      "finance": "Қаржы және есеп",
+      "hr": "HR және кадрлар",
+      "engineering": "Инженерия",
+      "medicine": "Медицина",
+      "education": "Білім",
+      "construction": "Құрылыс"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Аккаунтқа кіру",
+      "subtitle": "Кіру үшін email және құпия сөзді енгізіңіз",
+      "email": "Email",
+      "emailPlaceholder": "example@mail.com",
+      "password": "Құпия сөз",
+      "passwordPlaceholder": "Құпия сөзді енгізіңіз",
+      "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
+      "submitting": "Кіруде...",
+      "submit": "Кіру",
+      "noAccount": "Аккаунт жоқ па?",
+      "register": "Тіркелу",
+      "stats": {
+        "companies": "Компаниялар",
+        "students": "Студенттер",
+        "vacancies": "Бос орындар"
+      },
+      "invalidCredentials": "Email немесе құпия сөз қате",
+      "error": "Кіру қатесі. Қайталап көріңіз."
+    },
+    "register": {
+      "heroTitle": "Карьера жолыңызды бастаңыз",
+      "heroSubtitle": "Тіркеліңіз және Қазақстан студенттері үшін мыңдаған бос жұмыс орындарына қол жеткізіңіз",
+      "feature1": "Студенттер — тағылымдама және қосымша жұмыс табыңыз",
+      "feature2": "Жұмыс берушілер — жас таланттарды жалдаңыз",
+      "feature3": "Университеттер — жұмысқа орналасуды бақылаңыз",
+      "title": "Аккаунт жасау",
+      "subtitle": "Тіркелу үшін форманы толтырыңыз",
+      "iAm": "Мен",
+      "firstName": "Аты",
+      "lastName": "Тегі",
+      "firstNamePlaceholder": "Алибек",
+      "lastNamePlaceholder": "Сейтов",
+      "yourUniversity": "Сіздің университетіңіз",
+      "university": "Университет",
+      "selectUniversity": "— Университетті таңдаңыз —",
+      "companyName": "Компания атауы",
+      "companyNamePlaceholder": "«Компания» ЖШС",
+      "password": "Құпия сөз",
+      "passwordPlaceholder": "Минимум 8 таңба",
+      "passwordStrength": "Құпия сөздің беріктігі",
+      "weak": "Әлсіз",
+      "medium": "Орташа",
+      "strong": "Күшті",
+      "confirmPassword": "Құпия сөзді растаңыз",
+      "confirmPasswordPlaceholder": "Құпия сөзді қайталаңыз",
+      "passwordsMismatch": "Құпия сөздер сәйкес келмейді",
+      "iAccept": "Мен қабылдаймын",
+      "terms": "қызмет көрсету шарттары",
+      "privacy": "құпиялылық саясаты",
+      "submitting": "Аккаунт жасалуда...",
+      "submit": "Тіркелу",
+      "haveAccount": "Аккаунт бар ма?",
+      "loginLink": "Кіру",
+      "errors": {
+        "passwordsMismatch": "Құпия сөздер сәйкес келмейді",
+        "passwordTooShort": "Құпия сөз кемінде 8 таңбадан тұруы керек",
+        "selectUniversity": "Университетті таңдаңыз"
+      },
+      "success": "Тіркелу сәтті! Почтаңызды тексеріңіз.",
+      "error": "Тіркелу қатесі. Қайталап көріңіз.",
+      "roles": {
+        "student": "Студент",
+        "studentDesc": "Жұмыс іздеп тұрған",
+        "employer": "Жұмыс беруші",
+        "employerDesc": "Жалдап тұрған",
+        "university": "Университет",
+        "universityDesc": "Аналитика"
+      }
+    },
+    "forgotPassword": {
+      "title": "Құпия сөзді ұмыттыңыз ба?",
+      "subtitle": "Email енгізіңіз және біз құпия сөзді қалпына келтіру кодын жібереміз",
+      "email": "Email",
+      "emailPlaceholder": "siz@example.com",
+      "submitting": "Жіберілуде...",
+      "submit": "Код жіберу",
+      "backToLogin": "← Кіруге қайту",
+      "successTitle": "Почтаңызды тексеріңіз",
+      "successMessage": "{{email}} адресімен аккаунт бар болса, біз құпия сөзді қалпына келтіру кодын жібердік.",
+      "enterCode": "Код енгізу",
+      "error": "Қате орын алды",
+      "toast": "Құпия сөзді қалпына келтіру коды жіберілді"
+    },
+    "resetPassword": {
+      "title": "Құпия сөзді қалпына келтіру",
+      "subtitle": "Хаттан кодты және жаңа құпия сөзді енгізіңіз",
+      "code": "Растау коды",
+      "newPassword": "Жаңа құпия сөз",
+      "passwordPlaceholder": "Минимум 8 таңба",
+      "confirmPassword": "Құпия сөзді растаңыз",
+      "confirmPasswordPlaceholder": "Құпия сөзді қайталаңыз",
+      "passwordsMismatch": "Құпия сөздер сәйкес келмейді",
+      "submitting": "Сақталуда...",
+      "submit": "Жаңа құпия сөзді сақтау",
+      "getNewCode": "Жаңа код алу",
+      "backToLogin": "← Кіруге қайту",
+      "errors": {
+        "codeRequired": "6 таңбалы код енгізіңіз",
+        "passwordTooShort": "Құпия сөз кемінде 8 таңбадан тұруы керек",
+        "invalidCode": "Қате немесе мерзімі өткен код"
+      },
+      "success": "Құпия сөз сәтті өзгертілді!"
+    },
+    "verifyEmail": {
+      "title": "Email растау",
+      "subtitle": "Біз сіздің адресіңізге 6 таңбалы код жібердік",
+      "submitting": "Растау...",
+      "submit": "Растау",
+      "noCode": "Код келмеді ме?",
+      "resendCooldown": "{{seconds}}с ішінде қайта жіберу",
+      "resend": "Қайта жіберу",
+      "backToRegister": "← Тіркелуге қайту",
+      "errors": {
+        "codeRequired": "6 таңбалы код енгізіңіз",
+        "invalidCode": "Қате немесе мерзімі өткен код"
+      },
+      "success": "Email сәтті расталды!",
+      "resendSuccess": "Жаңа код сіздің email-ге жіберілді",
+      "resendError": "Кодты жіберу мүмкін болмады. Қайталап көріңіз."
+    }
+  },
+  "profile": {
+    "title": "Менің профилім",
+    "subtitle": "Профильді басқарыңыз және өтініштерді бақылаңыз",
+    "tabs": {
+      "profile": "Профиль",
+      "applications": "Менің өтініштерім",
+      "documents": "Құжаттар"
+    },
+    "edit": "Өңдеу",
+    "fillProfile": "Студент профилін толтырыңыз",
+    "form": {
+      "firstName": "Аты *",
+      "lastName": "Тегі *",
+      "iin": "ЖСН * (12 таңба)",
+      "phone": "Телефон",
+      "city": "Қала",
+      "cityPlaceholder": "Астана",
+      "specialization": "Мамандығы",
+      "specializationPlaceholder": "Ақпараттық жүйелер",
+      "university": "Университет",
+      "universityNotSet": "— таңдалмаған —",
+      "graduationYear": "Бітіру жылы",
+      "gpa": "GPA (0.0 – 4.0)",
+      "bio": "Өзім туралы",
+      "bioPlaceholder": "Өзіңіз туралы қысқаша, қызығушылықтарыңыз және мақсаттарыңыз...",
+      "skills": "Дағдылар",
+      "addSkillPlaceholder": "Дағды қосу...",
+      "skillsHint": "Дағдылар өтініш беру кезінде Match-Index-ке әсер етеді",
+      "saveBtn": "Сақтау",
+      "createBtn": "Профиль жасау",
+      "requiredFields": "Аты, тегі және ЖСН міндетті"
+    },
+    "view": {
+      "about": "Өзім туралы",
+      "skills": "Дағдылар",
+      "phone": "Телефон",
+      "iin": "ЖСН",
+      "graduationYear": "Бітіру жылы",
+      "gpa": "GPA",
+      "diplomaVerified": "Диплом расталды ✅",
+      "diplomaNotVerified": "Диплом расталмады",
+      "diplomaVerifiedHint": "{{date}} күні автоматты түрде расталды",
+      "diplomaNotVerifiedHint": "Автоматты растау үшін университетті, мамандығыңызды және бітіру жылыңызды толтырыңыз"
+    },
+    "documents": {
+      "title": "Менің құжаттарым",
+      "uploadHint": "Университет растауы үшін резюме және сертификаттарды жүктеңіз",
+      "uploading": "Жүктелуде...",
+      "upload": "{{type}} жүктеу",
+      "noDocuments": "Құжаттар әлі жоқ",
+      "noDocumentsHint": "Резюме немесе сертификат жүктеңіз",
+      "comment": "Пікір: {{text}}",
+      "loadError": "Құжаттарды жүктеу қатесі",
+      "deleteSuccess": "Құжат жойылды",
+      "deleteError": "Құжатты жою қатесі",
+      "downloadError": "Жүктеп алу қатесі",
+      "uploadSuccess": "{{type}} сәтті жүктелді",
+      "uploadError": "Жүктеу қатесі. Қайталап көріңіз."
+    },
+    "applications": {
+      "title": "Менің өтініштерім",
+      "empty": "Өтініштер әлі жоқ",
+      "emptyHint": "Ұнаған жұмысқа өтініш беріңіз",
+      "vacancyId": "Бос орын ID: {{id}}"
+    },
+    "status": {
+      "applied": "Өтініш берілді",
+      "interview": "Сұхбат",
+      "shortlisted": "Таңдалды",
+      "rejected": "Бас тартылды",
+      "offered": "Ұсыныс берілді"
+    },
+    "docStatus": {
+      "pending": "Күтілуде",
+      "verified": "✅ Расталды",
+      "rejected": "❌ Бас тартылды"
+    },
+    "toast": {
+      "saved": "Профиль сақталды!",
+      "errorSaving": "Сақтау қатесі",
+      "saveError": "Профильді сақтау қатесі. Қайталап көріңіз.",
+      "tryUpdate": " — профильді жаңартып көріңіз"
+    },
+    "loading": "Профиль жүктелуде...",
+    "iinError": {
+      "format": "ЖСН дәл 12 таңбадан тұруы керек",
+      "checksum": "ЖСН checksum тексерісінен өтпеді"
+    }
+  },
+  "employer": {
+    "dashboard": {
+      "title": "Жұмыс беруші панелі",
+      "subtitle": "Жұмыс орындарын, өтініштерді және компания профилін басқарыңыз"
+    },
+    "stats": {
+      "activeJobs": "Белсенді жұмыс орындары",
+      "totalApplications": "Барлық өтініштер",
+      "interviews": "Сұхбаттар",
+      "offers": "Ұсыныстар"
+    },
+    "tabs": {
+      "overview": "Шолу",
+      "jobs": "Жұмыс орындары",
+      "applications": "Өтініштер",
+      "profile": "Компания профилі"
+    },
+    "overview": {
+      "fillProfile": "Бос орындарыңыз кәсіби көрінсін үшін компания профилін толтырыңыз",
+      "fillProfileBtn": "Профильді толтыру →",
+      "quickActions": "Жылдам әрекеттер",
+      "postJob": "Жұмыс орнын жариялау",
+      "viewApplications": "Өтініштерді қарау",
+      "editProfile": "Профильді өңдеу"
+    },
+    "jobs": {
+      "postNew": "+ Жаңа жұмыс орнын жариялау",
+      "loading": "Жұмыс орындары жүктелуде...",
+      "empty": "Жұмыс орындары әлі жоқ",
+      "emptyHint": "Бірінші бос орынды жариялау үшін «+ Жаңа жұмыс орнын жариялау» басыңыз",
+      "active": "Белсенді",
+      "closed": "Жабылды",
+      "viewApplications": "Өтініштерді қарау",
+      "close": "Жабу",
+      "published": "Жарияланды: {{date}}"
+    },
+    "jobForm": {
+      "title": "Жаңа жұмыс орнын жариялау",
+      "jobTitle": "Жұмыс атауы *",
+      "jobTitlePlaceholder": "мысалы, Senior Developer",
+      "description": "Сипаттама *",
+      "descriptionPlaceholder": "Жауапкершіліктер мен талаптарды сипаттаңыз...",
+      "location": "Қала / Орналасқан жері",
+      "locationPlaceholder": "Астана",
+      "salaryMin": "Жалақыдан (₸)",
+      "salaryMax": "Жалақыға дейін (₸)",
+      "jobType": "Жұмыс түрі *",
+      "skills": "Қажетті дағдылар",
+      "skillsPlaceholder": "JavaScript, React, Node.js",
+      "submit": "Жариялау",
+      "submitting": "Жарияланып жатыр...",
+      "success": "Жұмыс орны сәтті жарияланды!",
+      "requiredFields": "Міндетті өрістерді толтырыңыз: атау, сипаттама және жұмыс түрі",
+      "error": "Жұмыс орнын жасау қатесі"
+    },
+    "applications": {
+      "selectVacancy": "Бос орынды таңдаңыз",
+      "selectVacancyPlaceholder": "-- Бос орынды таңдаңыз --",
+      "loading": "Өтініштер жүктелуде...",
+      "empty": "Өтініштер әлі жоқ",
+      "selectFirst": "Өтініштерді көру үшін бос орынды таңдаңыз",
+      "submitted": "Жіберілді: {{date}}",
+      "skills": "Дағдылар: {{skills}}",
+      "student": "Студент",
+      "profileLink": "Профиль →",
+      "toInterview": "Сұхбатқа",
+      "accept": "Қабылдау",
+      "reject": "Бас тарту",
+      "vacancyActive": "белсенді",
+      "vacancyClosed": "жабылды"
+    },
+    "profile": {
+      "title": "Компания профилі",
+      "subtitleUpdate": "Компания ақпаратын жаңартыңыз",
+      "subtitleCreate": "Компания профилін толтырыңыз — бұл студенттердің сенімін арттырады",
+      "loading": "Жүктелуде...",
+      "bin": "БСН (Бизнес идентификация нөмірі) *",
+      "binPlaceholder": "12 таңбалы сан",
+      "binVerified": "✅ Расталды",
+      "binPending": "⏳ Күтілуде",
+      "binHint": "БСН компанияны растау үшін қолданылады. Дәл 12 таңбадан тұруы керек.",
+      "companyName": "Компания атауы *",
+      "companyNamePlaceholder": "Менің компаниям ЖШС",
+      "description": "Компания сипаттамасы",
+      "descriptionPlaceholder": "Компанияңыз туралы айтыңыз, не істейтініңіз, миссияңыз...",
+      "industry": "Сала",
+      "selectIndustry": "Саланы таңдаңыз",
+      "companySize": "Компания өлшемі",
+      "selectSize": "Өлшемді таңдаңыз",
+      "city": "Қала / Орналасқан жері",
+      "cityPlaceholder": "Алматы, Қазақстан",
+      "website": "Веб-сайт",
+      "contactEmail": "Байланыс email",
+      "contactPhone": "Байланыс телефон",
+      "saveBtn": "Профильді жаңарту",
+      "createBtn": "Профиль жасау",
+      "saving": "Сақталуда...",
+      "success": "Компания профилі сақталды!",
+      "companyNameRequired": "Компания атауы міндетті",
+      "loadError": "Профильді жүктеу қатесі"
+    },
+    "status": {
+      "applied": "Өтініш берілді",
+      "interview": "Сұхбат",
+      "shortlisted": "Таңдалды",
+      "rejected": "Бас тартылды",
+      "offered": "Ұсыныс берілді"
+    }
+  },
+  "university": {
+    "title": "Университет аналитикасы",
+    "subtitle": "Шынайы деректер бойынша студенттердің жұмысқа орналасуын бақылаңыз",
+    "loading": "Аналитика жүктелуде...",
+    "loadError": "Аналитиканы жүктеу қатесі",
+    "stats": {
+      "totalStudents": "Жүйедегі студенттер",
+      "totalApplications": "Барлық өтініштер",
+      "offersReceived": "Алынған ұсыныстар",
+      "activeVacancies": "Белсенді бос орындар"
+    },
+    "tabs": {
+      "overview": "Шолу",
+      "myStudents": "Менің студенттерім",
+      "docReview": "📋 Құжаттар",
+      "students": "Студенттер",
+      "employers": "Жұмыс берушілер",
+      "statistics": "Статистика"
+    },
+    "overview": {
+      "applicationStatuses": "Студенттердің өтініш статусы",
+      "noApplications": "Өтініш деректері әлі жоқ",
+      "conversionRate": "Ұсыныс конверсиясы",
+      "offersFromApplications": "{{total}} өтініштен {{offers}} ұсыныс",
+      "vacanciesByCity": "Қала бойынша бос орындар",
+      "noVacancies": "Бос орындар әлі жоқ"
+    },
+    "myStudents": {
+      "title": "Сіздің университетіңіздегі студенттер",
+      "count": "({{count}} студент)",
+      "loading": "Жүктелуде...",
+      "empty": "Сіздің университетіңізден жүйеде студенттер әлі жоқ",
+      "emptyHint": "Студенттер тіркелгенде немесе профильде сіздің университетіңізді таңдауы керек",
+      "columns": {
+        "student": "Студент",
+        "specialization": "Мамандығы",
+        "gpa": "GPA",
+        "graduation": "Бітіру",
+        "skills": "Дағдылар"
+      },
+      "loadError": "Студенттерді жүктеу қатесі"
+    },
+    "docReview": {
+      "title": "Құжаттарды растау",
+      "hint": "Студенттің құжаттарын көру үшін оған басыңыз",
+      "loading": "Студенттер жүктелуде...",
+      "empty": "Сіздің университетіңізден жүйеде студенттер жоқ",
+      "noSpecialization": "Мамандығы көрсетілмеген",
+      "docsLoading": "Құжаттар жүктелуде...",
+      "noDocs": "Студент құжаттарды әлі жүктемеген",
+      "docVerified": "Құжат расталды",
+      "docRejected": "Құжат бас тартылды",
+      "verifyError": "Растау қатесі",
+      "rejectError": "Бас тарту қатесі",
+      "downloadError": "Жүктеп алу қатесі",
+      "loadError": "Құжаттарды жүктеу қатесі",
+      "studentsLoadError": "Студенттерді жүктеу қатесі",
+      "confirm": "Растау",
+      "reject": "Бас тарту",
+      "download": "Жүктеп алу"
+    },
+    "students": {
+      "title": "Мамандығы бойынша студенттер",
+      "noSpecialization": "Студенттер мамандығын әлі толтырмаған",
+      "count": "студент"
+    },
+    "employers": {
+      "title": "Түрі бойынша бос орындар таралуы",
+      "ofAll": "барлық бос орындардың %",
+      "noVacancies": "Бос орындар әлі жоқ"
+    },
+    "statistics": {
+      "topSkills": "Ең сұранысқа ие дағдылар",
+      "topSkillsHint": "жұмыс берушілердің бос орындарынан",
+      "noSkills": "Дағдылар деректері жоқ",
+      "mentions": "бос орындарда аталулар",
+      "summary": "Жүйе қорытындысы",
+      "columns": {
+        "metric": "Метрика",
+        "value": "Мән"
+      },
+      "rows": {
+        "students": "Жүйедегі студенттер",
+        "vacancies": "Белсенді бос орындар",
+        "applications": "Барлық өтініштер",
+        "offers": "Алынған ұсыныстар",
+        "conversion": "Ұсыныс конверсиясы",
+        "uniqueSkills": "Бос орындардағы бірегей дағдылар"
+      }
+    }
+  },
+  "employerDashboard": {
+    "title": "Жұмыс беруші панелі",
+    "tabs": {
+      "overview": "Шолу",
+      "jobs": "Жұмыс орындары",
+      "applications": "Өтініштер",
+      "profile": "Компания профилі"
+    },
+    "stats": {
+      "activeJobs": "Белсенді жұмыс орындары",
+      "totalApplications": "Барлық өтініштер",
+      "newApplications": "Жаңа өтініштер",
+      "hired": "Жалданған",
+      "interviews": "Сұхбаттар",
+      "offers": "Ұсыныстар"
+    },
+    "overview": {
+      "fillProfilePrompt": "Компания профилін толтырыңыз, вакансияларыңыз кәсіби көрінсін",
+      "fillProfileBtn": "Профильді толтыру →",
+      "quickActions": "Жылдам әрекеттер",
+      "postJob": "Бос орын жариялау",
+      "viewApplications": "Өтініштерді қарау",
+      "editProfile": "Профильді өңдеу"
+    },
+    "jobs": {
+      "postNew": "+ Жаңа бос орын жариялау",
+      "loading": "Бос орындар жүктелуде...",
+      "empty": "Сізде әлі бос орын жоқ",
+      "emptyHint": "Бірінші бос орыныңызды жариялау үшін жоғарыдағы батырманы басыңыз",
+      "statusActive": "Белсенді",
+      "statusClosed": "Жабық",
+      "published": "Жарияланды:",
+      "viewApplications": "Өтініштерді қарау",
+      "close": "Жабу"
+    },
+    "applications": {
+      "selectVacancy": "Бос орынды таңдаңыз",
+      "selectVacancyPlaceholder": "-- Бос орынды таңдаңыз --",
+      "vacancyActive": "белсенді",
+      "vacancyClosed": "жабық",
+      "selectToView": "Өтініштерді көру үшін бос орынды таңдаңыз",
+      "loading": "Өтініштер жүктелуде...",
+      "empty": "Өтініштер жоқ",
+      "skills": "Дағдылар:",
+      "submitted": "Берілді:",
+      "viewProfile": "Профиль →",
+      "toInterview": "Сұхбатқа шақыру",
+      "accept": "Қабылдау",
+      "reject": "Бас тарту"
+    },
+    "companyProfile": {
+      "title": "Компания профилі",
+      "updateSubtitle": "Компания туралы ақпаратты жаңартыңыз",
+      "createSubtitle": "Компания профилін толтырыңыз — бұл студенттердің сенімін арттырады",
+      "loading": "Жүктелуде...",
+      "binLabel": "БИН (Бизнес-идентификациялық нөмір) *",
+      "binPlaceholder": "12 санды нөмір",
+      "binVerified": "✅ Расталды",
+      "binPending": "⏳ Тексеруде",
+      "binHint": "БИН компанияны тексеру үшін қолданылады. Дәл 12 санды болуы керек.",
+      "companyName": "Компания атауы *",
+      "companyNamePlaceholder": "Менің компаниям ЖШС",
+      "description": "Компания сипаттамасы",
+      "descriptionPlaceholder": "Компания туралы, не жасайтыныңыз, миссияңыз...",
+      "industry": "Сала",
+      "industryPlaceholder": "Саланы таңдаңыз",
+      "companySize": "Компания мөлшері",
+      "companySizePlaceholder": "Мөлшерді таңдаңыз",
+      "employees": "қызметкер",
+      "location": "Қала / Орналасқан жері",
+      "locationPlaceholder": "Алматы, Қазақстан",
+      "website": "Веб-сайт",
+      "contactEmail": "Байланыс Email",
+      "contactPhone": "Байланыс телефоны",
+      "saving": "Сақталуда...",
+      "update": "Профильді жаңарту",
+      "create": "Профиль жасау",
+      "companyNameRequired": "Компания атауы міндетті",
+      "saveError": "Сақтау қатесі. Қайталап көріңіз."
+    },
+    "jobModal": {
+      "title": "Бос орын жариялау",
+      "titleLabel": "Лауазым атауы *",
+      "titlePlaceholder": "мыс., Аға әзірлеуші",
+      "descriptionLabel": "Бос орын сипаттамасы *",
+      "descriptionPlaceholder": "Рөлді, міндеттер мен талаптарды сипаттаңыз...",
+      "locationLabel": "Орналасқан жері",
+      "locationPlaceholder": "мыс., Астана, Қашықтан",
+      "jobTypeLabel": "Жұмыс түрі *",
+      "minSalaryLabel": "Мин. жалақы (₸)",
+      "maxSalaryLabel": "Макс. жалақы (₸)",
+      "skillsLabel": "Қажетті дағдылар",
+      "skillsPlaceholder": "мыс., React, Node.js, TypeScript",
+      "skillsHint": "Дағдыларды үтірмен бөліңіз",
+      "submitting": "Жариялануда...",
+      "submit": "Жариялау",
+      "cancel": "Болдырмау"
+    },
+    "errors": {
+      "loadJobs": "Жұмыс жүктеу қатесі",
+      "loadApplications": "Өтініштерді жүктеу қатесі",
+      "loadProfile": "Профильді жүктеу мүмкін болмады",
+      "createJob": "Жұмыс жасау қатесі"
+    },
+    "form": {
+      "errors": {
+        "missingFields": "Міндетті өрістерді толтырыңыз: атауы, сипаттамасы және жұмыс түрі",
+        "createJob": "Жұмыс жасау қатесі"
+      },
+      "success": {
+        "posted": "Жұмыс сәтті жарияланды!"
+      }
+    },
+    "profile": {
+      "success": {
+        "saved": "Компания профилі сақталды!"
+      }
+    }
+  },
+  "jobs": {
+    "browse": {
+      "title": "Жұмыс орындарын қарау",
+      "subtitle": "Келесі мүмкіндігіңізді табыңыз",
+      "filters": "Сүзгілер",
+      "searchLabel": "Іздеу",
+      "searchPlaceholder": "Жұмыс атауы, дағды...",
+      "jobType": "Жұмыс түрі",
+      "allTypes": "Барлық түрлер",
+      "fullTime": "Толық жұмыс күні",
+      "partTime": "Жарты жұмыс күні",
+      "internship": "Тағылымдама",
+      "contract": "Келісімшарт",
+      "location": "Орналасқан жері",
+      "locationPlaceholder": "Қала...",
+      "resetFilters": "Сүзгілерді тазалау",
+      "loading": "Жүктелуде...",
+      "found": "Табылды",
+      "vacanciesCount": "бос орын",
+      "page": "{{page}} / {{total}} бет",
+      "empty": "Сүзгілерге сәйкес бос орын жоқ",
+      "prev": "← Алдыңғы",
+      "next": "Келесі →",
+      "apply": "Өтініш беру",
+      "loadError": "Бос орындарды жүктеу мүмкін болмады"
+    },
+    "details": {
+      "description": "Жұмыс сипаттамасы",
+      "skills": "Қажетті дағдылар",
+      "loading": "Жүктелуде...",
+      "notFound": "Бос орын табылмады",
+      "loadError": "Бос орынды жүктеу мүмкін болмады",
+      "published": "Жарияланды:",
+      "successTitle": "Өтініш жіберілді!",
+      "successMessage": "Жұмыс беруші өтінішіңізді қарайды",
+      "myApplications": "Менің өтініштерім",
+      "applyBtn": "Өтініш беру",
+      "coverLetter": "Мотивациялық хат",
+      "coverLetterPlaceholder": "Бұл лауазымға неге сәйкес екеніңізді айтыңыз...",
+      "submitting": "Жіберілуде...",
+      "submit": "Өтінішті жіберу",
+      "onlyStudents": "Тек студенттер өтініш бере алады",
+      "active": "Белсенді",
+      "closed": "Жабық",
+      "applySuccess": "Өтініш сәтті жіберілді!",
+      "applyError": "Өтінішті жіберу қатесі",
+      "employer": "Жұмыс беруші"
+    },
+    "applyModal": {
+      "title": "Өтініш беру",
+      "coverLetter": "Мотивациялық хат",
+      "coverLetterPlaceholder": "Өзіңіз туралы және неге осы лауазымға сәйкес екеніңіз туралы айтыңыз...",
+      "submitting": "Жіберілуде...",
+      "submit": "Өтінішті жіберу",
+      "cancel": "Болдырмау"
+    }
+  },
+  "candidate": {
+    "loading": "Профиль жүктелуде...",
+    "notFound": "Үміткер табылмады",
+    "loadError": "Үміткер профилін жүктеу мүмкін болмады",
+    "about": "Өзі туралы",
+    "skills": "Дағдылар",
+    "data": "Деректер",
+    "gpa": "ОБК",
+    "graduationYear": "Бітіру жылы",
+    "specialization": "Мамандық",
+    "graduation": "{{year}} жылғы бітіруші",
+    "applicationStatus": "Өтініш мәртебесі",
+    "status": {
+      "applied": "Өтініш берілді",
+      "interview": "Сұхбат",
+      "shortlisted": "Таңдалды",
+      "offered": "Ұсыныс берілді",
+      "rejected": "Бас тартылды"
+    },
+    "toInterview": "Сұхбатқа шақыру",
+    "shortlist": "Таңдамаға қосу",
+    "offer": "Ұсыныс жасау",
+    "reject": "Бас тарту",
+    "documents": "Құжаттар",
+    "docsLoading": "Жүктелуде...",
+    "noDocs": "Құжаттар жоқ",
+    "docVerifiedByUniversity": "Университет растады",
+    "docRejected": "Қабылданбады",
+    "docPending": "Тексеруде",
+    "identification": "Жеке куәлік",
+    "iin": "ЖСН",
+    "statusUpdated": "Мәртебе жаңартылды",
+    "statusUpdateError": "Мәртебені жаңарту мүмкін болмады"
+  },
+  "sessions": {
+    "titles": {
+      "student": "Студент профилін толтырыңыз",
+      "employer": "Жұмыс беруші профилін толтырыңыз",
+      "university": "Университет профилін толтырыңыз",
+      "default": "Профильді толтырыңыз"
+    },
+    "descriptions": {
+      "student": "Мүмкіндіктерді іздеуді бастау үшін жеке ақпаратыңызды ұсыныңыз",
+      "employer": "Жұмыс мүмкіндіктерін жариялауды бастау үшін компания туралы мәліметтерді енгізіңіз",
+      "university": "Кампус қызметтерін басқару үшін университет туралы ақпаратты ұсыныңыз",
+      "default": "Профиль ақпаратын толтырыңыз"
+    },
+    "loggedInAs": "Кірген",
+    "logout": "Шығу",
+    "successMessage": "Профиль сәтті жасалды!",
+    "loading": "Жүктелуде..."
+  },
+  "universityAnalytics": {
+    "title": "Университет аналитика панелі",
+    "subtitle": "Шынайы деректер бойынша студенттердің жұмысқа орналасуын бақылау",
+    "loading": "Аналитика жүктелуде...",
+    "tabs": {
+      "overview": "Шолу",
+      "myStudents": "Менің студенттерім",
+      "docReview": "Құжаттар",
+      "students": "Студенттер",
+      "employers": "Жұмыс берушілер",
+      "statistics": "Статистика"
+    },
+    "stats": {
+      "studentsTotal": "Жүйедегі студенттер",
+      "applicationsTotal": "Барлық өтініштер",
+      "offersReceived": "Алынған ұсыныстар",
+      "activeVacancies": "Белсенді бос орындар"
+    },
+    "overview": {
+      "applicationStatuses": "Студенттердің өтініш статусы",
+      "noApplicationData": "Өтініш деректері әлі жоқ",
+      "conversionRate": "Ұсыныс конверсиясы",
+      "offersFromApplications": "{{offers}} ұсыныс {{total}} өтініштен",
+      "vacanciesByLocation": "Қала бойынша бос орындар",
+      "noVacancies": "Бос орындар әлі жоқ"
+    },
+    "myStudents": {
+      "title": "Сіздің университетіңіздегі студенттер",
+      "count": "({{count}} адам)",
+      "loading": "Жүктелуде...",
+      "noStudents": "Сіздің университетіңізден жүйеде студенттер әлі жоқ",
+      "noStudentsHint": "Студенттер тіркелгенде немесе профильде сіздің университетіңізді таңдауы керек",
+      "table": {
+        "student": "Студент",
+        "specialization": "Мамандығы",
+        "gpa": "GPA",
+        "graduation": "Бітіру",
+        "skills": "Дағдылар"
+      }
+    },
+    "docReview": {
+      "title": "Құжаттарды тексеру",
+      "hint": "Студенттің құжаттарын көру үшін оған басыңыз",
+      "loadingStudents": "Студенттер жүктелуде...",
+      "noStudents": "Сіздің университетіңізден жүйеде студенттер жоқ",
+      "loadingDocs": "Құжаттар жүктелуде...",
+      "noDocs": "Студент әлі құжаттар жүктемеген",
+      "download": "Жүктеп алу",
+      "verify": "Растау",
+      "reject": "Бас тарту",
+      "specializationNotSet": "Мамандығы көрсетілмеген"
+    },
+    "students": {
+      "bySpecialization": "Мамандығы бойынша студенттер",
+      "totalStudents": "({{total}} барлығы)",
+      "noSpecializations": "Студенттер профильде мамандығын әлі толтырмаған",
+      "studentsCount": "{{count}} студент"
+    },
+    "employers": {
+      "vacanciesByType": "Түрі бойынша бос орындар таралуы",
+      "percentageOfTotal": "Барлық бос орындардың {{percentage}}%"
+    },
+    "statistics": {
+      "demandedSkills": "Ең сұранысқа ие дағдылар",
+      "fromVacancies": "жұмыс берушілердің бос орындарынан",
+      "noSkillsData": "Дағдылар туралы деректер жоқ",
+      "mentionsInVacancies": "бос орындарда айтылған",
+      "summary": "Жүйе бойынша қорытынды",
+      "metrics": {
+        "studentsInSystem": "Жүйедегі студенттер",
+        "activeVacancies": "Белсенді бос орындар",
+        "totalApplications": "Барлық өтініштер",
+        "offersReceived": "Алынған ұсыныстар",
+        "conversionRate": "Ұсыныс конверсиясы",
+        "uniqueSkills": "Бос орындардағы бірегей дағдылар"
+      }
+    },
+    "status": {
+      "applied": "Өтініш берілді",
+      "interview": "Сұхбат",
+      "shortlisted": "Таңдалды",
+      "offered": "Ұсыныс берілді",
+      "rejected": "Бас тартылды"
+    },
+    "docStatus": {
+      "pending": "Тексеруде",
+      "verified": "✅ Расталды",
+      "rejected": "❌ Бас тартылды"
+    },
+    "errors": {
+      "loadAnalytics": "Аналитиканы жүктеу қатесі",
+      "loadStudents": "Студенттер тізімін жүктеу қатесі",
+      "loadStudentDocs": "Құжаттарды жүктеу қатесі",
+      "verifyDoc": "Растау қатесі",
+      "rejectDoc": "Бас тарту қатесі",
+      "downloadDoc": "Жүктеп алу қатесі"
+    },
+    "success": {
+      "docVerified": "Құжат расталды",
+      "docRejected": "Құжатқа бас тартылды"
+    }
+  }
+}

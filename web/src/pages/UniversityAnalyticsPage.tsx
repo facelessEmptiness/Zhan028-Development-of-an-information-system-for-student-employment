@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { apiFetch } from '../utils/apiClient';
@@ -29,22 +30,23 @@ interface AnalyticsSummary {
   };
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  applied:     'Подана',
-  interview:   'Собеседование',
-  shortlisted: 'В шортлисте',
-  offered:     'Оффер',
-  rejected:    'Отклонена',
-};
-
-const DOC_STATUS = {
-  pending:  { label: 'На проверке',   cls: 'bg-yellow-100 text-yellow-700' },
-  verified: { label: '✅ Подтверждён', cls: 'bg-green-100 text-green-700' },
-  rejected: { label: '❌ Отклонён',    cls: 'bg-red-100 text-red-700' },
-};
-
 const UniversityAnalyticsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+
+  const STATUS_LABELS: Record<string, string> = {
+    applied:     t('universityAnalytics.status.applied'),
+    interview:   t('universityAnalytics.status.interview'),
+    shortlisted: t('universityAnalytics.status.shortlisted'),
+    offered:     t('universityAnalytics.status.offered'),
+    rejected:    t('universityAnalytics.status.rejected'),
+  };
+
+  const DOC_STATUS = {
+    pending:  { label: t('universityAnalytics.docStatus.pending'),   cls: 'bg-yellow-100 text-yellow-700' },
+    verified: { label: t('universityAnalytics.docStatus.verified'), cls: 'bg-green-100 text-green-700' },
+    rejected: { label: t('universityAnalytics.docStatus.rejected'),    cls: 'bg-red-100 text-red-700' },
+  };
   const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'employers' | 'statistics' | 'my-students' | 'doc-review'>('overview');
   const [data, setData] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ const UniversityAnalyticsPage = () => {
         const json = await res.json();
         setData(json);
       } catch {
-        toast.error('Не удалось загрузить аналитику');
+        toast.error(t('universityAnalytics.errors.loadAnalytics'));
       } finally {
         setLoading(false);
       }
@@ -80,7 +82,7 @@ const UniversityAnalyticsPage = () => {
     setMyStudentsLoading(true);
     studentService.listByUniversity()
       .then(res => setMyStudents(res.students ?? []))
-      .catch(() => toast.error('Не удалось загрузить список студентов'))
+      .catch(() => toast.error(t('universityAnalytics.errors.loadStudents')))
       .finally(() => setMyStudentsLoading(false));
   }, [activeTab]);
 
@@ -89,7 +91,7 @@ const UniversityAnalyticsPage = () => {
     setDocStudentsLoading(true);
     studentService.listByUniversity()
       .then(res => setDocStudents(res.students ?? []))
-      .catch(() => toast.error('Не удалось загрузить студентов'))
+      .catch(() => toast.error(t('universityAnalytics.errors.loadStudents')))
       .finally(() => setDocStudentsLoading(false));
   }, [activeTab]);
 
@@ -100,7 +102,7 @@ const UniversityAnalyticsPage = () => {
       const docs = await documentService.listByStudent(userId);
       setStudentDocs(prev => ({ ...prev, [userId]: docs }));
     } catch {
-      toast.error('Не удалось загрузить документы');
+      toast.error(t('universityAnalytics.errors.loadStudentDocs'));
     } finally {
       setDocsLoading(prev => ({ ...prev, [userId]: false }));
     }
@@ -122,9 +124,9 @@ const UniversityAnalyticsPage = () => {
         ...prev,
         [userId]: prev[userId].map(d => d.id === docId ? updated : d),
       }));
-      toast.success('Документ подтверждён');
+      toast.success(t('universityAnalytics.success.docVerified'));
     } catch {
-      toast.error('Ошибка подтверждения');
+      toast.error(t('universityAnalytics.errors.verifyDoc'));
     }
   };
 
@@ -135,9 +137,9 @@ const UniversityAnalyticsPage = () => {
         ...prev,
         [userId]: prev[userId].map(d => d.id === docId ? updated : d),
       }));
-      toast.success('Документ отклонён');
+      toast.success(t('universityAnalytics.success.docRejected'));
     } catch {
-      toast.error('Ошибка отклонения');
+      toast.error(t('universityAnalytics.errors.rejectDoc'));
     }
   };
 
@@ -148,21 +150,21 @@ const UniversityAnalyticsPage = () => {
     : 0;
 
   const overallStats = [
-    { label: 'Студентов в системе', value: data ? String(data.students.total) : '—', icon: '👥', color: 'text-blue-600' },
-    { label: 'Всего заявок',        value: data ? String(data.applications.total) : '—', icon: '📨', color: 'text-green-600' },
-    { label: 'Получили оффер',      value: data ? String(data.applications.offered_count) : '—', icon: '✅', color: 'text-purple-600' },
-    { label: 'Активных вакансий',   value: data ? String(data.vacancies.total) : '—', icon: '📋', color: 'text-orange-600' },
+    { label: t('universityAnalytics.stats.studentsTotal'), value: data ? String(data.students.total) : '—', icon: '👥', color: 'text-blue-600' },
+    { label: t('universityAnalytics.stats.applicationsTotal'),        value: data ? String(data.applications.total) : '—', icon: '📨', color: 'text-green-600' },
+    { label: t('universityAnalytics.stats.offersReceived'),      value: data ? String(data.applications.offered_count) : '—', icon: '✅', color: 'text-purple-600' },
+    { label: t('universityAnalytics.stats.activeVacancies'),   value: data ? String(data.vacancies.total) : '—', icon: '📋', color: 'text-orange-600' },
   ];
 
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">University Analytics Dashboard</h1>
-        <p className="text-xl text-gray-600">Мониторинг занятости студентов на основе реальных данных</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('universityAnalytics.title')}</h1>
+        <p className="text-xl text-gray-600">{t('universityAnalytics.subtitle')}</p>
       </section>
 
       {loading && (
-        <div className="text-center py-16 text-gray-500">Загрузка аналитики...</div>
+        <div className="text-center py-16 text-gray-500">{t('universityAnalytics.loading')}</div>
       )}
       {!loading && data && (
         <>
@@ -190,11 +192,11 @@ const UniversityAnalyticsPage = () => {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {tab === 'overview'    ? 'Overview'         :
-                   tab === 'my-students' ? 'Мои студенты'     :
-                   tab === 'doc-review'  ? '📋 Документы'     :
-                   tab === 'students'    ? 'Students'         :
-                   tab === 'employers'   ? 'Employers'        : 'Statistics'}
+                  {tab === 'overview'    ? t('universityAnalytics.tabs.overview')         :
+                   tab === 'my-students' ? t('universityAnalytics.tabs.myStudents')     :
+                   tab === 'doc-review'  ? t('universityAnalytics.tabs.docReview')     :
+                   tab === 'students'    ? t('universityAnalytics.tabs.students')         :
+                   tab === 'employers'   ? t('universityAnalytics.tabs.employers')        : t('universityAnalytics.tabs.statistics')}
                 </button>
               ))}
             </div>
@@ -206,7 +208,7 @@ const UniversityAnalyticsPage = () => {
                 <div className="space-y-8">
                   {/* Application status breakdown */}
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Статусы заявок студентов</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('universityAnalytics.overview.applicationStatuses')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
                         {data.applications.by_status.map((item) => {
@@ -231,15 +233,15 @@ const UniversityAnalyticsPage = () => {
                           );
                         })}
                         {data.applications.by_status.length === 0 && (
-                          <p className="text-gray-500">Данных о заявках пока нет</p>
+                          <p className="text-gray-500">{t('universityAnalytics.overview.noApplicationData')}</p>
                         )}
                       </div>
                       <div className="bg-blue-50 rounded-lg p-6 flex items-center justify-center">
                         <div className="text-center">
                           <p className="text-5xl font-bold text-blue-600 mb-2">{employmentRate}%</p>
-                          <p className="text-gray-600">Конверсия в оффер</p>
+                          <p className="text-gray-600">{t('universityAnalytics.overview.conversionRate')}</p>
                           <p className="text-gray-400 text-sm mt-2">
-                            {data.applications.offered_count} офферов из {data.applications.total} заявок
+                            {t('universityAnalytics.overview.offersFromApplications', { offers: data.applications.offered_count, total: data.applications.total })}
                           </p>
                         </div>
                       </div>
@@ -248,7 +250,7 @@ const UniversityAnalyticsPage = () => {
 
                   {/* Vacancies by location */}
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Вакансии по городам</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('universityAnalytics.overview.vacanciesByLocation')}</h2>
                     <div className="space-y-3">
                       {data.vacancies.by_location.map((item) => {
                         const max = data.vacancies.by_location[0]?.count || 1;
@@ -268,7 +270,7 @@ const UniversityAnalyticsPage = () => {
                         );
                       })}
                       {data.vacancies.by_location.length === 0 && (
-                        <p className="text-gray-500">Вакансий пока нет</p>
+                        <p className="text-gray-500">{t('universityAnalytics.overview.noVacancies')}</p>
                       )}
                     </div>
                   </div>
@@ -279,18 +281,18 @@ const UniversityAnalyticsPage = () => {
               {activeTab === 'my-students' && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900">
-                    Студенты вашего университета
+                    {t('universityAnalytics.myStudents.title')}
                     {!myStudentsLoading && (
-                      <span className="ml-3 text-lg font-normal text-gray-500">({myStudents.length} чел.)</span>
+                      <span className="ml-3 text-lg font-normal text-gray-500">{t('universityAnalytics.myStudents.count', { count: myStudents.length })}</span>
                     )}
                   </h2>
                   {myStudentsLoading && (
-                    <div className="text-center py-10 text-gray-500">Загрузка...</div>
+                    <div className="text-center py-10 text-gray-500">{t('universityAnalytics.myStudents.loading')}</div>
                   )}
                   {!myStudentsLoading && myStudents.length === 0 && (
                     <div className="text-center py-10 text-gray-500">
-                      <p>Студентов вашего университета пока нет в системе</p>
-                      <p className="text-sm mt-2 text-gray-400">Студенты должны выбрать ваш университет при регистрации или в профиле</p>
+                      <p>{t('universityAnalytics.myStudents.noStudents')}</p>
+                      <p className="text-sm mt-2 text-gray-400">{t('universityAnalytics.myStudents.noStudentsHint')}</p>
                     </div>
                   )}
                   {!myStudentsLoading && myStudents.length > 0 && (
@@ -298,11 +300,11 @@ const UniversityAnalyticsPage = () => {
                       <table className="w-full">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Студент</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Специализация</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">GPA</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Выпуск</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Навыки</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.myStudents.table.student')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.myStudents.table.specialization')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.myStudents.table.gpa')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.myStudents.table.graduation')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.myStudents.table.skills')}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 bg-white">
@@ -347,13 +349,13 @@ const UniversityAnalyticsPage = () => {
               {activeTab === 'doc-review' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-900">Верификация документов</h2>
-                    <p className="text-sm text-gray-500">Нажмите на студента, чтобы просмотреть его документы</p>
+                    <h2 className="text-2xl font-bold text-gray-900">{t('universityAnalytics.docReview.title')}</h2>
+                    <p className="text-sm text-gray-500">{t('universityAnalytics.docReview.hint')}</p>
                   </div>
 
-                  {docStudentsLoading && <div className="text-center py-10 text-gray-500">Загрузка студентов...</div>}
+                  {docStudentsLoading && <div className="text-center py-10 text-gray-500">{t('universityAnalytics.docReview.loadingStudents')}</div>}
                   {!docStudentsLoading && docStudents.length === 0 && (
-                    <div className="text-center py-10 text-gray-500">Студентов вашего университета нет в системе</div>
+                    <div className="text-center py-10 text-gray-500">{t('universityAnalytics.docReview.noStudents')}</div>
                   )}
 
                   {docStudents.map(s => (
@@ -369,7 +371,7 @@ const UniversityAnalyticsPage = () => {
                           </div>
                           <div className="text-left">
                             <p className="font-medium text-gray-900">{s.first_name} {s.last_name}</p>
-                            <p className="text-xs text-gray-500">{s.specialization || 'Специализация не указана'}</p>
+                            <p className="text-xs text-gray-500">{s.specialization || t('universityAnalytics.docReview.specializationNotSet')}</p>
                           </div>
                         </div>
                         <span className="text-gray-400 text-lg">{expandedStudent === s.user_id ? '▲' : '▼'}</span>
@@ -378,9 +380,9 @@ const UniversityAnalyticsPage = () => {
                       {/* Documents panel */}
                       {expandedStudent === s.user_id && (
                         <div className="border-t border-gray-100 bg-gray-50 p-6">
-                          {docsLoading[s.user_id] && <p className="text-gray-500 text-sm">Загрузка документов...</p>}
+                          {docsLoading[s.user_id] && <p className="text-gray-500 text-sm">{t('universityAnalytics.docReview.loadingDocs')}</p>}
                           {!docsLoading[s.user_id] && (studentDocs[s.user_id]?.length ?? 0) === 0 && (
-                            <p className="text-gray-500 text-sm">Студент ещё не загрузил документы</p>
+                            <p className="text-gray-500 text-sm">{t('universityAnalytics.docReview.noDocs')}</p>
                           )}
                           <div className="space-y-3">
                             {(studentDocs[s.user_id] ?? []).map(doc => {
@@ -398,10 +400,10 @@ const UniversityAnalyticsPage = () => {
                                   <div className="flex items-center gap-3">
                                     <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cfg.cls}`}>{cfg.label}</span>
                                     <button
-                                      onClick={() => documentService.download(doc.id, doc.file_name).catch(() => toast.error('Ошибка скачивания'))}
+                                      onClick={() => documentService.download(doc.id, doc.file_name).catch(() => toast.error(t('profile.documents.downloadError')))}
                                       className="text-blue-600 hover:text-blue-700 text-xs font-medium"
                                     >
-                                      Скачать
+                                      {t('universityAnalytics.docReview.download')}
                                     </button>
                                     {doc.status === 'pending' && (
                                       <>
@@ -409,13 +411,13 @@ const UniversityAnalyticsPage = () => {
                                           onClick={() => handleVerify(doc.id, s.user_id)}
                                           className="px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700"
                                         >
-                                          Подтвердить
+                                          {t('universityAnalytics.docReview.verify')}
                                         </button>
                                         <button
                                           onClick={() => handleReject(doc.id, s.user_id)}
                                           className="px-3 py-1 border border-red-300 text-red-700 rounded-lg text-xs font-medium hover:bg-red-50"
                                         >
-                                          Отклонить
+                                          {t('universityAnalytics.docReview.reject')}
                                         </button>
                                       </>
                                     )}
@@ -436,14 +438,14 @@ const UniversityAnalyticsPage = () => {
                 <div className="space-y-8">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                      Студенты по специализации
+                      {t('universityAnalytics.students.bySpecialization')}
                       <span className="ml-3 text-lg font-normal text-gray-500">
-                        ({data.students.total} всего)
+                        {t('universityAnalytics.students.totalStudents', { total: data.students.total })}
                       </span>
                     </h2>
                     {data.students.by_specialization.length === 0 ? (
                       <div className="text-center py-12 text-gray-500">
-                        <p>Студенты ещё не заполнили специализацию в профиле</p>
+                        <p>{t('universityAnalytics.students.noSpecializations')}</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -456,7 +458,7 @@ const UniversityAnalyticsPage = () => {
                               <div className="flex justify-between items-center mb-3">
                                 <div>
                                   <h3 className="font-semibold text-gray-900">{item.specialization}</h3>
-                                  <p className="text-sm text-gray-600">{item.count} студентов</p>
+                                  <p className="text-sm text-gray-600">{t('universityAnalytics.students.studentsCount', { count: item.count })}</p>
                                 </div>
                                 <span className="text-2xl font-bold text-green-600">{pct}%</span>
                               </div>
@@ -479,7 +481,7 @@ const UniversityAnalyticsPage = () => {
               {activeTab === 'employers' && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Распределение вакансий по типу</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('universityAnalytics.employers.vacanciesByType')}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {data.vacancies.by_job_type.map((item) => (
                         <div
@@ -490,9 +492,7 @@ const UniversityAnalyticsPage = () => {
                             <div>
                               <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
                               <p className="text-gray-600 text-sm mt-1">
-                                {data.vacancies.total > 0
-                                  ? Math.round((item.count / data.vacancies.total) * 100)
-                                  : 0}% от всех вакансий
+                                {t('universityAnalytics.employers.percentageOfTotal', { percentage: data.vacancies.total > 0 ? Math.round((item.count / data.vacancies.total) * 100) : 0 })}
                               </p>
                             </div>
                             <span className="text-3xl font-bold text-blue-600">{item.count}</span>
@@ -500,7 +500,7 @@ const UniversityAnalyticsPage = () => {
                         </div>
                       ))}
                       {data.vacancies.by_job_type.length === 0 && (
-                        <p className="text-gray-500 col-span-2">Вакансий пока нет</p>
+                        <p className="text-gray-500 col-span-2">{t('universityAnalytics.overview.noVacancies')}</p>
                       )}
                     </div>
                   </div>
@@ -512,11 +512,11 @@ const UniversityAnalyticsPage = () => {
                 <div className="space-y-8">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                      Самые востребованные навыки
-                      <span className="ml-3 text-base font-normal text-gray-500">из вакансий работодателей</span>
+                      {t('universityAnalytics.statistics.demandedSkills')}
+                      <span className="ml-3 text-base font-normal text-gray-500">{t('universityAnalytics.statistics.fromVacancies')}</span>
                     </h2>
                     {data.vacancies.demanded_skills.length === 0 ? (
-                      <p className="text-gray-500">Данных о навыках нет</p>
+                      <p className="text-gray-500">{t('universityAnalytics.statistics.noSkillsData')}</p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {data.vacancies.demanded_skills.map((skill, idx) => {
@@ -541,7 +541,7 @@ const UniversityAnalyticsPage = () => {
                                   style={{ width: `${(skill.count / max) * 100}%` }}
                                 />
                               </div>
-                              <p className="text-xs text-gray-500 mt-1">упоминаний в вакансиях</p>
+                              <p className="text-xs text-gray-500 mt-1">{t('universityAnalytics.statistics.mentionsInVacancies')}</p>
                             </div>
                           );
                         })}
@@ -551,22 +551,26 @@ const UniversityAnalyticsPage = () => {
 
                   {/* Summary table */}
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Сводка по системе</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('universityAnalytics.statistics.summary')}</h2>
                     <div className="overflow-hidden rounded-xl border border-gray-200">
                       <table className="w-full">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Метрика</th>
-                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Значение</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.statistics.metrics.studentsInSystem')}</th>
+                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.statistics.metrics.activeVacancies')}</th>
+                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.statistics.metrics.totalApplications')}</th>
+                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.statistics.metrics.offersReceived')}</th>
+                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.statistics.metrics.conversionRate')}</th>
+                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">{t('universityAnalytics.statistics.metrics.uniqueSkills')}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 bg-white">
-                          <tr><td className="px-6 py-4 text-gray-700">Студентов в системе</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.students.total}</td></tr>
-                          <tr><td className="px-6 py-4 text-gray-700">Активных вакансий</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.vacancies.total}</td></tr>
-                          <tr><td className="px-6 py-4 text-gray-700">Всего заявок</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.applications.total}</td></tr>
-                          <tr><td className="px-6 py-4 text-gray-700">Получили оффер</td><td className="px-6 py-4 text-right font-bold text-green-600">{data.applications.offered_count}</td></tr>
-                          <tr><td className="px-6 py-4 text-gray-700">Конверсия в оффер</td><td className="px-6 py-4 text-right font-bold text-blue-600">{employmentRate}%</td></tr>
-                          <tr><td className="px-6 py-4 text-gray-700">Уникальных навыков в вакансиях</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.vacancies.demanded_skills.length}+</td></tr>
+                          <tr><td className="px-6 py-4 text-gray-700">{t('universityAnalytics.statistics.metrics.studentsInSystem')}</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.students.total}</td></tr>
+                          <tr><td className="px-6 py-4 text-gray-700">{t('universityAnalytics.statistics.metrics.activeVacancies')}</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.vacancies.total}</td></tr>
+                          <tr><td className="px-6 py-4 text-gray-700">{t('universityAnalytics.statistics.metrics.totalApplications')}</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.applications.total}</td></tr>
+                          <tr><td className="px-6 py-4 text-gray-700">{t('universityAnalytics.statistics.metrics.offersReceived')}</td><td className="px-6 py-4 text-right font-bold text-green-600">{data.applications.offered_count}</td></tr>
+                          <tr><td className="px-6 py-4 text-gray-700">{t('universityAnalytics.statistics.metrics.conversionRate')}</td><td className="px-6 py-4 text-right font-bold text-blue-600">{employmentRate}%</td></tr>
+                          <tr><td className="px-6 py-4 text-gray-700">{t('universityAnalytics.statistics.metrics.uniqueSkills')}</td><td className="px-6 py-4 text-right font-bold text-gray-900">{data.vacancies.demanded_skills.length}+</td></tr>
                         </tbody>
                       </table>
                     </div>

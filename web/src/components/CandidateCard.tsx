@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import MatchIndex from './MatchIndex';
 
 interface CandidateCardProps {
@@ -30,6 +31,8 @@ const CandidateCard = ({
   status,
   onClick,
 }: CandidateCardProps) => {
+  const { t } = useTranslation();
+
   const statusColors = {
     applied: 'bg-blue-50 text-blue-700 border-blue-200',
     interview: 'bg-purple-50 text-purple-700 border-purple-200',
@@ -38,10 +41,10 @@ const CandidateCard = ({
   };
 
   const statusLabels = {
-    applied: '📝 Applied',
-    interview: '📅 Interview',
-    shortlisted: '⭐ Shortlisted',
-    rejected: '❌ Rejected',
+    applied: `📝 ${t('candidate.status.applied')}`,
+    interview: `📅 ${t('candidate.status.interview')}`,
+    shortlisted: `⭐ ${t('candidate.status.shortlisted')}`,
+    rejected: `❌ ${t('candidate.status.rejected')}`,
   };
 
   return (
@@ -69,12 +72,12 @@ const CandidateCard = ({
       </div>
 
       <div className="mb-4">
-        <p className="text-sm font-medium text-gray-700 mb-2">Experience</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">{t('candidate.about')}</p>
         <p className="text-sm text-gray-600">{experience}</p>
       </div>
 
       <div className="mb-4">
-        <p className="text-sm font-medium text-gray-700 mb-2">Skills</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">{t('candidate.skills')}</p>
         <div className="flex flex-wrap gap-2">
           {skills.slice(0, 4).map((skill, idx) => (
             <span key={idx} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full font-medium">
@@ -83,7 +86,7 @@ const CandidateCard = ({
           ))}
           {skills.length > 4 && (
             <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
-              +{skills.length - 4} more
+              +{skills.length - 4}
             </span>
           )}
         </div>
@@ -97,13 +100,11 @@ const CandidateCard = ({
           onClick={(e) => e.stopPropagation()}
           className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors text-center"
         >
-          📄 View Resume
+          📄 {t('common.download')}
         </a>
         {status && (
           <div
-            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium border text-center ${
-              statusColors[status]
-            }`}
+            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium border text-center ${statusColors[status]}`}
           >
             {statusLabels[status]}
           </div>

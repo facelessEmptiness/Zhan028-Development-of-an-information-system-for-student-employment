@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import JobCard from '../components/JobCard';
 import MatchIndex from '../components/MatchIndex';
 import { type JobPosting } from '../services/employerService';
@@ -12,6 +13,7 @@ import { apiFetch } from '../utils/apiClient';
 const PAGE_SIZE = 10;
 
 const BrowseJobsPage = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') ?? '');
@@ -69,11 +71,11 @@ const BrowseJobsPage = () => {
       if (selectedLocation) urlParams.location = selectedLocation;
       setSearchParams(urlParams, { replace: true });
     } catch {
-      toast.error('Не удалось загрузить вакансии');
+      toast.error(t('jobs.browse.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, selectedType, selectedLocation, page, setSearchParams]);
+  }, [debouncedSearch, selectedType, selectedLocation, page, setSearchParams, t]);
 
   useEffect(() => {
     fetchVacancies();
@@ -92,11 +94,11 @@ const BrowseJobsPage = () => {
     setApplySubmitting(true);
     try {
       await applicationService.apply(applyingTo, coverLetter);
-      toast.success('Заявка успешно отправлена!');
+      toast.success(t('jobs.details.applySuccess'));
       setApplyingTo(null);
       setCoverLetter('');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Ошибка при отправке заявки');
+      toast.error(err instanceof Error ? err.message : t('jobs.details.applyError'));
     } finally {
       setApplySubmitting(false);
     }
@@ -115,8 +117,8 @@ const BrowseJobsPage = () => {
   const toJobCard = (v: JobPosting) => ({
     id: v.id,
     title: v.title,
-    company: v.company_name || 'Работодатель',
-    location: v.location || 'Не указано',
+    company: v.company_name || t('jobs.details.employer'),
+    location: v.location || t('common.notSpecified'),
     salary: { min: v.salary_min, max: v.salary_max },
     type: v.job_type as 'Full-time' | 'Part-time' | 'Internship' | 'Contract',
     description: v.description,
@@ -129,21 +131,21 @@ const BrowseJobsPage = () => {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Browse Jobs</h1>
-        <p className="text-xl text-gray-600">Find your next opportunity</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('jobs.browse.title')}</h1>
+        <p className="text-xl text-gray-600">{t('jobs.browse.subtitle')}</p>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Filters */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24 space-y-6">
-            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('jobs.browse.filters')}</h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('jobs.browse.searchLabel')}</label>
               <input
                 type="text"
-                placeholder="Job title, skill..."
+                placeholder={t('jobs.browse.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -151,25 +153,25 @@ const BrowseJobsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Job Type</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('jobs.browse.jobType')}</label>
               <select
                 value={selectedType}
                 onChange={(e) => { setSelectedType(e.target.value); setPage(1); }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All types</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Internship">Internship</option>
-                <option value="Contract">Contract</option>
+                <option value="">{t('jobs.browse.allTypes')}</option>
+                <option value="Full-time">{t('jobs.browse.fullTime')}</option>
+                <option value="Part-time">{t('jobs.browse.partTime')}</option>
+                <option value="Internship">{t('jobs.browse.internship')}</option>
+                <option value="Contract">{t('jobs.browse.contract')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('jobs.browse.location')}</label>
               <input
                 type="text"
-                placeholder="City..."
+                placeholder={t('jobs.browse.locationPlaceholder')}
                 value={selectedLocation}
                 onChange={(e) => { setSelectedLocation(e.target.value); setPage(1); }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -185,7 +187,7 @@ const BrowseJobsPage = () => {
               }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
             >
-              Reset Filters
+              {t('jobs.browse.resetFilters')}
             </button>
           </div>
         </div>
@@ -193,19 +195,19 @@ const BrowseJobsPage = () => {
         {/* Job Results */}
         <div className="lg:col-span-3">
           {loading && (
-            <div className="text-center py-16 text-gray-500">Загрузка вакансий...</div>
+            <div className="text-center py-16 text-gray-500">{t('jobs.browse.loading')}</div>
           )}
 
           {!loading && (
             <>
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-gray-600">
-                  Найдено{' '}
-                  <span className="font-semibold text-gray-900">{total}</span> вакансий
+                  {t('jobs.browse.found')}{' '}
+                  <span className="font-semibold text-gray-900">{total}</span> {t('jobs.browse.vacanciesCount')}
                 </p>
                 {totalPages > 1 && (
                   <p className="text-sm text-gray-500">
-                    Страница {page} из {totalPages}
+                    {t('jobs.browse.page', { page, total: totalPages })}
                   </p>
                 )}
               </div>
@@ -233,7 +235,7 @@ const BrowseJobsPage = () => {
                             }}
                             className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow"
                           >
-                            Подать заявку
+                            {t('jobs.browse.apply')}
                           </button>
                         </div>
                       )}
@@ -241,7 +243,7 @@ const BrowseJobsPage = () => {
                   ))
                 ) : (
                   <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                    <p className="text-gray-600 mb-4">Нет вакансий по заданным фильтрам</p>
+                    <p className="text-gray-600 mb-4">{t('jobs.browse.empty')}</p>
                     <button
                       onClick={() => {
                         setSearchTerm('');
@@ -251,7 +253,7 @@ const BrowseJobsPage = () => {
                       }}
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
-                      Clear Filters
+                      {t('jobs.browse.resetFilters')}
                     </button>
                   </div>
                 )}
@@ -265,7 +267,7 @@ const BrowseJobsPage = () => {
                     disabled={page === 1}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
-                    ← Назад
+                    {t('jobs.browse.prev')}
                   </button>
 
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -298,7 +300,7 @@ const BrowseJobsPage = () => {
                     disabled={page === totalPages}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
-                    Вперёд →
+                    {t('jobs.browse.next')}
                   </button>
                 </div>
               )}
@@ -311,16 +313,16 @@ const BrowseJobsPage = () => {
       {applyingTo !== null && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-lg w-full mx-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Подать заявку</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('jobs.applyModal.title')}</h2>
 
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Сопроводительное письмо
+                {t('jobs.applyModal.coverLetter')}
               </label>
               <textarea
                 value={coverLetter}
                 onChange={(e) => setCoverLetter(e.target.value)}
-                placeholder="Расскажите о себе и почему вы подходите для этой вакансии..."
+                placeholder={t('jobs.applyModal.coverLetterPlaceholder')}
                 rows={5}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -332,7 +334,7 @@ const BrowseJobsPage = () => {
                 disabled={applySubmitting}
                 className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {applySubmitting ? 'Отправка...' : 'Отправить заявку'}
+                {applySubmitting ? t('jobs.applyModal.submitting') : t('jobs.applyModal.submit')}
               </button>
               <button
                 onClick={() => {
@@ -342,7 +344,7 @@ const BrowseJobsPage = () => {
                 disabled={applySubmitting}
                 className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
-                Отмена
+                {t('jobs.applyModal.cancel')}
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import MatchIndex from '../components/MatchIndex';
 import { employerService, type JobPosting } from '../services/employerService';
@@ -46,6 +47,7 @@ const INDUSTRIES = [
 const COMPANY_SIZES = ['1–10', '11–50', '51–200', '201–500', '500+'];
 
 const EmployerDashboardPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'applications' | 'profile'>('overview');
   const [showJobForm, setShowJobForm] = useState(false);
@@ -79,7 +81,7 @@ const EmployerDashboardPage = () => {
       const jobs = await employerService.getJobPostings();
       setMyJobs(jobs);
     } catch {
-      setJobsError('Не удалось загрузить вакансии');
+      setJobsError(t('employerDashboard.errors.loadJobs'));
     } finally {
       setJobsLoading(false);
     }
@@ -93,7 +95,7 @@ const EmployerDashboardPage = () => {
       const apps = await applicationService.getVacancyApplications(vacancyId);
       setApplications(apps);
     } catch {
-      setAppsError('Не удалось загрузить заявки');
+      setAppsError(t('employerDashboard.errors.loadApplications'));
     } finally {
       setAppsLoading(false);
     }
@@ -122,7 +124,7 @@ const EmployerDashboardPage = () => {
       if (msg.includes('404') || msg.includes('not found')) {
         setProfileExists(false);
       } else {
-        setProfileError('Не удалось загрузить профиль');
+        setProfileError(t('employerDashboard.errors.loadProfile'));
       }
     } finally {
       setProfileLoading(false);
@@ -160,7 +162,7 @@ const EmployerDashboardPage = () => {
     setFormError('');
     setFormSuccess('');
     if (!formData.title.trim() || !formData.description.trim() || !formData.job_type) {
-      setFormError('Заполните обязательные поля: название, описание и тип занятости');
+      setFormError(t('employerDashboard.form.errors.missingFields'));
       return;
     }
     setSubmitting(true);
@@ -174,12 +176,12 @@ const EmployerDashboardPage = () => {
         job_type: formData.job_type,
         skills: formData.skills,
       });
-      setFormSuccess('Вакансия успешно опубликована!');
+      setFormSuccess(t('employerDashboard.form.success.posted'));
       setFormData(emptyForm);
       fetchMyJobs();
       setTimeout(() => { setShowJobForm(false); setFormSuccess(''); }, 1500);
     } catch (err: unknown) {
-      setFormError(err instanceof Error ? err.message : 'Ошибка при создании вакансии');
+      setFormError(err instanceof Error ? err.message : t('employerDashboard.form.errors.createJob'));
     } finally {
       setSubmitting(false);
     }
@@ -187,7 +189,7 @@ const EmployerDashboardPage = () => {
 
   const handleSaveProfile = async () => {
     if (!profile.company_name.trim()) {
-      setProfileError('Название компании обязательно');
+      setProfileError(t('employerDashboard.companyProfile.companyNameRequired'));
       return;
     }
     setProfileError('');
@@ -200,10 +202,10 @@ const EmployerDashboardPage = () => {
         await employerProfileService.createProfile(profile);
         setProfileExists(true);
       }
-      setProfileSuccess('Профиль компании сохранён!');
+      setProfileSuccess(t('employerDashboard.profile.success.saved'));
       setTimeout(() => setProfileSuccess(''), 3000);
     } catch (err: unknown) {
-      setProfileError(err instanceof Error ? err.message : 'Ошибка при сохранении');
+      setProfileError(t('employerDashboard.companyProfile.saveError'));
     } finally {
       setProfileSaving(false);
     }
@@ -228,10 +230,10 @@ const EmployerDashboardPage = () => {
   const activeJobsCount = myJobs.filter((j) => j.status === 'active').length;
 
   const stats = [
-    { label: 'Active Jobs', value: String(activeJobsCount), icon: '📋', color: 'bg-blue-50 text-blue-700' },
-    { label: 'Total Applications', value: String(applications.length), icon: '📨', color: 'bg-green-50 text-green-700' },
-    { label: 'Interviews', value: String(applications.filter((a) => a.status === 'interview').length), icon: '📅', color: 'bg-purple-50 text-purple-700' },
-    { label: 'Offers', value: String(applications.filter((a) => a.status === 'offered').length), icon: '✅', color: 'bg-yellow-50 text-yellow-700' },
+    { label: t('employerDashboard.stats.activeJobs'), value: String(activeJobsCount), icon: '📋', color: 'bg-blue-50 text-blue-700' },
+    { label: t('employerDashboard.stats.totalApplications'), value: String(applications.length), icon: '📨', color: 'bg-green-50 text-green-700' },
+    { label: t('employerDashboard.stats.interviews'), value: String(applications.filter((a) => a.status === 'interview').length), icon: '📅', color: 'bg-purple-50 text-purple-700' },
+    { label: t('employerDashboard.stats.offers'), value: String(applications.filter((a) => a.status === 'offered').length), icon: '✅', color: 'bg-yellow-50 text-yellow-700' },
   ];
 
   const statusBadgeClass = (s: string) => {
@@ -245,14 +247,9 @@ const EmployerDashboardPage = () => {
   };
 
   const statusLabel = (s: string) => {
-    switch (s) {
-      case 'applied':     return 'Подана';
-      case 'interview':   return 'Собеседование';
-      case 'shortlisted': return 'В шортлисте';
-      case 'rejected':    return 'Отклонена';
-      case 'offered':     return 'Оффер';
-      default:            return s;
-    }
+    const key = `candidate.status.${s}`;
+    const translated = t(key);
+    return translated !== key ? translated : s;
   };
 
   return (
@@ -290,7 +287,7 @@ const EmployerDashboardPage = () => {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {tab === 'profile' ? 'Company Profile' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {t(`employerDashboard.tabs.${tab}`)}
             </button>
           ))}
         </div>
@@ -311,7 +308,7 @@ const EmployerDashboardPage = () => {
                       <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-600">
                         {profile.industry && <span>🏭 {profile.industry}</span>}
                         {profile.location && <span>📍 {profile.location}</span>}
-                        {profile.company_size && <span>👥 {profile.company_size} сотрудников</span>}
+                        {profile.company_size && <span>👥 {profile.company_size} {t('employerDashboard.companyProfile.employees')}</span>}
                         {profile.website && (
                           <a href={profile.website} target="_blank" rel="noopener noreferrer"
                             className="text-blue-600 hover:underline">
@@ -335,40 +332,40 @@ const EmployerDashboardPage = () => {
               {!profileExists && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
                   <p className="text-yellow-800 font-medium mb-3">
-                    Заполните профиль компании, чтобы ваши вакансии выглядели профессионально
+                    {t('employerDashboard.overview.fillProfilePrompt')}
                   </p>
                   <button
                     onClick={() => setActiveTab('profile')}
                     className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium"
                   >
-                    Заполнить профиль →
+                    {t('employerDashboard.overview.fillProfileBtn')}
                   </button>
                 </div>
               )}
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Быстрые действия</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('employerDashboard.overview.quickActions')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button
                     onClick={() => { setActiveTab('jobs'); setShowJobForm(true); }}
                     className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-blue-700 font-medium hover:bg-blue-100 transition-colors text-left"
                   >
                     <div className="text-2xl mb-2">📋</div>
-                    <div>Опубликовать вакансию</div>
+                    <div>{t('employerDashboard.overview.postJob')}</div>
                   </button>
                   <button
                     onClick={() => setActiveTab('applications')}
                     className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 font-medium hover:bg-green-100 transition-colors text-left"
                   >
                     <div className="text-2xl mb-2">📨</div>
-                    <div>Просмотреть заявки</div>
+                    <div>{t('employerDashboard.overview.viewApplications')}</div>
                   </button>
                   <button
                     onClick={() => setActiveTab('profile')}
                     className="p-4 bg-purple-50 border border-purple-200 rounded-xl text-purple-700 font-medium hover:bg-purple-100 transition-colors text-left"
                   >
                     <div className="text-2xl mb-2">🏢</div>
-                    <div>Редактировать профиль</div>
+                    <div>{t('employerDashboard.overview.editProfile')}</div>
                   </button>
                 </div>
               </div>
@@ -382,15 +379,15 @@ const EmployerDashboardPage = () => {
                 onClick={() => { setShowJobForm(true); setFormError(''); setFormSuccess(''); }}
                 className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
               >
-                + Post New Job
+                {t('employerDashboard.jobs.postNew')}
               </button>
 
-              {jobsLoading && <p className="text-gray-500 text-center py-8">Загрузка вакансий...</p>}
+              {jobsLoading && <p className="text-gray-500 text-center py-8">{t('employerDashboard.jobs.loading')}</p>}
               {jobsError && <p className="text-red-600 text-center py-4">{jobsError}</p>}
               {!jobsLoading && !jobsError && myJobs.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg">У вас пока нет вакансий</p>
-                  <p className="text-sm mt-1">Нажмите «+ Post New Job» чтобы опубликовать первую вакансию</p>
+                  <p className="text-lg">{t('employerDashboard.jobs.empty')}</p>
+                  <p className="text-sm mt-1">{t('employerDashboard.jobs.emptyHint')}</p>
                 </div>
               )}
 
@@ -402,7 +399,7 @@ const EmployerDashboardPage = () => {
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${job.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                            {job.status === 'active' ? 'Активна' : 'Закрыта'}
+                            {job.status === 'active' ? t('employerDashboard.jobs.statusActive') : t('employerDashboard.jobs.statusClosed')}
                           </span>
                         </div>
                         <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
@@ -424,21 +421,21 @@ const EmployerDashboardPage = () => {
                             ))}
                           </div>
                         )}
-                        <p className="text-xs text-gray-400 mt-3">Опубликовано: {new Date(job.created_at).toLocaleDateString('ru-RU')}</p>
+                        <p className="text-xs text-gray-400 mt-3">{t('employerDashboard.jobs.published')} {new Date(job.created_at).toLocaleDateString()}</p>
                       </div>
                       <div className="flex flex-col gap-2 ml-4">
                         <button
                           onClick={() => { setSelectedVacancyId(job.id); setActiveTab('applications'); }}
                           className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 text-sm font-medium"
                         >
-                          Посмотреть заявки
+                          {t('employerDashboard.jobs.viewApplications')}
                         </button>
                         {job.status === 'active' && (
                           <button
                             onClick={() => handleCloseJob(job.id)}
                             className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 text-sm font-medium"
                           >
-                            Закрыть
+                            {t('employerDashboard.jobs.close')}
                           </button>
                         )}
                       </div>
@@ -453,19 +450,19 @@ const EmployerDashboardPage = () => {
           {activeTab === 'applications' && (
             <div className="space-y-6">
               {jobsLoading ? (
-                <p className="text-gray-500">Загрузка вакансий...</p>
+                <p className="text-gray-500">{t('employerDashboard.jobs.loading')}</p>
               ) : (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Выберите вакансию</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.applications.selectVacancy')}</label>
                   <select
                     value={selectedVacancyId}
                     onChange={(e) => setSelectedVacancyId(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-md"
                   >
-                    <option value="">-- Выберите вакансию --</option>
+                    <option value="">{t('employerDashboard.applications.selectVacancyPlaceholder')}</option>
                     {myJobs.map((job) => (
                       <option key={job.id} value={job.id}>
-                        {job.title} ({job.status === 'active' ? 'активна' : 'закрыта'})
+                        {job.title} ({job.status === 'active' ? t('employerDashboard.applications.vacancyActive') : t('employerDashboard.applications.vacancyClosed')})
                       </option>
                     ))}
                   </select>
@@ -474,15 +471,15 @@ const EmployerDashboardPage = () => {
 
               {!selectedVacancyId && (
                 <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg">Выберите вакансию, чтобы увидеть заявки</p>
+                  <p className="text-lg">{t('employerDashboard.applications.selectToView')}</p>
                 </div>
               )}
 
-              {selectedVacancyId && appsLoading && <p className="text-gray-500 text-center py-8">Загрузка заявок...</p>}
+              {selectedVacancyId && appsLoading && <p className="text-gray-500 text-center py-8">{t('employerDashboard.applications.loading')}</p>}
               {selectedVacancyId && appsError && <p className="text-red-600 text-center py-4">{appsError}</p>}
               {selectedVacancyId && !appsLoading && !appsError && applications.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg">Заявок пока нет</p>
+                  <p className="text-lg">{t('employerDashboard.applications.empty')}</p>
                 </div>
               )}
 
@@ -495,9 +492,9 @@ const EmployerDashboardPage = () => {
                           {app.student ? `${app.student.first_name} ${app.student.last_name}`.trim() || 'Студент' : 'Студент'}
                         </h3>
                         {app.student?.skills && (
-                          <p className="text-xs text-gray-500 mt-1">Навыки: {app.student.skills}</p>
+                          <p className="text-xs text-gray-500 mt-1">{t('employerDashboard.applications.skills')} {app.student.skills}</p>
                         )}
-                        <p className="text-xs text-gray-400 mt-1">Подана: {new Date(app.created_at).toLocaleDateString('ru-RU')}</p>
+                        <p className="text-xs text-gray-400 mt-1">{t('employerDashboard.applications.submitted')} {new Date(app.created_at).toLocaleDateString()}</p>
                       </div>
                       <div className="flex items-center gap-3">
                         {app.match_score > 0 && (
@@ -528,20 +525,20 @@ const EmployerDashboardPage = () => {
                           })}
                           className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-sm"
                         >
-                          Профиль →
+                          {t('employerDashboard.applications.viewProfile')}
                         </button>
                       )}
                       <button onClick={() => handleUpdateStatus(app.id, 'interview')} disabled={statusUpdating === app.id || app.status === 'interview'}
                         className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        На собеседование
+                        {t('employerDashboard.applications.toInterview')}
                       </button>
                       <button onClick={() => handleUpdateStatus(app.id, 'offered')} disabled={statusUpdating === app.id || app.status === 'offered'}
                         className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        Принять
+                        {t('employerDashboard.applications.accept')}
                       </button>
                       <button onClick={() => handleUpdateStatus(app.id, 'rejected')} disabled={statusUpdating === app.id || app.status === 'rejected'}
                         className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        Отклонить
+                        {t('employerDashboard.applications.reject')}
                       </button>
                     </div>
                   </div>
@@ -554,13 +551,13 @@ const EmployerDashboardPage = () => {
           {activeTab === 'profile' && (
             <div className="max-w-2xl space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">Профиль компании</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('employerDashboard.companyProfile.title')}</h2>
                 <p className="text-gray-500 text-sm">
-                  {profileExists ? 'Обновите информацию о вашей компании' : 'Заполните профиль компании — это повысит доверие студентов к вашим вакансиям'}
+                  {profileExists ? t('employerDashboard.companyProfile.updateSubtitle') : t('employerDashboard.companyProfile.createSubtitle')}
                 </p>
               </div>
 
-              {profileLoading && <p className="text-gray-500 py-8 text-center">Загрузка...</p>}
+              {profileLoading && <p className="text-gray-500 py-8 text-center">{t('employerDashboard.companyProfile.loading')}</p>}
 
               {!profileLoading && (
                 <>
@@ -575,7 +572,7 @@ const EmployerDashboardPage = () => {
                     {/* BIN */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        БИН (Бизнес-идентификационный номер) *
+                        {t('employerDashboard.companyProfile.binLabel')}
                       </label>
                       <div className="relative">
                         <input
@@ -583,46 +580,46 @@ const EmployerDashboardPage = () => {
                           name="bin"
                           value={profile.bin}
                           onChange={handleProfileChange}
-                          placeholder="12-значный номер"
+                          placeholder={t('employerDashboard.companyProfile.binPlaceholder')}
                           maxLength={12}
                           inputMode="numeric"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-32"
                         />
                         {profile.bin_status === 'verified' && (
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                            ✅ Подтверждён
+                            {t('employerDashboard.companyProfile.binVerified')}
                           </span>
                         )}
                         {profile.bin_status === 'pending' && profile.bin && (
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
-                            ⏳ На проверке
+                            {t('employerDashboard.companyProfile.binPending')}
                           </span>
                         )}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        БИН используется для верификации компании. Должен содержать ровно 12 цифр.
+                        {t('employerDashboard.companyProfile.binHint')}
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Название компании *</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.companyName')}</label>
                       <input
                         type="text"
                         name="company_name"
                         value={profile.company_name}
                         onChange={handleProfileChange}
-                        placeholder="ТОО «Моя Компания»"
+                        placeholder={t('employerDashboard.companyProfile.companyNamePlaceholder')}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Описание компании</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.description')}</label>
                       <textarea
                         name="company_description"
                         value={profile.company_description}
                         onChange={handleProfileChange}
-                        placeholder="Расскажите о компании, чем вы занимаетесь, какова ваша миссия..."
+                        placeholder={t('employerDashboard.companyProfile.descriptionPlaceholder')}
                         rows={4}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
@@ -630,14 +627,14 @@ const EmployerDashboardPage = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Отрасль</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.industry')}</label>
                         <select
                           name="industry"
                           value={profile.industry}
                           onChange={handleProfileChange}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <option value="">Выберите отрасль</option>
+                          <option value="">{t('employerDashboard.companyProfile.industryPlaceholder')}</option>
                           {INDUSTRIES.map((ind) => (
                             <option key={ind} value={ind}>{ind}</option>
                           ))}
@@ -645,16 +642,16 @@ const EmployerDashboardPage = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Размер компании</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.companySize')}</label>
                         <select
                           name="company_size"
                           value={profile.company_size}
                           onChange={handleProfileChange}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <option value="">Выберите размер</option>
+                          <option value="">{t('employerDashboard.companyProfile.companySizePlaceholder')}</option>
                           {COMPANY_SIZES.map((s) => (
-                            <option key={s} value={s}>{s} сотрудников</option>
+                            <option key={s} value={s}>{s} {t('employerDashboard.companyProfile.employees')}</option>
                           ))}
                         </select>
                       </div>
@@ -662,19 +659,19 @@ const EmployerDashboardPage = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Город / Местоположение</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.location')}</label>
                         <input
                           type="text"
                           name="location"
                           value={profile.location}
                           onChange={handleProfileChange}
-                          placeholder="Алматы, Казахстан"
+                          placeholder={t('employerDashboard.companyProfile.locationPlaceholder')}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Веб-сайт</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.website')}</label>
                         <input
                           type="url"
                           name="website"
@@ -688,7 +685,7 @@ const EmployerDashboardPage = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Контактный Email</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.contactEmail')}</label>
                         <input
                           type="email"
                           name="contact_email"
@@ -700,7 +697,7 @@ const EmployerDashboardPage = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Контактный телефон</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.companyProfile.contactPhone')}</label>
                         <input
                           type="tel"
                           name="contact_phone"
@@ -718,7 +715,7 @@ const EmployerDashboardPage = () => {
                     disabled={profileSaving}
                     className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {profileSaving ? 'Сохранение...' : profileExists ? 'Обновить профиль' : 'Создать профиль'}
+                    {profileSaving ? t('employerDashboard.companyProfile.saving') : profileExists ? t('employerDashboard.companyProfile.update') : t('employerDashboard.companyProfile.create')}
                   </button>
                 </>
               )}
@@ -732,7 +729,7 @@ const EmployerDashboardPage = () => {
       {showJobForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Post New Job</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('employerDashboard.jobModal.title')}</h2>
 
             {formError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formError}</div>
@@ -743,26 +740,26 @@ const EmployerDashboardPage = () => {
 
             <div className="space-y-5 mb-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Job Title *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.jobModal.titleLabel')}</label>
                 <input type="text" name="title" value={formData.title} onChange={handleFormChange}
-                  placeholder="e.g., Senior Developer"
+                  placeholder={t('employerDashboard.jobModal.titlePlaceholder')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Job Description *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.jobModal.descriptionLabel')}</label>
                 <textarea name="description" value={formData.description} onChange={handleFormChange}
-                  placeholder="Describe the role, responsibilities, and requirements..."
+                  placeholder={t('employerDashboard.jobModal.descriptionPlaceholder')}
                   rows={5}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.jobModal.locationLabel')}</label>
                 <input type="text" name="location" value={formData.location} onChange={handleFormChange}
-                  placeholder="e.g., Astana, Remote"
+                  placeholder={t('employerDashboard.jobModal.locationPlaceholder')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Job Type *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.jobModal.jobTypeLabel')}</label>
                 <select name="job_type" value={formData.job_type} onChange={handleFormChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="Full-time">Full-time</option>
@@ -773,36 +770,36 @@ const EmployerDashboardPage = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Min Salary ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.jobModal.minSalaryLabel')}</label>
                   <input type="number" name="salary_min" value={formData.salary_min} onChange={handleFormChange}
                     placeholder="3000" min={0}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Max Salary ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.jobModal.maxSalaryLabel')}</label>
                   <input type="number" name="salary_max" value={formData.salary_max} onChange={handleFormChange}
                     placeholder="5000" min={0}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Required Skills</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('employerDashboard.jobModal.skillsLabel')}</label>
                 <input type="text" name="skills" value={formData.skills} onChange={handleFormChange}
-                  placeholder="e.g., React, Node.js, TypeScript"
+                  placeholder={t('employerDashboard.jobModal.skillsPlaceholder')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <p className="text-xs text-gray-400 mt-1">Разделяйте навыки запятой</p>
+                <p className="text-xs text-gray-400 mt-1">{t('employerDashboard.jobModal.skillsHint')}</p>
               </div>
             </div>
 
             <div className="flex gap-3">
               <button onClick={handleSubmitJob} disabled={submitting}
                 className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                {submitting ? 'Публикация...' : 'Post Job'}
+                {submitting ? t('employerDashboard.jobModal.submitting') : t('employerDashboard.jobModal.submit')}
               </button>
               <button onClick={() => { setShowJobForm(false); setFormData(emptyForm); setFormError(''); setFormSuccess(''); }}
                 disabled={submitting}
                 className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50">
-                Cancel
+                {t('employerDashboard.jobModal.cancel')}
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import MatchIndex from './MatchIndex';
 
 interface JobCardProps {
@@ -30,6 +31,7 @@ const JobCard = ({
   applicants,
   onClick,
 }: JobCardProps) => {
+  const { t } = useTranslation();
   const salaryText = `${salary.min.toLocaleString()} – ${salary.max.toLocaleString()} ₸`;
 
   return (
@@ -60,35 +62,35 @@ const JobCard = ({
         ))}
         {skills.length > 3 && (
           <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
-            +{skills.length - 3} more
+            +{skills.length - 3}
           </span>
         )}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Location</p>
+          <p className="text-xs text-gray-500 mb-1">{t('candidate.data')}</p>
           <p className="text-sm font-semibold text-gray-900">📍 {location}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Salary</p>
+          <p className="text-xs text-gray-500 mb-1">₸</p>
           <p className="text-sm font-semibold text-gray-900">{salaryText}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Type</p>
+          <p className="text-xs text-gray-500 mb-1">{t('jobs.browse.jobType')}</p>
           <span className="inline-block px-2 py-1 bg-indigo-50 text-indigo-700 text-xs rounded font-medium">
             {type}
           </span>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Posted</p>
+          <p className="text-xs text-gray-500 mb-1">{t('jobs.details.published')}</p>
           <p className="text-sm font-semibold text-gray-900">{postedDate}</p>
         </div>
       </div>
 
       {applicants !== undefined && (
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-600">{applicants} applications received</p>
+          <p className="text-sm text-gray-600">{applicants} {t('jobs.browse.vacanciesCount')}</p>
         </div>
       )}
     </Link>

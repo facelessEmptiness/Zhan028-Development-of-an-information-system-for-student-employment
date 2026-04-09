@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 
 /** Проверяет казахстанский ИИН (12 цифр + контрольная сумма) */
-function validateIIN(iin: string): string | null {
+function validateIIN(iin: string, t: (key: string) => string): string | null {
   if (iin.length !== 12 || !/^\d{12}$/.test(iin)) {
-    return 'ИИН должен содержать ровно 12 цифр';
+    return t('profile.iinError.format');
   }
   const d = iin.split('').map(Number);
   const w1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -17,7 +18,7 @@ function validateIIN(iin: string): string | null {
     check = sum % 11;
   }
   if (check === 10 || check !== d[11]) {
-    return 'ИИН не прошёл проверку контрольной суммы';
+    return t('profile.iinError.checksum');
   }
   return null;
 }
@@ -56,14 +57,6 @@ const emptyForm: FormData = {
   university_id: '',
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  applied: 'Подано',
-  interview: 'Собеседование',
-  shortlisted: 'Отобран',
-  rejected: 'Отклонено',
-  offered: 'Оффер',
-};
-
 const STATUS_COLORS: Record<string, string> = {
   applied: 'bg-blue-100 text-blue-700',
   interview: 'bg-purple-100 text-purple-700',
@@ -72,18 +65,34 @@ const STATUS_COLORS: Record<string, string> = {
   offered: 'bg-yellow-100 text-yellow-700',
 };
 
-const DOC_STATUS_CONFIG = {
-  pending:  { label: 'На проверке', cls: 'bg-yellow-100 text-yellow-700' },
-  verified: { label: '✅ Подтверждён', cls: 'bg-green-100 text-green-700' },
-  rejected: { label: '❌ Отклонён',   cls: 'bg-red-100 text-red-700' },
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const cfg = DOC_STATUS_CONFIG[status as keyof typeof DOC_STATUS_CONFIG] ?? { label: status, cls: 'bg-gray-100 text-gray-700' };
-  return <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cfg.cls}`}>{cfg.label}</span>;
+const DOC_STATUS_CLASSES: Record<string, string> = {
+  pending:  'bg-yellow-100 text-yellow-700',
+  verified: 'bg-green-100 text-green-700',
+  rejected: 'bg-red-100 text-red-700',
 };
 
 const StudentProfilePage = () => {
+  const { t } = useTranslation();
+
+  const STATUS_LABELS: Record<string, string> = {
+    applied: t('profile.status.applied'),
+    interview: t('profile.status.interview'),
+    shortlisted: t('profile.status.shortlisted'),
+    rejected: t('profile.status.rejected'),
+    offered: t('profile.status.offered'),
+  };
+
+  const DOC_STATUS_CONFIG = {
+    pending:  { label: t('profile.docStatus.pending'),   cls: DOC_STATUS_CLASSES.pending },
+    verified: { label: t('profile.docStatus.verified'),  cls: DOC_STATUS_CLASSES.verified },
+    rejected: { label: t('profile.docStatus.rejected'),  cls: DOC_STATUS_CLASSES.rejected },
+  };
+
+  const StatusBadge = ({ status }: { status: string }) => {
+    const cfg = DOC_STATUS_CONFIG[status as keyof typeof DOC_STATUS_CONFIG] ?? { label: status, cls: 'bg-gray-100 text-gray-700' };
+    return <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cfg.cls}`}>{cfg.label}</span>;
+  };
+
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [profile, setProfile] = useState<BackendStudentProfile | null>(null);
   const [profileExists, setProfileExists] = useState(false);
@@ -157,7 +166,7 @@ const StudentProfilePage = () => {
       setDocsLoading(true);
       documentService.listMy()
         .then(setDocuments)
-        .catch(() => toast.error('Не удалось загрузить документы'))
+        .catch(() => toast.error(t('profile.documents.loadError')))
         .finally(() => setDocsLoading(false));
     }
   }, [activeTab]);
@@ -174,9 +183,9 @@ const StudentProfilePage = () => {
     try {
       const doc = await documentService.upload(file, uploadingType);
       setDocuments(prev => [doc, ...prev]);
-      toast.success(`${getTypeLabel(uploadingType)} загружен`);
+      toast.success(t('profile.documents.uploadSuccess', { type: getTypeLabel(uploadingType) }));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Ошибка загрузки');
+      toast.error(t('profile.documents.uploadError'));
     } finally {
       setUploadingType(null);
     }
@@ -186,9 +195,9 @@ const StudentProfilePage = () => {
     try {
       await documentService.delete(id);
       setDocuments(prev => prev.filter(d => d.id !== id));
-      toast.success('Документ удалён');
+      toast.success(t('profile.documents.deleteSuccess'));
     } catch {
-      toast.error('Не удалось удалить документ');
+      toast.error(t('profile.documents.deleteError'));
     }
   };
 
@@ -241,10 +250,10 @@ const StudentProfilePage = () => {
       let updated: BackendStudentProfile;
       if (!profileExists) {
         if (!formData.first_name || !formData.last_name || !formData.iin) {
-          toast.error('Имя, фамилия и ИИН обязательны');
+          toast.error(t('profile.form.requiredFields'));
           return;
         }
-        const iinError = validateIIN(formData.iin);
+        const iinError = validateIIN(formData.iin, t);
         if (iinError) {
           toast.error(iinError);
           return;
@@ -257,17 +266,18 @@ const StudentProfilePage = () => {
       }
 
       setProfile(updated);
-      toast.success('Профиль сохранён!');
+      toast.success(t('profile.toast.saved'));
       setEditMode(false);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Ошибка сохранения';
-      if (msg.includes('уже') || msg.toLowerCase().includes('exist') || msg.includes('already')) {
+      const status = (err as { statusCode?: number })?.statusCode;
+      const msg = err instanceof Error ? err.message : '';
+      if (status === 409 || msg.toLowerCase().includes('exist') || msg.includes('already')) {
         setProfileExists(true);
         setIsCreating(false);
         setEditMode(true);
-        toast.error(msg + ' — попробуйте обновить профиль');
+        toast.error(t('profile.toast.saveError') + t('profile.toast.tryUpdate'));
       } else {
-        toast.error(msg);
+        toast.error(t('profile.toast.saveError'));
       }
     } finally {
       setSaving(false);
@@ -277,7 +287,7 @@ const StudentProfilePage = () => {
   if (profileLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-gray-500">Загрузка профиля...</p>
+        <p className="text-gray-500">{t('profile.loading')}</p>
       </div>
     );
   }
@@ -287,8 +297,8 @@ const StudentProfilePage = () => {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Мой профиль</h1>
-        <p className="text-xl text-gray-600">Управляйте профилем и отслеживайте заявки</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('profile.title')}</h1>
+        <p className="text-xl text-gray-600">{t('profile.subtitle')}</p>
       </section>
 
       <div className="bg-white rounded-xl border border-gray-200">
@@ -304,7 +314,7 @@ const StudentProfilePage = () => {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {tab === 'profile' ? 'Профиль' : tab === 'applications' ? 'Мои заявки' : 'Документы'}
+              {tab === 'profile' ? t('profile.tabs.profile') : tab === 'applications' ? t('profile.tabs.applications') : t('profile.tabs.documents')}
             </button>
           ))}
         </div>
@@ -334,7 +344,7 @@ const StudentProfilePage = () => {
                     onClick={() => setEditMode(true)}
                     className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
                   >
-                    Редактировать
+                    {t('profile.edit')}
                   </button>
                 </div>
               )}
@@ -344,7 +354,7 @@ const StudentProfilePage = () => {
                 <div className="space-y-4">
                   {profile?.bio && (
                     <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
-                      <h3 className="font-semibold text-gray-900 mb-2">О себе</h3>
+                      <h3 className="font-semibold text-gray-900 mb-2">{t('profile.view.about')}</h3>
                       <p className="text-gray-700 text-sm">{profile.bio}</p>
                     </div>
                   )}
@@ -354,12 +364,12 @@ const StudentProfilePage = () => {
                     <span className="text-2xl">{profile?.diploma_verified ? '🎓' : '📋'}</span>
                     <div>
                       <p className="font-semibold text-sm text-gray-900">
-                        {profile?.diploma_verified ? 'Диплом подтверждён ✅' : 'Диплом не подтверждён'}
+                        {profile?.diploma_verified ? t('profile.view.diplomaVerified') : t('profile.view.diplomaNotVerified')}
                       </p>
                       <p className="text-xs text-gray-500 mt-0.5">
                         {profile?.diploma_verified
-                          ? `Автоматически верифицирован ${profile.diploma_verified_at ? new Date(profile.diploma_verified_at).toLocaleDateString('ru-RU') : ''}`
-                          : 'Заполните университет, специализацию и год выпуска для автоматической верификации'}
+                          ? t('profile.view.diplomaVerifiedHint', { date: profile.diploma_verified_at ? new Date(profile.diploma_verified_at).toLocaleDateString('ru-RU') : '' })
+                          : t('profile.view.diplomaNotVerifiedHint')}
                       </p>
                     </div>
                   </div>
@@ -367,25 +377,25 @@ const StudentProfilePage = () => {
                   <div className="grid grid-cols-2 gap-4">
                     {profile?.phone && (
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">Телефон</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('profile.view.phone')}</p>
                         <p className="font-medium text-gray-900">{profile.phone}</p>
                       </div>
                     )}
                     {profile?.iin && (
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">ИИН</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('profile.view.iin')}</p>
                         <p className="font-medium text-gray-900">{profile.iin}</p>
                       </div>
                     )}
                     {profile?.graduation_year ? (
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">Год выпуска</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('profile.view.graduationYear')}</p>
                         <p className="font-medium text-gray-900">{profile.graduation_year}</p>
                       </div>
                     ) : null}
                     {profile?.gpa ? (
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">GPA</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('profile.view.gpa')}</p>
                         <p className="font-medium text-gray-900 text-lg">{profile.gpa.toFixed(2)}</p>
                       </div>
                     ) : null}
@@ -393,7 +403,7 @@ const StudentProfilePage = () => {
 
                   {skillsArray.length > 0 && (
                     <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
-                      <h3 className="font-semibold text-gray-900 mb-3">Навыки</h3>
+                      <h3 className="font-semibold text-gray-900 mb-3">{t('profile.view.skills')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {skillsArray.map(skill => (
                           <span key={skill} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
@@ -411,13 +421,13 @@ const StudentProfilePage = () => {
                 <div className="space-y-5">
                   {isCreating && (
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-blue-800 text-sm font-medium">Заполните профиль студента</p>
+                      <p className="text-blue-800 text-sm font-medium">{t('profile.fillProfile')}</p>
                     </div>
                   )}
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Имя *</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.firstName')}</label>
                       <input
                         name="first_name"
                         value={formData.first_name}
@@ -426,7 +436,7 @@ const StudentProfilePage = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Фамилия *</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.lastName')}</label>
                       <input
                         name="last_name"
                         value={formData.last_name}
@@ -437,7 +447,7 @@ const StudentProfilePage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">ИИН * (12 цифр)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.iin')}</label>
                     <input
                       name="iin"
                       value={formData.iin}
@@ -450,7 +460,7 @@ const StudentProfilePage = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Телефон</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.phone')}</label>
                       <input
                         name="phone"
                         value={formData.phone}
@@ -460,37 +470,37 @@ const StudentProfilePage = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Город</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.city')}</label>
                       <input
                         name="location_city"
                         value={formData.location_city}
                         onChange={handleChange}
-                        placeholder="Астана"
+                        placeholder={t('profile.form.cityPlaceholder')}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Специальность</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.specialization')}</label>
                     <input
                       name="specialization"
                       value={formData.specialization}
                       onChange={handleChange}
-                      placeholder="Информационные системы"
+                      placeholder={t('profile.form.specializationPlaceholder')}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Университет</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.university')}</label>
                     <select
                       name="university_id"
                       value={formData.university_id}
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     >
-                      <option value="">— не указан —</option>
+                      <option value="">{t('profile.form.universityNotSet')}</option>
                       {universities.map(u => (
                         <option key={u.id} value={u.id}>{u.name} ({u.city})</option>
                       ))}
@@ -499,7 +509,7 @@ const StudentProfilePage = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Год выпуска</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.graduationYear')}</label>
                       <input
                         name="graduation_year"
                         type="number"
@@ -512,7 +522,7 @@ const StudentProfilePage = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">GPA (0.0 – 4.0)</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.gpa')}</label>
                       <input
                         name="gpa"
                         type="number"
@@ -528,27 +538,27 @@ const StudentProfilePage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">О себе</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">{t('profile.form.bio')}</label>
                     <textarea
                       name="bio"
                       value={formData.bio}
                       onChange={handleChange}
                       rows={3}
-                      placeholder="Кратко о себе, интересах и целях..."
+                      placeholder={t('profile.form.bioPlaceholder')}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   {/* Skills */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Навыки</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('profile.form.skills')}</label>
                     <div className="flex gap-2 mb-3">
                       <input
                         type="text"
                         value={newSkill}
                         onChange={e => setNewSkill(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddSkill(); } }}
-                        placeholder="Добавить навык..."
+                        placeholder={t('profile.form.addSkillPlaceholder')}
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <button
@@ -566,7 +576,7 @@ const StudentProfilePage = () => {
                         </div>
                       ))}
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">Навыки влияют на Match-Index при подаче заявок</p>
+                    <p className="text-xs text-gray-400 mt-1">{t('profile.form.skillsHint')}</p>
                   </div>
 
                   <div className="flex gap-3 pt-2">
@@ -575,7 +585,7 @@ const StudentProfilePage = () => {
                       disabled={saving}
                       className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                     >
-                      {saving ? 'Сохранение...' : profileExists ? 'Сохранить' : 'Создать профиль'}
+                      {saving ? t('common.saving') : profileExists ? t('common.save') : t('profile.form.createBtn')}
                     </button>
                     {profileExists && (
                       <button
@@ -583,7 +593,7 @@ const StudentProfilePage = () => {
                         disabled={saving}
                         className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
                       >
-                        Отмена
+                        {t('common.cancel')}
                       </button>
                     )}
                   </div>
@@ -596,8 +606,8 @@ const StudentProfilePage = () => {
           {activeTab === 'documents' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Мои документы</h2>
-                <p className="text-sm text-gray-500">Загружайте CV, диплом и сертификаты для верификации университетом</p>
+                <h2 className="text-2xl font-bold text-gray-900">{t('profile.documents.title')}</h2>
+                <p className="text-sm text-gray-500">{t('profile.documents.uploadHint')}</p>
               </div>
 
               {/* Upload buttons */}
@@ -613,7 +623,7 @@ const StudentProfilePage = () => {
                       {type === 'cv' ? '📄' : '📜'}
                     </span>
                     <span className="font-medium text-gray-700">
-                      {uploadingType === type ? 'Загрузка...' : `Загрузить ${getTypeLabel(type)}`}
+                      {uploadingType === type ? t('profile.documents.uploading') : t('profile.documents.upload', { type: getTypeLabel(type) })}
                     </span>
                   </button>
                 ))}
@@ -627,11 +637,11 @@ const StudentProfilePage = () => {
               />
 
               {/* Documents list */}
-              {docsLoading && <p className="text-gray-500 text-center py-8">Загрузка...</p>}
+              {docsLoading && <p className="text-gray-500 text-center py-8">{t('common.loading')}</p>}
               {!docsLoading && documents.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg">Документов пока нет</p>
-                  <p className="text-sm mt-1">Загрузите CV, диплом или сертификат</p>
+                  <p className="text-lg">{t('profile.documents.noDocuments')}</p>
+                  <p className="text-sm mt-1">{t('profile.documents.noDocumentsHint')}</p>
                 </div>
               )}
               {documents.map(doc => (
@@ -653,16 +663,16 @@ const StudentProfilePage = () => {
                   <div className="flex items-center gap-3">
                     <StatusBadge status={doc.status} />
                     <button
-                      onClick={() => documentService.download(doc.id, doc.file_name).catch(() => toast.error('Ошибка скачивания'))}
+                      onClick={() => documentService.download(doc.id, doc.file_name).catch(() => toast.error(t('profile.documents.downloadError')))}
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                     >
-                      Скачать
+                      {t('common.download')}
                     </button>
                     <button
                       onClick={() => handleDeleteDoc(doc.id)}
                       className="text-red-500 hover:text-red-700 text-sm"
                     >
-                      Удалить
+                      {t('common.delete')}
                     </button>
                   </div>
                 </div>
@@ -673,12 +683,12 @@ const StudentProfilePage = () => {
           {/* ===== APPLICATIONS TAB ===== */}
           {activeTab === 'applications' && (
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Мои заявки</h2>
-              {appsLoading && <p className="text-gray-500 py-8 text-center">Загрузка...</p>}
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('profile.applications.title')}</h2>
+              {appsLoading && <p className="text-gray-500 py-8 text-center">{t('common.loading')}</p>}
               {!appsLoading && applications.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg">У вас пока нет заявок</p>
-                  <p className="text-sm mt-1">Подайте заявку на понравившуюся вакансию</p>
+                  <p className="text-lg">{t('profile.applications.empty')}</p>
+                  <p className="text-sm mt-1">{t('profile.applications.emptyHint')}</p>
                 </div>
               )}
               {applications.map(app => (

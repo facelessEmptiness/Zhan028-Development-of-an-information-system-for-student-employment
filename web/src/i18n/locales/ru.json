@@ -1,0 +1,902 @@
+{
+  "common": {
+    "save": "Сохранить",
+    "saving": "Сохранение...",
+    "cancel": "Отмена",
+    "loading": "Загрузка...",
+    "delete": "Удалить",
+    "download": "Скачать",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "back": "← Назад",
+    "error": "Ошибка",
+    "confirm": "Подтвердить",
+    "reject": "Отклонить",
+    "send": "Отправить",
+    "search": "Поиск",
+    "close": "Закрыть",
+    "update": "Обновить",
+    "profile": "Профиль",
+    "employees": "сотрудников",
+    "employees_count": "{{count}} сотрудников",
+    "notSpecified": "Не указано"
+  },
+  "nav": {
+    "jobs": "Вакансии",
+    "myProfile": "Мой профиль",
+    "dashboard": "Панель",
+    "analytics": "Аналитика",
+    "login": "Войти",
+    "register": "Регистрация",
+    "logout": "Выйти",
+    "notifications": "Уведомления",
+    "noNotifications": "Нет уведомлений",
+    "markAllRead": "Отметить все",
+    "loggedInAs": "Вы вошли как",
+    "language": "Язык"
+  },
+  "role": {
+    "student": "Студент",
+    "employer": "Работодатель",
+    "university": "Университет",
+    "admin": "Администратор"
+  },
+  "home": {
+    "hero": {
+      "title": "Найдите работу своей мечты",
+      "subtitle": "Тысячи вакансий для студентов и выпускников Казахстана",
+      "searchPlaceholder": "Должность, ключевые слова",
+      "searchBtn": "Найти",
+      "register": "Зарегистрироваться",
+      "login": "Войти"
+    },
+    "categories": {
+      "title": "Вакансии по профессиям",
+      "openPositions": "открытых позиций"
+    },
+    "categories_list": {
+      "it": "IT и разработка",
+      "sales": "Продажи и маркетинг",
+      "finance": "Финансы и бухучёт",
+      "hr": "HR и кадры",
+      "engineering": "Инженерия",
+      "medicine": "Медицина",
+      "education": "Образование",
+      "construction": "Строительство"
+    },
+    "welcome": {
+      "greeting": "Добро пожаловать, {{name}}!",
+      "subtitle": "Находите и откликайтесь на вакансии, подходящие вашим навыкам"
+    },
+    "student": {
+      "searchTitle": "Поиск вакансий",
+      "searchPlaceholder": "Название должности или ключевые слова",
+      "profileCompletion": "Заполненность профиля",
+      "fillProfile": "Заполнить профиль →",
+      "myApplications": "Мои отклики",
+      "viewAll": "Посмотреть все →",
+      "profileCard": "Мой профиль",
+      "profileDesc": "Заполните резюме и информацию",
+      "jobsCard": "Вакансии",
+      "jobsDesc": "Просмотрите доступные вакансии",
+      "applicationsCard": "Мои отклики",
+      "applicationsDesc": "Отслеживайте статус заявок",
+      "recommended": "Рекомендуемые вакансии",
+      "fillProfileForRec": "Заполните профиль, чтобы получить персональные рекомендации",
+      "viewAllJobs": "Смотреть все вакансии"
+    },
+    "employer": {
+      "subtitle": "Управляйте вакансиями и находите лучших кандидатов",
+      "title": "Панель работодателя",
+      "description": "Публикуйте вакансии, просматривайте кандидатов и управляйте откликами",
+      "goToDashboard": "Перейти в панель"
+    },
+    "university": {
+      "subtitle": "Отслеживайте статистику трудоустройства выпускников",
+      "title": "Аналитика трудоустройства",
+      "description": "Полная статистика по трудоустройству студентов и анализ востребованных навыков",
+      "goToAnalytics": "Перейти в аналитику"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Вход в аккаунт",
+      "subtitle": "Введите email и пароль для входа",
+      "email": "Email",
+      "emailPlaceholder": "example@mail.com",
+      "password": "Пароль",
+      "passwordPlaceholder": "Введите пароль",
+      "forgotPassword": "Забыли пароль?",
+      "submitting": "Входим...",
+      "submit": "Войти",
+      "noAccount": "Нет аккаунта?",
+      "register": "Зарегистрироваться",
+      "stats": {
+        "companies": "Компаний",
+        "students": "Студентов",
+        "vacancies": "Вакансий"
+      },
+      "invalidCredentials": "Неверный email или пароль",
+      "error": "Ошибка входа. Попробуйте ещё раз."
+    },
+    "register": {
+      "heroTitle": "Начните свой путь к карьере",
+      "heroSubtitle": "Зарегистрируйтесь и получите доступ к тысячам вакансий для студентов Казахстана",
+      "feature1": "Студенты — находите стажировки и подработку",
+      "feature2": "Работодатели — нанимайте молодые таланты",
+      "feature3": "Университеты — следите за трудоустройством",
+      "title": "Создать аккаунт",
+      "subtitle": "Заполните форму для регистрации",
+      "iAm": "Я являюсь",
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "firstNamePlaceholder": "Алибек",
+      "lastNamePlaceholder": "Сейтов",
+      "yourUniversity": "Ваш университет",
+      "university": "Университет",
+      "selectUniversity": "— Выберите университет —",
+      "companyName": "Название компании",
+      "companyNamePlaceholder": "ТОО «Компания»",
+      "password": "Пароль",
+      "passwordPlaceholder": "Минимум 8 символов",
+      "passwordStrength": "Надёжность пароля",
+      "weak": "Слабый",
+      "medium": "Средний",
+      "strong": "Сильный",
+      "confirmPassword": "Подтвердите пароль",
+      "confirmPasswordPlaceholder": "Повторите пароль",
+      "passwordsMismatch": "Пароли не совпадают",
+      "iAccept": "Я принимаю",
+      "terms": "условия использования",
+      "privacy": "политику конфиденциальности",
+      "submitting": "Создаём аккаунт...",
+      "submit": "Зарегистрироваться",
+      "haveAccount": "Уже есть аккаунт?",
+      "loginLink": "Войти",
+      "errors": {
+        "passwordsMismatch": "Пароли не совпадают",
+        "passwordTooShort": "Пароль должен содержать минимум 8 символов",
+        "selectUniversity": "Выберите университет"
+      },
+      "success": "Регистрация успешна! Проверьте вашу почту.",
+      "error": "Ошибка регистрации. Попробуйте ещё раз.",
+      "roles": {
+        "student": "Студент",
+        "studentDesc": "Ищу работу",
+        "employer": "Работодатель",
+        "employerDesc": "Нанимаю",
+        "university": "Университет",
+        "universityDesc": "Аналитика"
+      }
+    },
+    "forgotPassword": {
+      "title": "Забыли пароль?",
+      "subtitle": "Введите ваш email и мы отправим код для сброса пароля",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submitting": "Отправляем...",
+      "submit": "Отправить код",
+      "backToLogin": "← Вернуться ко входу",
+      "successTitle": "Проверьте почту",
+      "successMessage": "Если аккаунт с адресом {{email}} существует, мы отправили код для сброса пароля.",
+      "enterCode": "Ввести код",
+      "error": "Произошла ошибка",
+      "toast": "Код для сброса пароля отправлен"
+    },
+    "resetPassword": {
+      "title": "Сброс пароля",
+      "subtitle": "Введите код из письма и новый пароль",
+      "code": "Код подтверждения",
+      "newPassword": "Новый пароль",
+      "passwordPlaceholder": "Минимум 8 символов",
+      "confirmPassword": "Подтвердите пароль",
+      "confirmPasswordPlaceholder": "Повторите пароль",
+      "passwordsMismatch": "Пароли не совпадают",
+      "submitting": "Сохраняем...",
+      "submit": "Сохранить новый пароль",
+      "getNewCode": "Получить новый код",
+      "backToLogin": "← Вернуться ко входу",
+      "errors": {
+        "codeRequired": "Введите 6-значный код",
+        "passwordTooShort": "Пароль должен быть не менее 8 символов",
+        "invalidCode": "Неверный или просроченный код"
+      },
+      "success": "Пароль успешно изменён!"
+    },
+    "verifyEmail": {
+      "title": "Подтверждение email",
+      "subtitle": "Мы отправили 6-значный код на",
+      "submitting": "Проверяем...",
+      "submit": "Подтвердить",
+      "noCode": "Не получили код?",
+      "resendCooldown": "Отправить повторно через {{seconds}}с",
+      "resend": "Отправить повторно",
+      "backToRegister": "← Вернуться к регистрации",
+      "errors": {
+        "codeRequired": "Введите 6-значный код",
+        "invalidCode": "Неверный или просроченный код"
+      },
+      "success": "Email успешно подтверждён!",
+      "resendSuccess": "Новый код отправлен на вашу почту",
+      "resendError": "Не удалось отправить код. Попробуйте ещё раз."
+    }
+  },
+  "profile": {
+    "title": "Мой профиль",
+    "subtitle": "Управляйте профилем и отслеживайте заявки",
+    "tabs": {
+      "profile": "Профиль",
+      "applications": "Мои заявки",
+      "documents": "Документы"
+    },
+    "edit": "Редактировать",
+    "fillProfile": "Заполните профиль студента",
+    "form": {
+      "firstName": "Имя *",
+      "lastName": "Фамилия *",
+      "iin": "ИИН * (12 цифр)",
+      "phone": "Телефон",
+      "city": "Город",
+      "cityPlaceholder": "Астана",
+      "specialization": "Специальность",
+      "specializationPlaceholder": "Информационные системы",
+      "university": "Университет",
+      "universityNotSet": "— не указан —",
+      "graduationYear": "Год выпуска",
+      "gpa": "GPA (0.0 – 4.0)",
+      "bio": "О себе",
+      "bioPlaceholder": "Кратко о себе, интересах и целях...",
+      "skills": "Навыки",
+      "addSkillPlaceholder": "Добавить навык...",
+      "skillsHint": "Навыки влияют на Match-Index при подаче заявок",
+      "saveBtn": "Сохранить",
+      "createBtn": "Создать профиль",
+      "requiredFields": "Имя, фамилия и ИИН обязательны"
+    },
+    "view": {
+      "about": "О себе",
+      "skills": "Навыки",
+      "phone": "Телефон",
+      "iin": "ИИН",
+      "graduationYear": "Год выпуска",
+      "gpa": "GPA",
+      "diplomaVerified": "Диплом подтверждён ✅",
+      "diplomaNotVerified": "Диплом не подтверждён",
+      "diplomaVerifiedHint": "Автоматически верифицирован {{date}}",
+      "diplomaNotVerifiedHint": "Заполните университет, специализацию и год выпуска для автоматической верификации"
+    },
+    "documents": {
+      "title": "Мои документы",
+      "uploadHint": "Загружайте CV, диплом и сертификаты для верификации университетом",
+      "uploading": "Загрузка...",
+      "upload": "Загрузить {{type}}",
+      "noDocuments": "Документов пока нет",
+      "noDocumentsHint": "Загрузите CV, диплом или сертификат",
+      "comment": "Комментарий: {{text}}",
+      "loadError": "Не удалось загрузить документы",
+      "deleteSuccess": "Документ удалён",
+      "deleteError": "Не удалось удалить документ",
+      "downloadError": "Ошибка скачивания",
+      "uploadSuccess": "{{type}} успешно загружен",
+      "uploadError": "Ошибка загрузки. Попробуйте ещё раз."
+    },
+    "applications": {
+      "title": "Мои заявки",
+      "empty": "У вас пока нет заявок",
+      "emptyHint": "Подайте заявку на понравившуюся вакансию",
+      "vacancyId": "Вакансия ID: {{id}}"
+    },
+    "status": {
+      "applied": "Подано",
+      "interview": "Собеседование",
+      "shortlisted": "Отобран",
+      "rejected": "Отклонено",
+      "offered": "Оффер"
+    },
+    "docStatus": {
+      "pending": "На проверке",
+      "verified": "✅ Подтверждён",
+      "rejected": "❌ Отклонён"
+    },
+    "toast": {
+      "saved": "Профиль сохранён!",
+      "errorSaving": "Ошибка сохранения",
+      "saveError": "Ошибка сохранения профиля. Попробуйте ещё раз.",
+      "tryUpdate": " — попробуйте обновить профиль"
+    },
+    "loading": "Загрузка профиля...",
+    "iinError": {
+      "format": "ИИН должен содержать ровно 12 цифр",
+      "checksum": "ИИН не прошёл проверку контрольной суммы"
+    }
+  },
+  "employer": {
+    "dashboard": {
+      "title": "Панель работодателя",
+      "subtitle": "Управляйте вакансиями, заявками и профилем компании"
+    },
+    "stats": {
+      "activeJobs": "Активных вакансий",
+      "totalApplications": "Всего заявок",
+      "interviews": "Собеседования",
+      "offers": "Офферы"
+    },
+    "tabs": {
+      "overview": "Обзор",
+      "jobs": "Вакансии",
+      "applications": "Заявки",
+      "profile": "Профиль компании"
+    },
+    "overview": {
+      "fillProfile": "Заполните профиль компании, чтобы ваши вакансии выглядели профессионально",
+      "fillProfileBtn": "Заполнить профиль →",
+      "quickActions": "Быстрые действия",
+      "postJob": "Опубликовать вакансию",
+      "viewApplications": "Просмотреть заявки",
+      "editProfile": "Редактировать профиль"
+    },
+    "jobs": {
+      "postNew": "+ Опубликовать вакансию",
+      "loading": "Загрузка вакансий...",
+      "empty": "У вас пока нет вакансий",
+      "emptyHint": "Нажмите «+ Опубликовать вакансию» чтобы опубликовать первую вакансию",
+      "active": "Активна",
+      "closed": "Закрыта",
+      "viewApplications": "Посмотреть заявки",
+      "close": "Закрыть",
+      "published": "Опубликовано: {{date}}"
+    },
+    "jobForm": {
+      "title": "Опубликовать вакансию",
+      "jobTitle": "Название должности *",
+      "jobTitlePlaceholder": "Например, Senior Developer",
+      "description": "Описание *",
+      "descriptionPlaceholder": "Опишите обязанности и требования...",
+      "location": "Город / Местоположение",
+      "locationPlaceholder": "Астана",
+      "salaryMin": "Зарплата от (₸)",
+      "salaryMax": "Зарплата до (₸)",
+      "jobType": "Тип занятости *",
+      "skills": "Необходимые навыки",
+      "skillsPlaceholder": "JavaScript, React, Node.js",
+      "submit": "Опубликовать",
+      "submitting": "Публикуем...",
+      "success": "Вакансия успешно опубликована!",
+      "requiredFields": "Заполните обязательные поля: название, описание и тип занятости",
+      "error": "Ошибка при создании вакансии"
+    },
+    "applications": {
+      "selectVacancy": "Выберите вакансию",
+      "selectVacancyPlaceholder": "-- Выберите вакансию --",
+      "loading": "Загрузка заявок...",
+      "empty": "Заявок пока нет",
+      "selectFirst": "Выберите вакансию, чтобы увидеть заявки",
+      "submitted": "Подана: {{date}}",
+      "skills": "Навыки: {{skills}}",
+      "student": "Студент",
+      "profileLink": "Профиль →",
+      "toInterview": "На собеседование",
+      "accept": "Принять",
+      "reject": "Отклонить",
+      "vacancyActive": "активна",
+      "vacancyClosed": "закрыта"
+    },
+    "profile": {
+      "title": "Профиль компании",
+      "subtitleUpdate": "Обновите информацию о вашей компании",
+      "subtitleCreate": "Заполните профиль компании — это повысит доверие студентов к вашим вакансиям",
+      "loading": "Загрузка...",
+      "bin": "БИН (Бизнес-идентификационный номер) *",
+      "binPlaceholder": "12-значный номер",
+      "binVerified": "✅ Подтверждён",
+      "binPending": "⏳ На проверке",
+      "binHint": "БИН используется для верификации компании. Должен содержать ровно 12 цифр.",
+      "companyName": "Название компании *",
+      "companyNamePlaceholder": "ТОО «Моя Компания»",
+      "description": "Описание компании",
+      "descriptionPlaceholder": "Расскажите о компании, чем вы занимаетесь, какова ваша миссия...",
+      "industry": "Отрасль",
+      "selectIndustry": "Выберите отрасль",
+      "companySize": "Размер компании",
+      "selectSize": "Выберите размер",
+      "city": "Город / Местоположение",
+      "cityPlaceholder": "Алматы, Казахстан",
+      "website": "Веб-сайт",
+      "contactEmail": "Контактный Email",
+      "contactPhone": "Контактный телефон",
+      "saveBtn": "Обновить профиль",
+      "createBtn": "Создать профиль",
+      "saving": "Сохранение...",
+      "success": "Профиль компании сохранён!",
+      "companyNameRequired": "Название компании обязательно",
+      "loadError": "Не удалось загрузить профиль"
+    },
+    "status": {
+      "applied": "Подана",
+      "interview": "Собеседование",
+      "shortlisted": "В шортлисте",
+      "rejected": "Отклонена",
+      "offered": "Оффер"
+    }
+  },
+  "university": {
+    "title": "Аналитика университета",
+    "subtitle": "Мониторинг занятости студентов на основе реальных данных",
+    "loading": "Загрузка аналитики...",
+    "loadError": "Не удалось загрузить аналитику",
+    "stats": {
+      "totalStudents": "Студентов в системе",
+      "totalApplications": "Всего заявок",
+      "offersReceived": "Получили оффер",
+      "activeVacancies": "Активных вакансий"
+    },
+    "tabs": {
+      "overview": "Обзор",
+      "myStudents": "Мои студенты",
+      "docReview": "📋 Документы",
+      "students": "Студенты",
+      "employers": "Работодатели",
+      "statistics": "Статистика"
+    },
+    "overview": {
+      "applicationStatuses": "Статусы заявок студентов",
+      "noApplications": "Данных о заявках пока нет",
+      "conversionRate": "Конверсия в оффер",
+      "offersFromApplications": "{{offers}} офферов из {{total}} заявок",
+      "vacanciesByCity": "Вакансии по городам",
+      "noVacancies": "Вакансий пока нет"
+    },
+    "myStudents": {
+      "title": "Студенты вашего университета",
+      "count": "({{count}} чел.)",
+      "loading": "Загрузка...",
+      "empty": "Студентов вашего университета пока нет в системе",
+      "emptyHint": "Студенты должны выбрать ваш университет при регистрации или в профиле",
+      "columns": {
+        "student": "Студент",
+        "specialization": "Специализация",
+        "gpa": "GPA",
+        "graduation": "Выпуск",
+        "skills": "Навыки"
+      },
+      "loadError": "Не удалось загрузить список студентов"
+    },
+    "docReview": {
+      "title": "Верификация документов",
+      "hint": "Нажмите на студента, чтобы просмотреть его документы",
+      "loading": "Загрузка студентов...",
+      "empty": "Студентов вашего университета нет в системе",
+      "noSpecialization": "Специализация не указана",
+      "docsLoading": "Загрузка документов...",
+      "noDocs": "Студент ещё не загрузил документы",
+      "docVerified": "Документ подтверждён",
+      "docRejected": "Документ отклонён",
+      "verifyError": "Ошибка подтверждения",
+      "rejectError": "Ошибка отклонения",
+      "downloadError": "Ошибка скачивания",
+      "loadError": "Не удалось загрузить документы",
+      "studentsLoadError": "Не удалось загрузить студентов",
+      "confirm": "Подтвердить",
+      "reject": "Отклонить",
+      "download": "Скачать"
+    },
+    "students": {
+      "title": "Студенты по специализации",
+      "noSpecialization": "Студенты ещё не заполнили специализацию в профиле",
+      "count": "студентов"
+    },
+    "employers": {
+      "title": "Распределение вакансий по типу",
+      "ofAll": "% от всех вакансий",
+      "noVacancies": "Вакансий пока нет"
+    },
+    "statistics": {
+      "topSkills": "Самые востребованные навыки",
+      "topSkillsHint": "из вакансий работодателей",
+      "noSkills": "Данных о навыках нет",
+      "mentions": "упоминаний в вакансиях",
+      "summary": "Сводка по системе",
+      "columns": {
+        "metric": "Метрика",
+        "value": "Значение"
+      },
+      "rows": {
+        "students": "Студентов в системе",
+        "vacancies": "Активных вакансий",
+        "applications": "Всего заявок",
+        "offers": "Получили оффер",
+        "conversion": "Конверсия в оффер",
+        "uniqueSkills": "Уникальных навыков в вакансиях"
+      }
+    },
+    "appStatus": {
+      "applied": "Подана",
+      "interview": "Собеседование",
+      "shortlisted": "В шортлисте",
+      "offered": "Оффер",
+      "rejected": "Отклонена"
+    }
+  },
+  "jobs": {
+    "browse": {
+      "title": "Поиск вакансий",
+      "subtitle": "Найдите следующую возможность",
+      "filters": "Фильтры",
+      "searchLabel": "Поиск",
+      "searchPlaceholder": "Должность, навык...",
+      "jobType": "Тип занятости",
+      "allTypes": "Все типы",
+      "fullTime": "Полная занятость",
+      "partTime": "Частичная занятость",
+      "internship": "Стажировка",
+      "contract": "Контракт",
+      "location": "Город",
+      "locationPlaceholder": "Город...",
+      "resetFilters": "Сбросить фильтры",
+      "loading": "Загрузка вакансий...",
+      "found": "Найдено",
+      "vacanciesCount": "вакансий",
+      "page": "Страница {{page}} из {{total}}",
+      "empty": "Нет вакансий по заданным фильтрам",
+      "prev": "← Назад",
+      "next": "Вперёд →",
+      "apply": "Подать заявку",
+      "loadError": "Не удалось загрузить вакансии"
+    },
+    "details": {
+      "description": "Описание вакансии",
+      "skills": "Требуемые навыки",
+      "loading": "Загрузка вакансии...",
+      "notFound": "Вакансия не найдена",
+      "loadError": "Не удалось загрузить вакансию",
+      "published": "Опубликовано:",
+      "successTitle": "Заявка отправлена!",
+      "successMessage": "Работодатель рассмотрит вашу кандидатуру",
+      "myApplications": "Мои заявки",
+      "applyBtn": "Подать заявку",
+      "coverLetter": "Сопроводительное письмо",
+      "coverLetterPlaceholder": "Расскажите почему вы подходите для этой роли...",
+      "submitting": "Отправка...",
+      "submit": "Отправить заявку",
+      "onlyStudents": "Только студенты могут подавать заявки",
+      "active": "Активна",
+      "closed": "Закрыта",
+      "applySuccess": "Заявка успешно отправлена!",
+      "applyError": "Ошибка при подаче заявки",
+      "employer": "Работодатель"
+    },
+    "applyModal": {
+      "title": "Подать заявку",
+      "coverLetter": "Сопроводительное письмо",
+      "coverLetterPlaceholder": "Расскажите о себе и почему вы подходите для этой вакансии...",
+      "submitting": "Отправка...",
+      "submit": "Отправить заявку",
+      "cancel": "Отмена"
+    }
+  },
+  "candidate": {
+    "loading": "Загрузка профиля...",
+    "notFound": "Кандидат не найден",
+    "loadError": "Не удалось загрузить профиль кандидата",
+    "about": "О себе",
+    "skills": "Навыки",
+    "data": "Данные",
+    "gpa": "GPA",
+    "graduationYear": "Год выпуска",
+    "specialization": "Специализация",
+    "graduation": "Выпуск {{year}}",
+    "applicationStatus": "Статус заявки",
+    "status": {
+      "applied": "Подана",
+      "interview": "Собеседование",
+      "shortlisted": "В шортлисте",
+      "offered": "Оффер",
+      "rejected": "Отклонена"
+    },
+    "toInterview": "На собеседование",
+    "shortlist": "В шортлист",
+    "offer": "Выдать оффер",
+    "reject": "Отклонить",
+    "documents": "Документы",
+    "docsLoading": "Загрузка...",
+    "noDocs": "Документов нет",
+    "docVerifiedByUniversity": "Verified by University",
+    "docRejected": "Отклонён",
+    "docPending": "На проверке",
+    "identification": "Идентификация",
+    "iin": "ИИН",
+    "statusUpdated": "Статус обновлён",
+    "statusUpdateError": "Не удалось обновить статус"
+  },
+  "notFound": {
+    "title": "Страница не найдена",
+    "heading": "Похоже, вы потерялись",
+    "description": "Страница, которую вы ищете, не существует или была перемещена. Проверьте адрес или вернитесь на главную.",
+    "home": "На главную",
+    "back": "Назад",
+    "quickLinks": "Быстрые ссылки",
+    "jobs": "Вакансии",
+    "profile": "Мой профиль",
+    "employerDashboard": "Панель работодателя",
+    "analytics": "Аналитика"
+  },
+  "sessions": {
+    "titles": {
+      "student": "Заполните профиль студента",
+      "employer": "Заполните профиль работодателя",
+      "university": "Заполните профиль университета",
+      "default": "Заполните профиль"
+    },
+    "descriptions": {
+      "student": "Предоставьте личную информацию для начала поиска возможностей",
+      "employer": "Введите данные компании для размещения вакансий",
+      "university": "Предоставьте информацию об университете для управления",
+      "default": "Заполните информацию профиля"
+    },
+    "loggedInAs": "Вы вошли как",
+    "logout": "Выйти",
+    "skip": "Пропустить"
+  },
+  "docTypes": {
+    "cv": "CV / Резюме",
+    "certificate": "Сертификат"
+  },
+  "industries": {
+    "Технологии": "Технологии",
+    "Финансы": "Финансы",
+    "Образование": "Образование",
+    "Здравоохранение": "Здравоохранение",
+    "Производство": "Производство",
+    "Торговля": "Торговля",
+    "Консалтинг": "Консалтинг",
+    "Медиа": "Медиа",
+    "Строительство": "Строительство",
+    "Другое": "Другое"
+  },
+  "time": {
+    "justNow": "только что",
+    "minutesAgo": "{{count}} мин назад",
+    "hoursAgo": "{{count}} ч назад",
+    "yesterday": "вчера",
+    "daysAgo": "{{count}} дн назад"
+  },
+  "employerDashboard": {
+    "title": "Панель работодателя",
+    "tabs": {
+      "overview": "Обзор",
+      "jobs": "Вакансии",
+      "applications": "Заявки",
+      "profile": "Профиль компании"
+    },
+    "stats": {
+      "activeJobs": "Активных вакансий",
+      "totalApplications": "Всего заявок",
+      "newApplications": "Новых заявок",
+      "hired": "Нанято",
+      "interviews": "Собеседования",
+      "offers": "Офферы"
+    },
+    "overview": {
+      "fillProfilePrompt": "Заполните профиль компании, чтобы ваши вакансии выглядели профессионально",
+      "fillProfileBtn": "Заполнить профиль →",
+      "quickActions": "Быстрые действия",
+      "postJob": "Опубликовать вакансию",
+      "viewApplications": "Просмотреть заявки",
+      "editProfile": "Редактировать профиль"
+    },
+    "jobs": {
+      "postNew": "+ Опубликовать вакансию",
+      "loading": "Загрузка вакансий...",
+      "empty": "У вас пока нет вакансий",
+      "emptyHint": "Нажмите кнопку выше, чтобы опубликовать первую вакансию",
+      "statusActive": "Активна",
+      "statusClosed": "Закрыта",
+      "published": "Опубликовано:",
+      "viewApplications": "Посмотреть заявки",
+      "close": "Закрыть"
+    },
+    "applications": {
+      "selectVacancy": "Выберите вакансию",
+      "selectVacancyPlaceholder": "-- Выберите вакансию --",
+      "vacancyActive": "активна",
+      "vacancyClosed": "закрыта",
+      "selectToView": "Выберите вакансию, чтобы увидеть заявки",
+      "loading": "Загрузка заявок...",
+      "empty": "Заявок пока нет",
+      "skills": "Навыки:",
+      "submitted": "Подана:",
+      "viewProfile": "Профиль →",
+      "toInterview": "На собеседование",
+      "accept": "Принять",
+      "reject": "Отклонить"
+    },
+    "companyProfile": {
+      "title": "Профиль компании",
+      "updateSubtitle": "Обновите информацию о вашей компании",
+      "createSubtitle": "Заполните профиль компании — это повысит доверие студентов к вашим вакансиям",
+      "loading": "Загрузка...",
+      "binLabel": "БИН (Бизнес-идентификационный номер) *",
+      "binPlaceholder": "12-значный номер",
+      "binVerified": "✅ Подтверждён",
+      "binPending": "⏳ На проверке",
+      "binHint": "БИН используется для верификации компании. Должен содержать ровно 12 цифр.",
+      "companyName": "Название компании *",
+      "companyNamePlaceholder": "ТОО «Моя Компания»",
+      "description": "Описание компании",
+      "descriptionPlaceholder": "Расскажите о компании, чем вы занимаетесь, какова ваша миссия...",
+      "industry": "Отрасль",
+      "industryPlaceholder": "Выберите отрасль",
+      "companySize": "Размер компании",
+      "companySizePlaceholder": "Выберите размер",
+      "employees": "сотрудников",
+      "location": "Город / Местоположение",
+      "locationPlaceholder": "Алматы, Казахстан",
+      "website": "Веб-сайт",
+      "contactEmail": "Контактный Email",
+      "contactPhone": "Контактный телефон",
+      "saving": "Сохранение...",
+      "update": "Обновить профиль",
+      "create": "Создать профиль",
+      "companyNameRequired": "Название компании обязательно",
+      "saveError": "Ошибка при сохранении. Попробуйте ещё раз."
+    },
+    "jobModal": {
+      "title": "Опубликовать вакансию",
+      "titleLabel": "Название должности *",
+      "titlePlaceholder": "напр., Старший разработчик",
+      "descriptionLabel": "Описание вакансии *",
+      "descriptionPlaceholder": "Опишите роль, обязанности и требования...",
+      "locationLabel": "Местоположение",
+      "locationPlaceholder": "напр., Астана, Удалённо",
+      "jobTypeLabel": "Тип занятости *",
+      "minSalaryLabel": "Мин. зарплата (₸)",
+      "maxSalaryLabel": "Макс. зарплата (₸)",
+      "skillsLabel": "Требуемые навыки",
+      "skillsPlaceholder": "напр., React, Node.js, TypeScript",
+      "skillsHint": "Разделяйте навыки запятой",
+      "submitting": "Публикация...",
+      "submit": "Опубликовать",
+      "cancel": "Отмена"
+    },
+    "errors": {
+      "loadJobs": "Не удалось загрузить вакансии",
+      "loadApplications": "Не удалось загрузить заявки",
+      "loadProfile": "Не удалось загрузить профиль",
+      "createJob": "Ошибка при создании вакансии"
+    },
+    "form": {
+      "errors": {
+        "missingFields": "Заполните обязательные поля: название, описание и тип занятости",
+        "createJob": "Ошибка при создании вакансии"
+      },
+      "success": {
+        "posted": "Вакансия успешно опубликована!"
+      }
+    },
+    "profile": {
+      "success": {
+        "saved": "Профиль компании сохранён!"
+      }
+    }
+  },
+  "sessions": {
+    "titles": {
+      "student": "Заполните профиль студента",
+      "employer": "Заполните профиль работодателя",
+      "university": "Заполните профиль университета",
+      "default": "Заполните профиль"
+    },
+    "descriptions": {
+      "student": "Предоставьте личную информацию, чтобы начать поиск возможностей",
+      "employer": "Введите данные о компании, чтобы начать публикацию вакансий",
+      "university": "Предоставьте информацию об университете для управления кампусными активностями",
+      "default": "Заполните информацию о профиле"
+    },
+    "loggedInAs": "Вы вошли как",
+    "logout": "Выйти",
+    "successMessage": "Профиль успешно создан!",
+    "loading": "Загрузка..."
+  },
+  "universityAnalytics": {
+    "title": "Панель аналитики университета",
+    "subtitle": "Мониторинг занятости студентов на основе реальных данных",
+    "loading": "Загрузка аналитики...",
+    "tabs": {
+      "overview": "Обзор",
+      "myStudents": "Мои студенты",
+      "docReview": "Документы",
+      "students": "Студенты",
+      "employers": "Работодатели",
+      "statistics": "Статистика"
+    },
+    "stats": {
+      "studentsTotal": "Студентов в системе",
+      "applicationsTotal": "Всего заявок",
+      "offersReceived": "Получили оффер",
+      "activeVacancies": "Активных вакансий"
+    },
+    "overview": {
+      "applicationStatuses": "Статусы заявок студентов",
+      "noApplicationData": "Данных о заявках пока нет",
+      "conversionRate": "Конверсия в оффер",
+      "offersFromApplications": "{{offers}} офферов из {{total}} заявок",
+      "vacanciesByLocation": "Вакансии по городам",
+      "noVacancies": "Вакансий пока нет"
+    },
+    "myStudents": {
+      "title": "Студенты вашего университета",
+      "count": "({{count}} чел.)",
+      "loading": "Загрузка...",
+      "noStudents": "Студентов вашего университета пока нет в системе",
+      "noStudentsHint": "Студенты должны выбрать ваш университет при регистрации или в профиле",
+      "table": {
+        "student": "Студент",
+        "specialization": "Специализация",
+        "gpa": "GPA",
+        "graduation": "Выпуск",
+        "skills": "Навыки"
+      }
+    },
+    "docReview": {
+      "title": "Верификация документов",
+      "hint": "Нажмите на студента, чтобы просмотреть его документы",
+      "loadingStudents": "Загрузка студентов...",
+      "noStudents": "Студентов вашего университета нет в системе",
+      "loadingDocs": "Загрузка документов...",
+      "noDocs": "Студент ещё не загрузил документы",
+      "download": "Скачать",
+      "verify": "Подтвердить",
+      "reject": "Отклонить",
+      "specializationNotSet": "Специализация не указана"
+    },
+    "students": {
+      "bySpecialization": "Студенты по специализации",
+      "totalStudents": "({{total}} всего)",
+      "noSpecializations": "Студенты ещё не заполнили специализацию в профиле",
+      "studentsCount": "{{count}} студентов"
+    },
+    "employers": {
+      "vacanciesByType": "Распределение вакансий по типу",
+      "percentageOfTotal": "{{percentage}}% от всех вакансий"
+    },
+    "statistics": {
+      "demandedSkills": "Самые востребованные навыки",
+      "fromVacancies": "из вакансий работодателей",
+      "noSkillsData": "Данных о навыках нет",
+      "mentionsInVacancies": "упоминаний в вакансиях",
+      "summary": "Сводка по системе",
+      "metrics": {
+        "studentsInSystem": "Студентов в системе",
+        "activeVacancies": "Активных вакансий",
+        "totalApplications": "Всего заявок",
+        "offersReceived": "Получили оффер",
+        "conversionRate": "Конверсия в оффер",
+        "uniqueSkills": "Уникальных навыков в вакансиях"
+      }
+    },
+    "status": {
+      "applied": "Подана",
+      "interview": "Собеседование",
+      "shortlisted": "В шортлисте",
+      "offered": "Оффер",
+      "rejected": "Отклонена"
+    },
+    "docStatus": {
+      "pending": "На проверке",
+      "verified": "✅ Подтверждён",
+      "rejected": "❌ Отклонён"
+    },
+    "errors": {
+      "loadAnalytics": "Не удалось загрузить аналитику",
+      "loadStudents": "Не удалось загрузить список студентов",
+      "loadStudentDocs": "Не удалось загрузить документы",
+      "verifyDoc": "Ошибка подтверждения",
+      "rejectDoc": "Ошибка отклонения",
+      "downloadDoc": "Ошибка скачивания"
+    },
+    "success": {
+      "docVerified": "Документ подтверждён",
+      "docRejected": "Документ отклонён"
+    }
+  }
+}

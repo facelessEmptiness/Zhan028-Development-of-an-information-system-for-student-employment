@@ -1,0 +1,902 @@
+{
+  "common": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "delete": "Delete",
+    "download": "Download",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "← Back",
+    "error": "Error",
+    "confirm": "Confirm",
+    "reject": "Reject",
+    "send": "Send",
+    "search": "Search",
+    "close": "Close",
+    "update": "Update",
+    "profile": "Profile",
+    "employees": "employees",
+    "employees_count": "{{count}} employees",
+    "notSpecified": "Not specified"
+  },
+  "nav": {
+    "jobs": "Jobs",
+    "myProfile": "My Profile",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "login": "Log In",
+    "register": "Register",
+    "logout": "Log Out",
+    "notifications": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllRead": "Mark all read",
+    "loggedInAs": "Logged in as",
+    "language": "Language"
+  },
+  "role": {
+    "student": "Student",
+    "employer": "Employer",
+    "university": "University",
+    "admin": "Administrator"
+  },
+  "home": {
+    "hero": {
+      "title": "Find your dream job",
+      "subtitle": "Thousands of vacancies for students and graduates of Kazakhstan",
+      "searchPlaceholder": "Position, keywords",
+      "searchBtn": "Search",
+      "register": "Sign Up",
+      "login": "Log In"
+    },
+    "categories": {
+      "title": "Jobs by profession",
+      "openPositions": "open positions"
+    },
+    "welcome": {
+      "greeting": "Welcome, {{name}}!",
+      "subtitle": "Find and apply for jobs that match your skills"
+    },
+    "student": {
+      "searchTitle": "Search Jobs",
+      "searchPlaceholder": "Job title or keywords",
+      "profileCompletion": "Profile completion",
+      "fillProfile": "Fill in profile →",
+      "myApplications": "My Applications",
+      "viewAll": "View all →",
+      "profileCard": "My Profile",
+      "profileDesc": "Fill in your resume and info",
+      "jobsCard": "Jobs",
+      "jobsDesc": "Browse available vacancies",
+      "applicationsCard": "My Applications",
+      "applicationsDesc": "Track your application status",
+      "recommended": "Recommended Jobs",
+      "fillProfileForRec": "Fill in your profile to get personalized recommendations",
+      "viewAllJobs": "View all jobs"
+    },
+    "employer": {
+      "subtitle": "Manage vacancies and find the best candidates",
+      "title": "Employer Dashboard",
+      "description": "Post jobs, browse candidates, and manage applications",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "university": {
+      "subtitle": "Track graduate employment statistics",
+      "title": "Employment Analytics",
+      "description": "Full statistics on student employment and in-demand skills analysis",
+      "goToAnalytics": "Go to Analytics"
+    },
+    "categories_list": {
+      "it": "IT & Development",
+      "sales": "Sales & Marketing",
+      "finance": "Finance & Accounting",
+      "hr": "HR & Recruiting",
+      "engineering": "Engineering",
+      "medicine": "Medicine",
+      "education": "Education",
+      "construction": "Construction"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Enter your email and password to log in",
+      "email": "Email",
+      "emailPlaceholder": "example@mail.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "submitting": "Signing in...",
+      "submit": "Log In",
+      "noAccount": "Don't have an account?",
+      "register": "Sign Up",
+      "stats": {
+        "companies": "Companies",
+        "students": "Students",
+        "vacancies": "Vacancies"
+      },
+      "invalidCredentials": "Invalid email or password",
+      "error": "Login error. Please try again."
+    },
+    "register": {
+      "heroTitle": "Start your career journey",
+      "heroSubtitle": "Sign up and get access to thousands of vacancies for students in Kazakhstan",
+      "feature1": "Students — find internships and part-time jobs",
+      "feature2": "Employers — hire young talent",
+      "feature3": "Universities — track employment",
+      "title": "Create an Account",
+      "subtitle": "Fill in the form to register",
+      "iAm": "I am a",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "firstNamePlaceholder": "John",
+      "lastNamePlaceholder": "Doe",
+      "yourUniversity": "Your University",
+      "university": "University",
+      "selectUniversity": "— Select a university —",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "My Company Ltd.",
+      "password": "Password",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "passwordStrength": "Password strength",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat password",
+      "passwordsMismatch": "Passwords do not match",
+      "iAccept": "I accept the",
+      "terms": "terms of service",
+      "privacy": "privacy policy",
+      "submitting": "Creating account...",
+      "submit": "Sign Up",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log In",
+      "errors": {
+        "passwordsMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "selectUniversity": "Please select a university"
+      },
+      "success": "Registration successful! Please check your email.",
+      "error": "Registration error. Please try again.",
+      "roles": {
+        "student": "Student",
+        "studentDesc": "Looking for work",
+        "employer": "Employer",
+        "employerDesc": "Hiring",
+        "university": "University",
+        "universityDesc": "Analytics"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "Enter your email and we'll send you a reset code",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submitting": "Sending...",
+      "submit": "Send Code",
+      "backToLogin": "← Back to login",
+      "successTitle": "Check your email",
+      "successMessage": "If an account with {{email}} exists, we sent a password reset code.",
+      "enterCode": "Enter code",
+      "error": "An error occurred",
+      "toast": "Password reset code sent"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter the code from the email and a new password",
+      "code": "Confirmation Code",
+      "newPassword": "New Password",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat password",
+      "passwordsMismatch": "Passwords do not match",
+      "submitting": "Saving...",
+      "submit": "Save New Password",
+      "getNewCode": "Get new code",
+      "backToLogin": "← Back to login",
+      "errors": {
+        "codeRequired": "Enter a 6-digit code",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "invalidCode": "Invalid or expired code"
+      },
+      "success": "Password changed successfully!"
+    },
+    "verifyEmail": {
+      "title": "Email Verification",
+      "subtitle": "We sent a 6-digit code to",
+      "submitting": "Verifying...",
+      "submit": "Verify",
+      "noCode": "Didn't receive the code?",
+      "resendCooldown": "Resend in {{seconds}}s",
+      "resend": "Resend",
+      "backToRegister": "← Back to registration",
+      "errors": {
+        "codeRequired": "Enter the 6-digit code",
+        "invalidCode": "Invalid or expired code"
+      },
+      "success": "Email verified successfully!",
+      "resendSuccess": "New code sent to your email",
+      "resendError": "Failed to resend code. Please try again."
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your profile and track applications",
+    "tabs": {
+      "profile": "Profile",
+      "applications": "My Applications",
+      "documents": "Documents"
+    },
+    "edit": "Edit",
+    "fillProfile": "Fill in your student profile",
+    "form": {
+      "firstName": "First Name *",
+      "lastName": "Last Name *",
+      "iin": "IIN * (12 digits)",
+      "phone": "Phone",
+      "city": "City",
+      "cityPlaceholder": "Astana",
+      "specialization": "Specialization",
+      "specializationPlaceholder": "Information Systems",
+      "university": "University",
+      "universityNotSet": "— not selected —",
+      "graduationYear": "Graduation Year",
+      "gpa": "GPA (0.0 – 4.0)",
+      "bio": "About Me",
+      "bioPlaceholder": "Briefly about yourself, interests and goals...",
+      "skills": "Skills",
+      "addSkillPlaceholder": "Add skill...",
+      "skillsHint": "Skills affect the Match-Index when applying",
+      "saveBtn": "Save",
+      "createBtn": "Create Profile",
+      "requiredFields": "First name, last name and IIN are required"
+    },
+    "view": {
+      "about": "About Me",
+      "skills": "Skills",
+      "phone": "Phone",
+      "iin": "IIN",
+      "graduationYear": "Graduation Year",
+      "gpa": "GPA",
+      "diplomaVerified": "Diploma Verified ✅",
+      "diplomaNotVerified": "Diploma Not Verified",
+      "diplomaVerifiedHint": "Automatically verified on {{date}}",
+      "diplomaNotVerifiedHint": "Fill in university, specialization and graduation year for automatic verification"
+    },
+    "documents": {
+      "title": "My Documents",
+      "uploadHint": "Upload your CV and certificates for university verification",
+      "uploading": "Uploading...",
+      "upload": "Upload {{type}}",
+      "noDocuments": "No documents yet",
+      "noDocumentsHint": "Upload a CV or certificate",
+      "comment": "Comment: {{text}}",
+      "loadError": "Failed to load documents",
+      "deleteSuccess": "Document deleted",
+      "deleteError": "Failed to delete document",
+      "downloadError": "Download error",
+      "uploadSuccess": "{{type}} uploaded successfully",
+      "uploadError": "Upload error. Please try again."
+    },
+    "applications": {
+      "title": "My Applications",
+      "empty": "No applications yet",
+      "emptyHint": "Apply for a job you like",
+      "vacancyId": "Vacancy ID: {{id}}"
+    },
+    "status": {
+      "applied": "Applied",
+      "interview": "Interview",
+      "shortlisted": "Shortlisted",
+      "rejected": "Rejected",
+      "offered": "Offered"
+    },
+    "docStatus": {
+      "pending": "Pending",
+      "verified": "✅ Verified",
+      "rejected": "❌ Rejected"
+    },
+    "toast": {
+      "saved": "Profile saved!",
+      "errorSaving": "Error saving",
+      "saveError": "Error saving profile. Please try again.",
+      "tryUpdate": " — try updating the profile"
+    },
+    "loading": "Loading profile...",
+    "iinError": {
+      "format": "IIN must be exactly 12 digits",
+      "checksum": "IIN failed checksum validation"
+    }
+  },
+  "employer": {
+    "dashboard": {
+      "title": "Employer Dashboard",
+      "subtitle": "Manage your jobs, applications, and company profile"
+    },
+    "stats": {
+      "activeJobs": "Active Jobs",
+      "totalApplications": "Total Applications",
+      "interviews": "Interviews",
+      "offers": "Offers"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "jobs": "Jobs",
+      "applications": "Applications",
+      "profile": "Company Profile"
+    },
+    "overview": {
+      "fillProfile": "Fill in your company profile to make your vacancies look professional",
+      "fillProfileBtn": "Fill in profile →",
+      "quickActions": "Quick Actions",
+      "postJob": "Post a Job",
+      "viewApplications": "View Applications",
+      "editProfile": "Edit Profile"
+    },
+    "jobs": {
+      "postNew": "+ Post New Job",
+      "loading": "Loading jobs...",
+      "empty": "No jobs yet",
+      "emptyHint": "Click «+ Post New Job» to publish your first vacancy",
+      "active": "Active",
+      "closed": "Closed",
+      "viewApplications": "View Applications",
+      "close": "Close",
+      "published": "Published: {{date}}"
+    },
+    "jobForm": {
+      "title": "Post New Job",
+      "jobTitle": "Job Title *",
+      "jobTitlePlaceholder": "e.g., Senior Developer",
+      "description": "Description *",
+      "descriptionPlaceholder": "Describe responsibilities and requirements...",
+      "location": "City / Location",
+      "locationPlaceholder": "Astana",
+      "salaryMin": "Salary from (₸)",
+      "salaryMax": "Salary to (₸)",
+      "jobType": "Job Type *",
+      "skills": "Required Skills",
+      "skillsPlaceholder": "JavaScript, React, Node.js",
+      "submit": "Publish",
+      "submitting": "Publishing...",
+      "success": "Job posted successfully!",
+      "requiredFields": "Fill in required fields: title, description and job type",
+      "error": "Error creating job"
+    },
+    "applications": {
+      "selectVacancy": "Select a Vacancy",
+      "selectVacancyPlaceholder": "-- Select a vacancy --",
+      "loading": "Loading applications...",
+      "empty": "No applications yet",
+      "selectFirst": "Select a vacancy to see applications",
+      "submitted": "Submitted: {{date}}",
+      "skills": "Skills: {{skills}}",
+      "student": "Student",
+      "profileLink": "Profile →",
+      "toInterview": "To Interview",
+      "accept": "Accept",
+      "reject": "Reject",
+      "vacancyActive": "active",
+      "vacancyClosed": "closed"
+    },
+    "profile": {
+      "title": "Company Profile",
+      "subtitleUpdate": "Update your company information",
+      "subtitleCreate": "Fill in your company profile — it increases trust from students",
+      "loading": "Loading...",
+      "bin": "BIN (Business Identification Number) *",
+      "binPlaceholder": "12-digit number",
+      "binVerified": "✅ Verified",
+      "binPending": "⏳ Pending",
+      "binHint": "BIN is used for company verification. Must be exactly 12 digits.",
+      "companyName": "Company Name *",
+      "companyNamePlaceholder": "My Company Ltd.",
+      "description": "Company Description",
+      "descriptionPlaceholder": "Tell about your company, what you do, your mission...",
+      "industry": "Industry",
+      "selectIndustry": "Select industry",
+      "companySize": "Company Size",
+      "selectSize": "Select size",
+      "city": "City / Location",
+      "cityPlaceholder": "Almaty, Kazakhstan",
+      "website": "Website",
+      "contactEmail": "Contact Email",
+      "contactPhone": "Contact Phone",
+      "saveBtn": "Update Profile",
+      "createBtn": "Create Profile",
+      "saving": "Saving...",
+      "success": "Company profile saved!",
+      "companyNameRequired": "Company name is required",
+      "loadError": "Failed to load profile"
+    },
+    "status": {
+      "applied": "Applied",
+      "interview": "Interview",
+      "shortlisted": "Shortlisted",
+      "rejected": "Rejected",
+      "offered": "Offered"
+    }
+  },
+  "university": {
+    "title": "University Analytics",
+    "subtitle": "Monitor student employment based on real data",
+    "loading": "Loading analytics...",
+    "loadError": "Failed to load analytics",
+    "stats": {
+      "totalStudents": "Students in system",
+      "totalApplications": "Total applications",
+      "offersReceived": "Received offers",
+      "activeVacancies": "Active vacancies"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "myStudents": "My Students",
+      "docReview": "📋 Documents",
+      "students": "Students",
+      "employers": "Employers",
+      "statistics": "Statistics"
+    },
+    "overview": {
+      "applicationStatuses": "Student Application Statuses",
+      "noApplications": "No application data yet",
+      "conversionRate": "Offer Conversion Rate",
+      "offersFromApplications": "{{offers}} offers from {{total}} applications",
+      "vacanciesByCity": "Vacancies by City",
+      "noVacancies": "No vacancies yet"
+    },
+    "myStudents": {
+      "title": "Students at your university",
+      "count": "({{count}} students)",
+      "loading": "Loading...",
+      "empty": "No students from your university in the system yet",
+      "emptyHint": "Students must select your university when registering or in their profile",
+      "columns": {
+        "student": "Student",
+        "specialization": "Specialization",
+        "gpa": "GPA",
+        "graduation": "Graduation",
+        "skills": "Skills"
+      },
+      "loadError": "Failed to load students"
+    },
+    "docReview": {
+      "title": "Document Verification",
+      "hint": "Click on a student to view their documents",
+      "loading": "Loading students...",
+      "empty": "No students from your university in the system",
+      "noSpecialization": "No specialization specified",
+      "docsLoading": "Loading documents...",
+      "noDocs": "Student has not uploaded documents yet",
+      "docVerified": "Document verified",
+      "docRejected": "Document rejected",
+      "verifyError": "Verification error",
+      "rejectError": "Rejection error",
+      "downloadError": "Download error",
+      "loadError": "Failed to load documents",
+      "studentsLoadError": "Failed to load students",
+      "confirm": "Verify",
+      "reject": "Reject",
+      "download": "Download"
+    },
+    "students": {
+      "title": "Students by Specialization",
+      "noSpecialization": "Students have not filled in their specialization yet",
+      "count": "students"
+    },
+    "employers": {
+      "title": "Vacancy Distribution by Type",
+      "ofAll": "% of all vacancies",
+      "noVacancies": "No vacancies yet"
+    },
+    "statistics": {
+      "topSkills": "Most In-Demand Skills",
+      "topSkillsHint": "from employer vacancies",
+      "noSkills": "No skill data available",
+      "mentions": "mentions in vacancies",
+      "summary": "System Summary",
+      "columns": {
+        "metric": "Metric",
+        "value": "Value"
+      },
+      "rows": {
+        "students": "Students in system",
+        "vacancies": "Active vacancies",
+        "applications": "Total applications",
+        "offers": "Received offers",
+        "conversion": "Offer conversion rate",
+        "uniqueSkills": "Unique skills in vacancies"
+      }
+    },
+    "appStatus": {
+      "applied": "Applied",
+      "interview": "Interview",
+      "shortlisted": "Shortlisted",
+      "offered": "Offered",
+      "rejected": "Rejected"
+    }
+  },
+  "jobs": {
+    "browse": {
+      "title": "Browse Jobs",
+      "subtitle": "Find your next opportunity",
+      "filters": "Filters",
+      "searchLabel": "Search",
+      "searchPlaceholder": "Job title, skill...",
+      "jobType": "Job Type",
+      "allTypes": "All types",
+      "fullTime": "Full-time",
+      "partTime": "Part-time",
+      "internship": "Internship",
+      "contract": "Contract",
+      "location": "Location",
+      "locationPlaceholder": "City...",
+      "resetFilters": "Reset Filters",
+      "loading": "Loading jobs...",
+      "found": "Found",
+      "vacanciesCount": "vacancies",
+      "page": "Page {{page}} of {{total}}",
+      "empty": "No vacancies matching filters",
+      "prev": "← Prev",
+      "next": "Next →",
+      "apply": "Apply",
+      "loadError": "Failed to load vacancies"
+    },
+    "details": {
+      "description": "Job Description",
+      "skills": "Required Skills",
+      "loading": "Loading vacancy...",
+      "notFound": "Vacancy not found",
+      "loadError": "Failed to load vacancy",
+      "published": "Published:",
+      "successTitle": "Application Sent!",
+      "successMessage": "The employer will review your application",
+      "myApplications": "My Applications",
+      "applyBtn": "Apply",
+      "coverLetter": "Cover Letter",
+      "coverLetterPlaceholder": "Tell us why you are a good fit for this role...",
+      "submitting": "Sending...",
+      "submit": "Submit Application",
+      "onlyStudents": "Only students can apply",
+      "active": "Active",
+      "closed": "Closed",
+      "applySuccess": "Application submitted successfully!",
+      "applyError": "Error submitting application",
+      "employer": "Employer"
+    },
+    "applyModal": {
+      "title": "Apply",
+      "coverLetter": "Cover Letter",
+      "coverLetterPlaceholder": "Tell us about yourself and why you are a good fit...",
+      "submitting": "Sending...",
+      "submit": "Submit Application",
+      "cancel": "Cancel"
+    }
+  },
+  "candidate": {
+    "loading": "Loading profile...",
+    "notFound": "Candidate not found",
+    "loadError": "Failed to load candidate profile",
+    "about": "About",
+    "skills": "Skills",
+    "data": "Data",
+    "gpa": "GPA",
+    "graduationYear": "Graduation Year",
+    "specialization": "Specialization",
+    "graduation": "Class of {{year}}",
+    "applicationStatus": "Application Status",
+    "status": {
+      "applied": "Applied",
+      "interview": "Interview",
+      "shortlisted": "Shortlisted",
+      "offered": "Offered",
+      "rejected": "Rejected"
+    },
+    "toInterview": "To Interview",
+    "shortlist": "Shortlist",
+    "offer": "Make Offer",
+    "reject": "Reject",
+    "documents": "Documents",
+    "docsLoading": "Loading...",
+    "noDocs": "No documents",
+    "docVerifiedByUniversity": "Verified by University",
+    "docRejected": "Rejected",
+    "docPending": "Pending",
+    "identification": "Identification",
+    "iin": "IIN",
+    "statusUpdated": "Status updated",
+    "statusUpdateError": "Failed to update status"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "heading": "Looks like you're lost",
+    "description": "The page you are looking for doesn't exist or has been moved. Check the URL or go back to the homepage.",
+    "home": "Go Home",
+    "back": "Go Back",
+    "quickLinks": "Quick Links",
+    "jobs": "Jobs",
+    "profile": "My Profile",
+    "employerDashboard": "Employer Dashboard",
+    "analytics": "Analytics"
+  },
+  "sessions": {
+    "titles": {
+      "student": "Complete Your Student Profile",
+      "employer": "Complete Your Employer Profile",
+      "university": "Complete Your University Profile",
+      "default": "Complete Your Profile"
+    },
+    "descriptions": {
+      "student": "Provide your personal information to get started with finding opportunities",
+      "employer": "Enter your company details to start posting job opportunities",
+      "university": "Provide your university information to manage campus activities",
+      "default": "Complete your profile information"
+    },
+    "loggedInAs": "Logged in as",
+    "logout": "Logout",
+    "skip": "Skip for now"
+  },
+  "docTypes": {
+    "cv": "CV / Resume",
+    "certificate": "Certificate"
+  },
+  "industries": {
+    "Технологии": "Technology",
+    "Финансы": "Finance",
+    "Образование": "Education",
+    "Здравоохранение": "Healthcare",
+    "Производство": "Manufacturing",
+    "Торговля": "Trade",
+    "Консалтинг": "Consulting",
+    "Медиа": "Media",
+    "Строительство": "Construction",
+    "Другое": "Other"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}} min ago",
+    "hoursAgo": "{{count}} h ago",
+    "yesterday": "yesterday",
+    "daysAgo": "{{count}} days ago"
+  },
+  "employerDashboard": {
+    "title": "Employer Dashboard",
+    "tabs": {
+      "overview": "Overview",
+      "jobs": "Jobs",
+      "applications": "Applications",
+      "profile": "Company Profile"
+    },
+    "stats": {
+      "activeJobs": "Active Jobs",
+      "totalApplications": "Total Applications",
+      "newApplications": "New Applications",
+      "hired": "Hired",
+      "interviews": "Interviews",
+      "offers": "Offers"
+    },
+    "overview": {
+      "fillProfilePrompt": "Complete your company profile to make your vacancies look professional",
+      "fillProfileBtn": "Complete profile →",
+      "quickActions": "Quick Actions",
+      "postJob": "Post a Job",
+      "viewApplications": "View Applications",
+      "editProfile": "Edit Profile"
+    },
+    "jobs": {
+      "postNew": "+ Post New Job",
+      "loading": "Loading jobs...",
+      "empty": "You have no vacancies yet",
+      "emptyHint": "Click the button above to publish your first vacancy",
+      "statusActive": "Active",
+      "statusClosed": "Closed",
+      "published": "Published:",
+      "viewApplications": "View Applications",
+      "close": "Close"
+    },
+    "applications": {
+      "selectVacancy": "Select a vacancy",
+      "selectVacancyPlaceholder": "-- Select a vacancy --",
+      "vacancyActive": "active",
+      "vacancyClosed": "closed",
+      "selectToView": "Select a vacancy to see applications",
+      "loading": "Loading applications...",
+      "empty": "No applications yet",
+      "skills": "Skills:",
+      "submitted": "Submitted:",
+      "viewProfile": "Profile →",
+      "toInterview": "Invite to Interview",
+      "accept": "Accept",
+      "reject": "Reject"
+    },
+    "companyProfile": {
+      "title": "Company Profile",
+      "updateSubtitle": "Update your company information",
+      "createSubtitle": "Fill in your company profile — it will increase student trust in your vacancies",
+      "loading": "Loading...",
+      "binLabel": "BIN (Business Identification Number) *",
+      "binPlaceholder": "12-digit number",
+      "binVerified": "✅ Verified",
+      "binPending": "⏳ Pending review",
+      "binHint": "BIN is used to verify your company. Must contain exactly 12 digits.",
+      "companyName": "Company Name *",
+      "companyNamePlaceholder": "My Company LLC",
+      "description": "Company Description",
+      "descriptionPlaceholder": "Tell about your company, what you do, your mission...",
+      "industry": "Industry",
+      "industryPlaceholder": "Select industry",
+      "companySize": "Company Size",
+      "companySizePlaceholder": "Select size",
+      "employees": "employees",
+      "location": "City / Location",
+      "locationPlaceholder": "Almaty, Kazakhstan",
+      "website": "Website",
+      "contactEmail": "Contact Email",
+      "contactPhone": "Contact Phone",
+      "saving": "Saving...",
+      "update": "Update Profile",
+      "create": "Create Profile",
+      "companyNameRequired": "Company name is required",
+      "saveError": "Error saving profile. Please try again."
+    },
+    "jobModal": {
+      "title": "Post New Job",
+      "titleLabel": "Job Title *",
+      "titlePlaceholder": "e.g., Senior Developer",
+      "descriptionLabel": "Job Description *",
+      "descriptionPlaceholder": "Describe the role, responsibilities, and requirements...",
+      "locationLabel": "Location",
+      "locationPlaceholder": "e.g., Astana, Remote",
+      "jobTypeLabel": "Job Type *",
+      "minSalaryLabel": "Min Salary (₸)",
+      "maxSalaryLabel": "Max Salary (₸)",
+      "skillsLabel": "Required Skills",
+      "skillsPlaceholder": "e.g., React, Node.js, TypeScript",
+      "skillsHint": "Separate skills with commas",
+      "submitting": "Posting...",
+      "submit": "Post Job",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "loadJobs": "Failed to load jobs",
+      "loadApplications": "Failed to load applications",
+      "loadProfile": "Failed to load profile",
+      "createJob": "Error creating job"
+    },
+    "form": {
+      "errors": {
+        "missingFields": "Fill in required fields: title, description and job type",
+        "createJob": "Error creating job"
+      },
+      "success": {
+        "posted": "Job posted successfully!"
+      }
+    },
+    "profile": {
+      "success": {
+        "saved": "Company profile saved!"
+      }
+    }
+  },
+  "sessions": {
+    "titles": {
+      "student": "Complete Your Student Profile",
+      "employer": "Complete Your Employer Profile",
+      "university": "Complete Your University Profile",
+      "default": "Complete Your Profile"
+    },
+    "descriptions": {
+      "student": "Provide your personal information to get started with finding opportunities",
+      "employer": "Enter your company details to start posting job opportunities",
+      "university": "Provide your university information to manage campus activities",
+      "default": "Complete your profile information"
+    },
+    "loggedInAs": "Logged in as",
+    "logout": "Logout",
+    "successMessage": "Profile created successfully!",
+    "loading": "Loading..."
+  },
+  "universityAnalytics": {
+    "title": "University Analytics Dashboard",
+    "subtitle": "Monitoring student employment based on real data",
+    "loading": "Loading analytics...",
+    "tabs": {
+      "overview": "Overview",
+      "myStudents": "My Students",
+      "docReview": "Documents",
+      "students": "Students",
+      "employers": "Employers",
+      "statistics": "Statistics"
+    },
+    "stats": {
+      "studentsTotal": "Students in system",
+      "applicationsTotal": "Total applications",
+      "offersReceived": "Received offers",
+      "activeVacancies": "Active vacancies"
+    },
+    "overview": {
+      "applicationStatuses": "Student application statuses",
+      "noApplicationData": "No application data yet",
+      "conversionRate": "Offer conversion rate",
+      "offersFromApplications": "{{offers}} offers from {{total}} applications",
+      "vacanciesByLocation": "Vacancies by location",
+      "noVacancies": "No vacancies yet"
+    },
+    "myStudents": {
+      "title": "Students from your university",
+      "count": "({{count}} people)",
+      "loading": "Loading...",
+      "noStudents": "No students from your university in the system yet",
+      "noStudentsHint": "Students must select your university during registration or in their profile",
+      "table": {
+        "student": "Student",
+        "specialization": "Specialization",
+        "gpa": "GPA",
+        "graduation": "Graduation",
+        "skills": "Skills"
+      }
+    },
+    "docReview": {
+      "title": "Document Verification",
+      "hint": "Click on a student to view their documents",
+      "loadingStudents": "Loading students...",
+      "noStudents": "No students from your university in the system",
+      "loadingDocs": "Loading documents...",
+      "noDocs": "Student hasn't uploaded documents yet",
+      "download": "Download",
+      "verify": "Verify",
+      "reject": "Reject",
+      "specializationNotSet": "Specialization not specified"
+    },
+    "students": {
+      "bySpecialization": "Students by specialization",
+      "totalStudents": "({{total}} total)",
+      "noSpecializations": "Students haven't filled in specialization in their profile yet",
+      "studentsCount": "{{count}} students"
+    },
+    "employers": {
+      "vacanciesByType": "Vacancy distribution by type",
+      "percentageOfTotal": "{{percentage}}% of all vacancies"
+    },
+    "statistics": {
+      "demandedSkills": "Most demanded skills",
+      "fromVacancies": "from employer vacancies",
+      "noSkillsData": "No skills data available",
+      "mentionsInVacancies": "mentions in vacancies",
+      "summary": "System summary",
+      "metrics": {
+        "studentsInSystem": "Students in system",
+        "activeVacancies": "Active vacancies",
+        "totalApplications": "Total applications",
+        "offersReceived": "Received offers",
+        "conversionRate": "Offer conversion rate",
+        "uniqueSkills": "Unique skills in vacancies"
+      }
+    },
+    "status": {
+      "applied": "Applied",
+      "interview": "Interview",
+      "shortlisted": "Shortlisted",
+      "offered": "Offered",
+      "rejected": "Rejected"
+    },
+    "docStatus": {
+      "pending": "Pending",
+      "verified": "✅ Verified",
+      "rejected": "❌ Rejected"
+    },
+    "errors": {
+      "loadAnalytics": "Failed to load analytics",
+      "loadStudents": "Failed to load student list",
+      "loadStudentDocs": "Failed to load documents",
+      "verifyDoc": "Verification error",
+      "rejectDoc": "Rejection error",
+      "downloadDoc": "Download error"
+    },
+    "success": {
+      "docVerified": "Document verified",
+      "docRejected": "Document rejected"
+    }
+  }
+}

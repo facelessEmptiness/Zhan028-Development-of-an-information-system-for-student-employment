@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { authApi } from '../api';
 import { useAuth } from '../context';
+import LanguageSelector from '../components/LanguageSelector';
 
 const VerifyEmailPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { loginWithTokens } = useAuth();
 
@@ -59,7 +62,7 @@ const VerifyEmailPage = () => {
     e.preventDefault();
     const fullCode = code.join('');
     if (fullCode.length !== 6) {
-      toast.error('Введите 6-значный код');
+      toast.error(t('auth.verifyEmail.errors.codeRequired'));
       return;
     }
 
@@ -67,10 +70,10 @@ const VerifyEmailPage = () => {
     try {
       const response = await authApi.verifyEmail({ email, code: fullCode });
       loginWithTokens(response.tokens, response.user);
-      toast.success('Email успешно подтверждён!');
+      toast.success(t('auth.verifyEmail.success'));
       navigate('/');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Неверный или просроченный код');
+      toast.error(err instanceof Error ? err.message : t('auth.verifyEmail.errors.invalidCode'));
       setCode(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     } finally {
@@ -82,15 +85,18 @@ const VerifyEmailPage = () => {
     if (resendCooldown > 0) return;
     try {
       await authApi.resendVerification(email);
-      toast.success('Новый код отправлен на вашу почту');
+      toast.success(t('auth.verifyEmail.resendSuccess'));
       setResendCooldown(60);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Не удалось отправить код');
+      toast.error(t('auth.verifyEmail.resendError'));
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 px-4">
+    <div className="min-h-screen relative flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 px-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
       <div className="w-full max-w-md">
         {/* Card */}
         <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl">
@@ -104,10 +110,10 @@ const VerifyEmailPage = () => {
           </div>
 
           <h1 className="text-2xl font-bold text-white text-center mb-2">
-            Подтверждение email
+            {t('auth.verifyEmail.title')}
           </h1>
           <p className="text-slate-300 text-center text-sm mb-8">
-            Мы отправили 6-значный код на<br />
+            {t('auth.verifyEmail.subtitle')}<br />
             <span className="text-blue-300 font-medium">{email}</span>
           </p>
 
@@ -140,29 +146,29 @@ const VerifyEmailPage = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Проверяем...
+                  {t('auth.verifyEmail.submitting')}
                 </span>
-              ) : 'Подтвердить'}
+              ) : t('auth.verifyEmail.submit')}
             </button>
           </form>
 
           {/* Resend */}
           <div className="mt-6 text-center">
-            <p className="text-slate-400 text-sm mb-2">Не получили код?</p>
+            <p className="text-slate-400 text-sm mb-2">{t('auth.verifyEmail.noCode')}</p>
             <button
               onClick={handleResend}
               disabled={resendCooldown > 0}
               className="text-blue-400 hover:text-blue-300 text-sm font-medium disabled:text-slate-500 disabled:cursor-not-allowed transition-colors"
             >
               {resendCooldown > 0
-                ? `Отправить повторно через ${resendCooldown}с`
-                : 'Отправить повторно'}
+                ? t('auth.verifyEmail.resendCooldown', { seconds: resendCooldown })
+                : t('auth.verifyEmail.resend')}
             </button>
           </div>
 
           <div className="mt-4 text-center">
             <Link to="/register" className="text-slate-400 hover:text-slate-300 text-sm transition-colors">
-              ← Вернуться к регистрации
+              {t('auth.verifyEmail.backToRegister')}
             </Link>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import MatchIndex from '../components/MatchIndex';
 import { apiFetch } from '../utils/apiClient';
 import { applicationService } from '../services/applicationService';
@@ -14,14 +15,6 @@ interface LocationState {
   vacancyId?: string;
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  applied: 'Подана',
-  interview: 'Собеседование',
-  shortlisted: 'В шортлисте',
-  offered: 'Оффер',
-  rejected: 'Отклонена',
-};
-
 const STATUS_COLOR: Record<string, string> = {
   applied: 'bg-blue-100 text-blue-700',
   interview: 'bg-purple-100 text-purple-700',
@@ -31,6 +24,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 const CandidateDetailPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,13 +57,13 @@ const CandidateDetailPage = () => {
           .finally(() => setDocsLoading(false));
       } catch {
         setLoadError(true);
-        toast.error('Не удалось загрузить профиль кандидата');
+        toast.error(t('candidate.loadError'));
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, [id]);
+  }, [id, t]);
 
   const handleUpdateStatus = async (newStatus: string) => {
     if (!state.applicationId) return;
@@ -77,22 +71,29 @@ const CandidateDetailPage = () => {
     try {
       await applicationService.updateStatus(state.applicationId, newStatus);
       setCurrentStatus(newStatus);
-      toast.success('Статус обновлён');
+      toast.success(t('candidate.statusUpdated'));
     } catch {
-      toast.error('Не удалось обновить статус');
+      toast.error(t('candidate.statusUpdateError'));
     } finally {
       setStatusUpdating(false);
     }
   };
 
+  const getStatusLabel = (status: string): string => {
+    const key = `candidate.status.${status}` as const;
+    const translated = t(key);
+    // If the key wasn't found, fall back to the raw status
+    return translated !== key ? translated : status;
+  };
+
   if (loading) {
-    return <div className="text-center py-20 text-gray-500">Загрузка профиля...</div>;
+    return <div className="text-center py-20 text-gray-500">{t('candidate.loading')}</div>;
   }
   if (loadError || !student) {
     return (
       <div className="text-center py-20">
-        <p className="text-red-600 mb-4">Кандидат не найден</p>
-        <button onClick={() => navigate(-1)} className="text-blue-600 hover:underline">← Назад</button>
+        <p className="text-red-600 mb-4">{t('candidate.notFound')}</p>
+        <button onClick={() => navigate(-1)} className="text-blue-600 hover:underline">{t('common.back')}</button>
       </div>
     );
   }
@@ -103,7 +104,7 @@ const CandidateDetailPage = () => {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
-        ← Назад
+        {t('common.back')}
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -124,7 +125,9 @@ const CandidateDetailPage = () => {
                   <div className="flex flex-wrap gap-4 text-gray-600 text-sm">
                     {student.location_city && <span>📍 {student.location_city}</span>}
                     {student.phone && <span>📱 {student.phone}</span>}
-                    {student.graduation_year > 0 && <span>🎓 Выпуск {student.graduation_year}</span>}
+                    {student.graduation_year > 0 && (
+                      <span>🎓 {t('candidate.graduation', { year: student.graduation_year })}</span>
+                    )}
                     {student.gpa > 0 && (
                       <span className="font-semibold text-green-700">GPA: {student.gpa.toFixed(2)}</span>
                     )}
@@ -140,7 +143,7 @@ const CandidateDetailPage = () => {
           {/* Bio */}
           {student.bio && (
             <div className="bg-white rounded-xl border border-gray-200 p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">О себе</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-3">{t('candidate.about')}</h2>
               <p className="text-gray-700 leading-relaxed">{student.bio}</p>
             </div>
           )}
@@ -148,7 +151,7 @@ const CandidateDetailPage = () => {
           {/* Skills */}
           {skills.length > 0 && (
             <div className="bg-white rounded-xl border border-gray-200 p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Навыки</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{t('candidate.skills')}</h2>
               <div className="flex flex-wrap gap-3">
                 {skills.map((skill) => (
                   <span key={skill} className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium">
@@ -161,23 +164,23 @@ const CandidateDetailPage = () => {
 
           {/* Details table */}
           <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Данные</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('candidate.data')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {student.gpa > 0 && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <p className="text-xs text-gray-500 mb-1">GPA</p>
+                  <p className="text-xs text-gray-500 mb-1">{t('candidate.gpa')}</p>
                   <p className="text-2xl font-bold text-green-600">{student.gpa.toFixed(2)}</p>
                 </div>
               )}
               {student.graduation_year > 0 && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <p className="text-xs text-gray-500 mb-1">Год выпуска</p>
+                  <p className="text-xs text-gray-500 mb-1">{t('candidate.graduationYear')}</p>
                   <p className="text-2xl font-bold text-gray-900">{student.graduation_year}</p>
                 </div>
               )}
               {student.specialization && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 sm:col-span-2">
-                  <p className="text-xs text-gray-500 mb-1">Специализация</p>
+                  <p className="text-xs text-gray-500 mb-1">{t('candidate.specialization')}</p>
                   <p className="font-semibold text-gray-900">{student.specialization}</p>
                 </div>
               )}
@@ -190,11 +193,11 @@ const CandidateDetailPage = () => {
           {/* Status & Actions */}
           {state.applicationId && (
             <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24 space-y-3">
-              <h3 className="font-semibold text-gray-900 mb-2">Статус заявки</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">{t('candidate.applicationStatus')}</h3>
 
               {currentStatus && (
                 <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-3 ${STATUS_COLOR[currentStatus] ?? 'bg-gray-100 text-gray-700'}`}>
-                  {STATUS_LABEL[currentStatus] ?? currentStatus}
+                  {getStatusLabel(currentStatus)}
                 </span>
               )}
 
@@ -203,38 +206,38 @@ const CandidateDetailPage = () => {
                 disabled={statusUpdating || currentStatus === 'interview'}
                 className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                На собеседование
+                {t('candidate.toInterview')}
               </button>
               <button
                 onClick={() => handleUpdateStatus('shortlisted')}
                 disabled={statusUpdating || currentStatus === 'shortlisted'}
                 className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                В шортлист
+                {t('candidate.shortlist')}
               </button>
               <button
                 onClick={() => handleUpdateStatus('offered')}
                 disabled={statusUpdating || currentStatus === 'offered'}
                 className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Выдать оффер
+                {t('candidate.offer')}
               </button>
               <button
                 onClick={() => handleUpdateStatus('rejected')}
                 disabled={statusUpdating || currentStatus === 'rejected'}
                 className="w-full px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Отклонить
+                {t('candidate.reject')}
               </button>
             </div>
           )}
 
           {/* Documents */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Документы</h3>
-            {docsLoading && <p className="text-sm text-gray-500">Загрузка...</p>}
+            <h3 className="font-semibold text-gray-900 mb-4">{t('candidate.documents')}</h3>
+            {docsLoading && <p className="text-sm text-gray-500">{t('candidate.docsLoading')}</p>}
             {!docsLoading && documents.length === 0 && (
-              <p className="text-sm text-gray-400">Документов нет</p>
+              <p className="text-sm text-gray-400">{t('candidate.noDocs')}</p>
             )}
             <div className="space-y-3">
               {documents.map(doc => (
@@ -248,15 +251,15 @@ const CandidateDetailPage = () => {
                     <div className="mt-1 flex items-center gap-2">
                       {doc.status === 'verified' ? (
                         <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                          ✅ Verified by University
+                          ✅ {t('candidate.docVerifiedByUniversity')}
                         </span>
                       ) : doc.status === 'rejected' ? (
                         <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-                          ❌ Отклонён
+                          ❌ {t('candidate.docRejected')}
                         </span>
                       ) : (
                         <span className="text-xs font-semibold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
-                          На проверке
+                          {t('candidate.docPending')}
                         </span>
                       )}
                     </div>
@@ -264,7 +267,7 @@ const CandidateDetailPage = () => {
                       onClick={() => documentService.download(doc.id, doc.file_name).catch(() => {})}
                       className="text-xs text-blue-600 hover:underline mt-1 inline-block"
                     >
-                      Скачать
+                      {t('common.download')}
                     </button>
                   </div>
                 </div>
@@ -274,8 +277,8 @@ const CandidateDetailPage = () => {
 
           {/* IIN info */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="font-semibold text-gray-900 mb-3">Идентификация</h3>
-            <p className="text-xs text-gray-500 mb-1">ИИН</p>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('candidate.identification')}</h3>
+            <p className="text-xs text-gray-500 mb-1">{t('candidate.iin')}</p>
             <p className="font-mono text-gray-800">{student.iin}</p>
           </div>
         </div>

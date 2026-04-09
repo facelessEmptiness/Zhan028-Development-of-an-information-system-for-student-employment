@@ -1,26 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CreateStudentProfileRequest } from '../types/auth';
 import { getUniversities, type University } from '../services/universityService';
-
-/** Проверяет казахстанский ИИН (12 цифр + контрольная сумма) */
-function validateIIN(iin: string): string | null {
-  if (iin.length !== 12 || !/^\d{12}$/.test(iin)) {
-    return 'ИИН должен содержать ровно 12 цифр';
-  }
-  const d = iin.split('').map(Number);
-  const w1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-  let sum = w1.reduce((acc, w, i) => acc + d[i] * w, 0);
-  let check = sum % 11;
-  if (check === 10) {
-    const w2 = [3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2];
-    sum = w2.reduce((acc, w, i) => acc + d[i] * w, 0);
-    check = sum % 11;
-  }
-  if (check === 10 || check !== d[11]) {
-    return 'ИИН не прошёл проверку контрольной суммы';
-  }
-  return null;
-}
 
 interface StudentProfileFormProps {
   onSubmit: (data: CreateStudentProfileRequest) => Promise<void>;
@@ -28,6 +9,7 @@ interface StudentProfileFormProps {
 }
 
 export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfileFormProps) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -50,6 +32,24 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       return acc;
     }, {});
 
+  const validateIIN = (iin: string): string | null => {
+    if (iin.length !== 12 || !/^\d{12}$/.test(iin)) {
+      return t('profile.iinError.format');
+    }
+    const d = iin.split('').map(Number);
+    const w1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    let sum = w1.reduce((acc, w, i) => acc + d[i] * w, 0);
+    let check = sum % 11;
+    if (check === 10) {
+      const w2 = [3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2];
+      sum = w2.reduce((acc, w, i) => acc + d[i] * w, 0);
+      check = sum % 11;
+    }
+    if (check === 10 || check !== d[11]) {
+      return t('profile.iinError.checksum');
+    }
+    return null;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,7 +67,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
     }
 
     if (!formData.first_name || !formData.last_name) {
-      setError('Please fill in all required fields');
+      setError(t('profile.form.requiredFields'));
       return;
     }
 
@@ -80,7 +80,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       };
       await onSubmit(requestData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update profile');
+      setError(err instanceof Error ? err.message : t('profile.toast.errorSaving'));
     }
   };
 
@@ -98,7 +98,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       {/* IIN */}
       <div>
         <label htmlFor="iin" className="block text-sm font-medium text-emerald-100 mb-2">
-          ИИН (Индивидуальный идентификационный номер) *
+          {t('profile.form.iin')} *
         </label>
         <div className="relative">
           <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'iin' ? 'text-emerald-400' : 'text-gray-400'}`}>
@@ -133,7 +133,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="first_name" className="block text-sm font-medium text-emerald-100 mb-2">
-            Имя *
+            {t('auth.register.firstName')} *
           </label>
           <div className="relative">
             <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'first_name' ? 'text-emerald-400' : 'text-gray-400'}`}>
@@ -145,7 +145,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
               id="first_name"
               name="first_name"
               type="text"
-              placeholder="John"
+              placeholder={t('auth.register.firstNamePlaceholder')}
               value={formData.first_name}
               onChange={handleChange}
               onFocus={() => setFocusedField('first_name')}
@@ -164,7 +164,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
 
         <div>
           <label htmlFor="last_name" className="block text-sm font-medium text-emerald-100 mb-2">
-            Фамилия *
+            {t('auth.register.lastName')} *
           </label>
           <div className="relative">
             <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${focusedField === 'last_name' ? 'text-emerald-400' : 'text-gray-400'}`}>
@@ -176,7 +176,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
               id="last_name"
               name="last_name"
               type="text"
-              placeholder="Doe"
+              placeholder={t('auth.register.lastNamePlaceholder')}
               value={formData.last_name}
               onChange={handleChange}
               onFocus={() => setFocusedField('last_name')}
@@ -197,7 +197,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
       {/* University (Optional) */}
       <div>
         <label className="block text-sm font-medium text-emerald-100 mb-2">
-          Университет (необязательно)
+          {t('auth.register.yourUniversity')}
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
@@ -213,7 +213,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
             onBlur={() => setFocusedField(null)}
             className="w-full pl-12 pr-4 py-3.5 bg-slate-800 border border-white/20 rounded-xl text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 appearance-none cursor-pointer"
           >
-            <option value="" className="bg-slate-800 text-gray-400">— Выберите университет —</option>
+            <option value="" className="bg-slate-800 text-gray-400">{t('auth.register.selectUniversity')}</option>
             {Object.entries(groupedByCity).map(([city, unis]) => (
               <optgroup key={city} label={`📍 ${city}`} className="bg-slate-800">
                 {unis.sort((a, b) => a.name.localeCompare(b.name, 'ru')).map((uni) => (
@@ -244,11 +244,11 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>Сохранение...</span>
+            <span>{t('common.saving')}</span>
           </>
         ) : (
           <>
-            <span>Сохранить профиль</span>
+            <span>{t('profile.form.saveBtn')}</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>

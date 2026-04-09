@@ -1,14 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context';
 import { notificationService, type Notification } from '../services/notificationService';
-
-const ROLE_LABELS: Record<string, string> = {
-  student: 'Студент',
-  employer: 'Работодатель',
-  university: 'Университет',
-  admin: 'Администратор',
-};
 
 const ROLE_COLORS: Record<string, string> = {
   student: 'bg-blue-100 text-blue-700',
@@ -31,19 +25,20 @@ function getProfilePath(role?: string) {
   return '/';
 }
 
-function getNavLinks(role?: string) {
-  const links = [{ to: '/jobs', label: 'Вакансии' }];
+function getNavLinks(t: any, role?: string) {
+  const links = [{ to: '/jobs', label: t('nav.jobs') }];
   if (role === 'student') {
-    links.push({ to: '/profile', label: 'Мой профиль' });
+    links.push({ to: '/profile', label: t('nav.myProfile') });
   } else if (role === 'employer') {
-    links.push({ to: '/employer-dashboard', label: 'Панель' });
+    links.push({ to: '/employer-dashboard', label: t('nav.dashboard') });
   } else if (role === 'university' || role === 'admin') {
-    links.push({ to: '/analytics', label: 'Аналитика' });
+    links.push({ to: '/analytics', label: t('nav.analytics') });
   }
   return links;
 }
 
 export default function Header() {
+  const { t, i18n } = useTranslation();
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,8 +46,17 @@ export default function Header() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+
+  const ROLE_LABELS: Record<string, string> = {
+    student: t('role.student'),
+    employer: t('role.employer'),
+    university: t('role.university'),
+    admin: t('role.admin'),
+  };
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
+  const langDropdownRef = useRef<HTMLDivElement>(null);
 
   // Fetch notifications when authenticated
   const fetchNotifications = useCallback(async () => {
@@ -93,6 +97,9 @@ export default function Header() {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
         setNotifOpen(false);
       }
+      if (langDropdownRef.current && !langDropdownRef.current.contains(e.target as Node)) {
+        setLangDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -102,6 +109,7 @@ export default function Header() {
   useEffect(() => {
     setDropdownOpen(false);
     setNotifOpen(false);
+    setLangDropdownOpen(false);
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -109,8 +117,13 @@ export default function Header() {
     navigate('/login');
   };
 
+  const handleLanguageChange = (lang: string) => {
+    i18n.changeLanguage(lang);
+    setLangDropdownOpen(false);
+  };
+
   const avatarLetter = user?.email?.[0]?.toUpperCase() ?? '?';
-  const navLinks = getNavLinks(user?.role);
+  const navLinks = getNavLinks(t, user?.role);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -152,6 +165,70 @@ export default function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Language selector */}
+            <div className="relative" ref={langDropdownRef}>
+              <button
+                onClick={() => setLangDropdownOpen(v => !v)}
+                style={{ color: '#374151' }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <span className="uppercase font-semibold" style={{ color: '#111827' }}>
+                  {i18n.language === 'kz' ? 'KZ' : i18n.language === 'en' ? 'EN' : 'RU'}
+                </span>
+                <svg className={`w-3.5 h-3.5 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {langDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 'calc(100% + 4px)',
+                    minWidth: '140px',
+                    background: '#ffffff',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                    border: '1px solid #e5e7eb',
+                    zIndex: 9999,
+                    padding: '4px 0',
+                  }}
+                >
+                  {[
+                    { code: 'ru', label: '🇷🇺 Русский' },
+                    { code: 'en', label: 'EN English' },
+                    { code: 'kz', label: '🇰🇿 Қазақша' },
+                  ].map(({ code, label }) => (
+                    <button
+                      key={code}
+                      onClick={() => handleLanguageChange(code)}
+                      style={{
+                        display: 'block',
+                        width: 'calc(100% - 8px)',
+                        textAlign: 'left',
+                        padding: '8px 14px',
+                        fontSize: '14px',
+                        color: i18n.language === code ? '#2563eb' : '#111827',
+                        fontWeight: i18n.language === code ? 600 : 400,
+                        background: i18n.language === code ? '#eff6ff' : 'transparent',
+                        cursor: 'pointer',
+                        border: 'none',
+                        borderRadius: '4px',
+                        margin: '0 4px',
+                      }}
+                      onMouseEnter={e => { if (i18n.language !== code) (e.currentTarget as HTMLButtonElement).style.background = '#f9fafb'; }}
+                      onMouseLeave={e => { if (i18n.language !== code) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             {isAuthenticated ? (
               <>
                 {/* Notifications bell */}
@@ -159,7 +236,7 @@ export default function Header() {
                   <button
                     onClick={() => setNotifOpen(v => !v)}
                     className="relative p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                    aria-label="Уведомления"
+                    aria-label={t('nav.notifications')}
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -176,20 +253,20 @@ export default function Header() {
                   {notifOpen && (
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
                       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                        <span className="font-semibold text-gray-800 text-sm">Уведомления</span>
+                        <span className="font-semibold text-gray-800 text-sm">{t('nav.notifications')}</span>
                         {unreadCount > 0 && (
                           <button
                             onClick={handleMarkAllRead}
                             className="text-xs text-blue-600 hover:underline"
                           >
-                            Отметить все
+                            {t('nav.markAllRead')}
                           </button>
                         )}
                       </div>
                       <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
                         {notifications.length === 0 ? (
                           <div className="px-4 py-8 text-center text-sm text-gray-400">
-                            Нет уведомлений
+                            {t('nav.noNotifications')}
                           </div>
                         ) : (
                           notifications.map(n => (
@@ -237,7 +314,7 @@ export default function Header() {
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-1 overflow-hidden">
                       {/* Header */}
                       <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-xs text-gray-400 mb-0.5">Вы вошли как</p>
+                        <p className="text-xs text-gray-400 mb-0.5">{t('nav.loggedInAs')}</p>
                         <p className="text-sm font-semibold text-gray-800 truncate">{user?.email}</p>
                         <span className={`inline-block mt-1 text-[11px] font-semibold px-1.5 py-0.5 rounded-md ${ROLE_COLORS[user?.role ?? 'student']}`}>
                           {ROLE_LABELS[user?.role ?? ''] ?? user?.role}
@@ -252,7 +329,7 @@ export default function Header() {
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        Мой профиль
+                        {t('nav.myProfile')}
                       </Link>
                       <Link
                         to="/jobs"
@@ -261,7 +338,7 @@ export default function Header() {
                         <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        Вакансии
+                        {t('nav.jobs')}
                       </Link>
 
                       <div className="border-t border-gray-100 mt-1 pt-1">
@@ -272,7 +349,7 @@ export default function Header() {
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
-                          Выйти
+                          {t('nav.logout')}
                         </button>
                       </div>
                     </div>
@@ -285,13 +362,13 @@ export default function Header() {
                   to="/login"
                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  Войти
+                  {t('nav.login')}
                 </Link>
                 <Link
                   to="/register"
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
                 >
-                  Регистрация
+                  {t('nav.register')}
                 </Link>
               </div>
             )}

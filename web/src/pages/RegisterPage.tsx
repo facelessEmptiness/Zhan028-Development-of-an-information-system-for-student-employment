@@ -1,12 +1,15 @@
 import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context';
 import { getUniversities, type University } from '../services/universityService';
+import LanguageSelector from '../components/LanguageSelector';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -48,10 +51,10 @@ const RegisterPage = () => {
     if (/[A-Z]/.test(formData.password)) strength++;
     if (/[0-9]/.test(formData.password)) strength++;
     if (/[^A-Za-z0-9]/.test(formData.password)) strength++;
-    if (strength <= 2) return { level: 1, text: 'Слабый', color: 'bg-red-500' };
-    if (strength <= 3) return { level: 2, text: 'Средний', color: 'bg-yellow-500' };
-    return { level: 3, text: 'Сильный', color: 'bg-green-500' };
-  }, [formData.password]);
+    if (strength <= 2) return { level: 1, text: t('auth.register.weak'), color: 'bg-red-500' };
+    if (strength <= 3) return { level: 2, text: t('auth.register.medium'), color: 'bg-yellow-500' };
+    return { level: 3, text: t('auth.register.strong'), color: 'bg-green-500' };
+  }, [formData.password, t]);
 
   const passwordsMatch = formData.password === formData.confirmPassword;
 
@@ -59,15 +62,15 @@ const RegisterPage = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Пароли не совпадают');
+      toast.error(t('auth.register.errors.passwordsMismatch'));
       return;
     }
     if (formData.password.length < 8) {
-      toast.error('Пароль должен содержать минимум 8 символов');
+      toast.error(t('auth.register.errors.passwordTooShort'));
       return;
     }
     if (formData.role === 'university' && !formData.university) {
-      toast.error('Выберите университет');
+      toast.error(t('auth.register.errors.selectUniversity'));
       return;
     }
 
@@ -79,10 +82,10 @@ const RegisterPage = () => {
         role: formData.role,
         university_id: formData.university || undefined,
       });
-      toast.success('Регистрация успешна! Проверьте вашу почту.');
+      toast.success(t('auth.register.success'));
       navigate(`/verify-email?email=${encodeURIComponent(response.email)}`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Ошибка регистрации');
+      toast.error(t('auth.register.error'));
     } finally {
       setIsLoading(false);
     }
@@ -91,8 +94,8 @@ const RegisterPage = () => {
   const roles = [
     {
       value: 'student',
-      label: 'Студент',
-      desc: 'Ищу работу',
+      label: t('auth.register.roles.student'),
+      desc: t('auth.register.roles.studentDesc'),
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -101,8 +104,8 @@ const RegisterPage = () => {
     },
     {
       value: 'employer',
-      label: 'Работодатель',
-      desc: 'Нанимаю',
+      label: t('auth.register.roles.employer'),
+      desc: t('auth.register.roles.employerDesc'),
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -111,8 +114,8 @@ const RegisterPage = () => {
     },
     {
       value: 'university',
-      label: 'Университет',
-      desc: 'Аналитика',
+      label: t('auth.register.roles.university'),
+      desc: t('auth.register.roles.universityDesc'),
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5m0 0l9 5m-9-5v10l9 5m0 0l9-5m-9 5v-10m0 0l-9-5m9 5l9-5M7 11.5v10m10-10v10" />
@@ -124,7 +127,7 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Nav */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2 w-fit">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,6 +136,7 @@ const RegisterPage = () => {
           </div>
           <span className="text-xl font-bold text-gray-900">CareerBond</span>
         </Link>
+        <LanguageSelector />
       </div>
 
       <div className="flex-1 flex">
@@ -140,18 +144,18 @@ const RegisterPage = () => {
         <div className="hidden lg:flex lg:w-2/5 bg-gradient-to-r from-blue-600 to-indigo-600 p-12 flex-col justify-between">
           <div>
             <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-              Начните свой путь<br />к карьере
+              {t('auth.register.heroTitle')}
             </h1>
             <p className="text-blue-100 text-lg leading-relaxed">
-              Зарегистрируйтесь и получите доступ к тысячам вакансий для студентов Казахстана
+              {t('auth.register.heroSubtitle')}
             </p>
           </div>
 
           <div className="space-y-3">
             {[
-              { icon: '🎓', text: 'Студенты — находите стажировки и подработку' },
-              { icon: '💼', text: 'Работодатели — нанимайте молодые таланты' },
-              { icon: '🏛️', text: 'Университеты — следите за трудоустройством' },
+              { icon: '🎓', text: t('auth.register.feature1') },
+              { icon: '💼', text: t('auth.register.feature2') },
+              { icon: '🏛️', text: t('auth.register.feature3') },
             ].map((item) => (
               <div key={item.text} className="flex items-start space-x-3 bg-white/20 rounded-xl p-4">
                 <span className="text-xl">{item.icon}</span>
@@ -176,13 +180,13 @@ const RegisterPage = () => {
 
             {/* Form Card */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Создать аккаунт</h2>
-              <p className="text-gray-500 text-sm mb-6">Заполните форму для регистрации</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('auth.register.title')}</h2>
+              <p className="text-gray-500 text-sm mb-6">{t('auth.register.subtitle')}</p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Role selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Я являюсь</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.iAm')}</label>
                   <div className="grid grid-cols-3 gap-3">
                     {roles.map((r) => (
                       <label
@@ -215,7 +219,7 @@ const RegisterPage = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Имя
+                      {t('auth.register.firstName')}
                     </label>
                     <input
                       id="firstName"
@@ -225,12 +229,12 @@ const RegisterPage = () => {
                       value={formData.firstName}
                       onChange={handleChange}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="Алибек"
+                      placeholder={t('auth.register.firstNamePlaceholder')}
                     />
                   </div>
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Фамилия
+                      {t('auth.register.lastName')}
                     </label>
                     <input
                       id="lastName"
@@ -240,7 +244,7 @@ const RegisterPage = () => {
                       value={formData.lastName}
                       onChange={handleChange}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="Сейтов"
+                      placeholder={t('auth.register.lastNamePlaceholder')}
                     />
                   </div>
                 </div>
@@ -249,14 +253,14 @@ const RegisterPage = () => {
                 {(formData.role === 'student' || formData.role === 'university') && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {formData.role === 'university' ? 'Ваш университет' : 'Университет'}
+                      {formData.role === 'university' ? t('auth.register.yourUniversity') : t('auth.register.university')}
                     </label>
                     <select
                       value={formData.university}
                       onChange={(e) => setFormData((prev) => ({ ...prev, university: e.target.value }))}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
                     >
-                      <option value="">— Выберите университет —</option>
+                      <option value="">{t('auth.register.selectUniversity')}</option>
                       {Object.entries(groupedByCity).map(([city, unis]) => (
                         <optgroup key={city} label={`📍 ${city}`}>
                           {unis
@@ -276,7 +280,7 @@ const RegisterPage = () => {
                 {formData.role === 'employer' && (
                   <div>
                     <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Название компании
+                      {t('auth.register.companyName')}
                     </label>
                     <input
                       id="company"
@@ -286,7 +290,7 @@ const RegisterPage = () => {
                       value={formData.company}
                       onChange={handleChange}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="ТОО «Компания»"
+                      placeholder={t('auth.register.companyNamePlaceholder')}
                     />
                   </div>
                 )}
@@ -312,7 +316,7 @@ const RegisterPage = () => {
                 {/* Password */}
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Пароль
+                    {t('auth.register.password')}
                   </label>
                   <div className="relative">
                     <input
@@ -324,7 +328,7 @@ const RegisterPage = () => {
                       value={formData.password}
                       onChange={handleChange}
                       className="w-full px-3 py-3 pr-12 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="Минимум 8 символов"
+                      placeholder={t('auth.register.passwordPlaceholder')}
                     />
                     <button
                       type="button"
@@ -348,7 +352,7 @@ const RegisterPage = () => {
                   {formData.password && (
                     <div className="mt-2">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs text-gray-500">Надёжность пароля</span>
+                        <span className="text-xs text-gray-500">{t('auth.register.passwordStrength')}</span>
                         <span className={`text-xs font-medium ${passwordStrength.level === 1 ? 'text-red-500' : passwordStrength.level === 2 ? 'text-yellow-600' : 'text-green-600'}`}>
                           {passwordStrength.text}
                         </span>
@@ -366,7 +370,7 @@ const RegisterPage = () => {
                 {/* Confirm Password */}
                 <div>
                   <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Подтвердите пароль
+                    {t('auth.register.confirmPassword')}
                   </label>
                   <input
                     id="confirmPassword"
@@ -379,10 +383,10 @@ const RegisterPage = () => {
                     className={`w-full px-3 py-3 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                       formData.confirmPassword && !passwordsMatch ? 'border-red-400' : 'border-gray-300'
                     }`}
-                    placeholder="Повторите пароль"
+                    placeholder={t('auth.register.confirmPasswordPlaceholder')}
                   />
                   {formData.confirmPassword && !passwordsMatch && (
-                    <p className="mt-1 text-xs text-red-500">Пароли не совпадают</p>
+                    <p className="mt-1 text-xs text-red-500">{t('auth.register.errors.passwordsMismatch')}</p>
                   )}
                 </div>
 
@@ -397,10 +401,10 @@ const RegisterPage = () => {
                     className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <label htmlFor="terms" className="text-sm text-gray-600">
-                    Я принимаю{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">условия использования</a>
+                    {t('auth.register.iAccept')}{' '}
+                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">{t('auth.register.terms')}</a>
                     {' '}и{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">политику конфиденциальности</a>
+                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">{t('auth.register.privacy')}</a>
                   </label>
                 </div>
 
@@ -416,18 +420,18 @@ const RegisterPage = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <span>Создаём аккаунт...</span>
+                      <span>{t('auth.register.submitting')}</span>
                     </>
                   ) : (
-                    <span>Зарегистрироваться</span>
+                    <span>{t('auth.register.submit')}</span>
                   )}
                 </button>
               </form>
 
               <p className="mt-6 text-center text-sm text-gray-500">
-                Уже есть аккаунт?{' '}
+                {t('auth.register.haveAccount')}{' '}
                 <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700">
-                  Войти
+                  {t('auth.register.loginLink')}
                 </Link>
               </p>
             </div>
