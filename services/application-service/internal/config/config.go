@@ -12,6 +12,7 @@ import (
 
 type Config struct {
 	GRPCPort   string
+	HTTPPort   string
 	DBHost     string
 	DBPort     string
 	DBUser     string
@@ -25,6 +26,7 @@ func LoadConfig() (*Config, error) {
 
 	return &Config{
 		GRPCPort:   getEnv("GRPC_PORT", "50054"),
+		HTTPPort:   getEnv("HTTP_PORT", "8083"),
 		DBHost:     getEnv("DB_HOST", "localhost"),
 		DBPort:     getEnv("DB_PORT", "5436"),
 		DBUser:     getEnv("DB_USER", "postgres"),

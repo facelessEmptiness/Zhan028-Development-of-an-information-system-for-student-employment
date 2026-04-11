@@ -897,6 +897,36 @@
     "success": {
       "docVerified": "Document verified",
       "docRejected": "Document rejected"
+    },
+    "autoVerify": {
+      "button": "Auto-verify diploma",
+      "success": "{{count}} document(s) verified automatically",
+      "noPending": "No pending documents to verify",
+      "error": "Failed to auto-verify documents"
+    }
+  },
+  "interview": {
+    "title": "Interview",
+    "modalTitle": "Schedule Interview",
+    "schedule": "Schedule Interview",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel Interview",
+    "confirm": "Schedule",
+    "scheduled": "Interview scheduled",
+    "wasCancelled": "Interview was cancelled",
+    "date": "Date",
+    "time": "Time",
+    "datetime": "Date & Time",
+    "location": "Location",
+    "locationPlaceholder": "e.g. Office address or video call link",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional information for the candidate",
+    "scheduledSuccess": "Interview scheduled. Candidate has been notified.",
+    "scheduleError": "Failed to schedule interview",
+    "cancelledSuccess": "Interview cancelled",
+    "cancelError": "Failed to cancel interview",
+    "validation": {
+      "dateTimeRequired": "Please select a date and time"
     }
   }
 }

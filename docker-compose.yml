@@ -200,6 +200,7 @@ services:
     container_name: application-service
     ports:
       - "50054:50054"
+      - "8083:8083"
     environment:
       DB_HOST: application-db
       DB_PORT: 5432
@@ -207,6 +208,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: application_db
       GRPC_PORT: 50054
+      HTTP_PORT: 8083
     depends_on:
       application-db:
         condition: service_healthy
@@ -226,6 +228,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       AUTH_SERVICE_URL: http://auth-service:8081
       DOCUMENT_SERVICE_URL: http://student-service:8082
+      APPLICATION_HTTP_URL: http://application-service:8083
       STUDENT_GRPC_URL: student-service:50051
       EMPLOYER_GRPC_URL: employer-service:50052
       UNIVERSITY_GRPC_URL: university-service:50053

@@ -7,6 +7,7 @@ import { apiFetch } from '../utils/apiClient';
 import { applicationService } from '../services/applicationService';
 import { type BackendStudentProfile } from '../services/studentService';
 import { documentService, type Document, getTypeLabel } from '../services/documentService';
+import { interviewService, type Interview } from '../services/interviewService';
 
 interface LocationState {
   applicationId?: string;
@@ -40,6 +41,17 @@ const CandidateDetailPage = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [docsLoading, setDocsLoading] = useState(false);
 
+  // Interview scheduling state
+  const [interview, setInterview] = useState<Interview | null>(null);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [interviewForm, setInterviewForm] = useState({
+    date: '',
+    time: '',
+    location: '',
+    notes: '',
+  });
+  const [interviewSubmitting, setInterviewSubmitting] = useState(false);
+
   useEffect(() => {
     if (!id) return;
     const load = async () => {
@@ -64,6 +76,53 @@ const CandidateDetailPage = () => {
     };
     load();
   }, [id, t]);
+
+  // Load existing interview for this application
+  useEffect(() => {
+    if (!state.applicationId) return;
+    interviewService.getByApplication(state.applicationId)
+      .then(setInterview)
+      .catch(() => {/* no interview yet */});
+  }, [state.applicationId]);
+
+  const handleScheduleInterview = async () => {
+    if (!state.applicationId || !id || !state.vacancyId) return;
+    if (!interviewForm.date || !interviewForm.time) {
+      toast.error(t('interview.validation.dateTimeRequired'));
+      return;
+    }
+    setInterviewSubmitting(true);
+    try {
+      // Combine date + time into RFC3339
+      const scheduledAt = new Date(`${interviewForm.date}T${interviewForm.time}:00`).toISOString();
+      const created = await interviewService.schedule({
+        application_id: state.applicationId,
+        student_id: id,
+        vacancy_id: state.vacancyId,
+        scheduled_at: scheduledAt,
+        location: interviewForm.location,
+        notes: interviewForm.notes,
+      });
+      setInterview(created);
+      setShowInterviewModal(false);
+      toast.success(t('interview.scheduledSuccess'));
+    } catch {
+      toast.error(t('interview.scheduleError'));
+    } finally {
+      setInterviewSubmitting(false);
+    }
+  };
+
+  const handleCancelInterview = async () => {
+    if (!interview) return;
+    try {
+      await interviewService.cancel(interview.id);
+      setInterview(prev => prev ? { ...prev, status: 'cancelled' } : null);
+      toast.success(t('interview.cancelledSuccess'));
+    } catch {
+      toast.error(t('interview.cancelError'));
+    }
+  };
 
   const handleUpdateStatus = async (newStatus: string) => {
     if (!state.applicationId) return;
@@ -102,6 +161,7 @@ const CandidateDetailPage = () => {
   const fullName = `${student.first_name} ${student.last_name}`.trim();
 
   return (
+    <>
     <div className="max-w-6xl mx-auto space-y-8">
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
         {t('common.back')}
@@ -135,7 +195,7 @@ const CandidateDetailPage = () => {
                 </div>
               </div>
               {state.matchScore != null && state.matchScore > 0 && (
-                <MatchIndex percentage={state.matchScore} size="lg" />
+                <MatchIndex percentage={state.matchScore} size="lg" showLabel={false} />
               )}
             </div>
           </div>
@@ -232,6 +292,60 @@ const CandidateDetailPage = () => {
             </div>
           )}
 
+          {/* Interview Scheduling */}
+          {state.applicationId && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-3">
+              <h3 className="font-semibold text-gray-900 mb-2">{t('interview.title')}</h3>
+
+              {interview && interview.status === 'scheduled' ? (
+                <div className="space-y-2">
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 space-y-1">
+                    <p className="text-sm font-semibold text-purple-800">📅 {t('interview.scheduled')}</p>
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium">{t('interview.datetime')}:</span>{' '}
+                      {new Date(interview.scheduled_at).toLocaleString()}
+                    </p>
+                    {interview.location && (
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">{t('interview.location')}:</span>{' '}
+                        {interview.location}
+                      </p>
+                    )}
+                    {interview.notes && (
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">{t('interview.notes')}:</span>{' '}
+                        {interview.notes}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleCancelInterview}
+                    className="w-full px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium text-sm"
+                  >
+                    {t('interview.cancel')}
+                  </button>
+                </div>
+              ) : interview && interview.status === 'cancelled' ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-500 italic">{t('interview.wasCancelled')}</p>
+                  <button
+                    onClick={() => setShowInterviewModal(true)}
+                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm"
+                  >
+                    {t('interview.reschedule')}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowInterviewModal(true)}
+                  className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm"
+                >
+                  {t('interview.schedule')}
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Documents */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="font-semibold text-gray-900 mb-4">{t('candidate.documents')}</h3>
@@ -243,7 +357,7 @@ const CandidateDetailPage = () => {
               {documents.map(doc => (
                 <div key={doc.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
                   <span className="text-xl mt-0.5">
-                    {doc.type === 'cv' ? '📄' : '📜'}
+                    {doc.type === 'cv' ? '📄' : doc.type === 'diploma' ? '🎓' : '📜'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{doc.file_name}</p>
@@ -263,12 +377,14 @@ const CandidateDetailPage = () => {
                         </span>
                       )}
                     </div>
-                    <button
-                      onClick={() => documentService.download(doc.id, doc.file_name).catch(() => {})}
-                      className="text-xs text-blue-600 hover:underline mt-1 inline-block"
-                    >
-                      {t('common.download')}
-                    </button>
+                    {doc.type === 'cv' && (
+                      <button
+                        onClick={() => documentService.download(doc.id, doc.file_name).catch(() => {})}
+                        className="text-xs text-blue-600 hover:underline mt-1 inline-block"
+                      >
+                        {t('common.download')}
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -284,6 +400,97 @@ const CandidateDetailPage = () => {
         </div>
       </div>
     </div>
+
+    {/* Interview Scheduling Modal */}
+    {showInterviewModal && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">{t('interview.modalTitle')}</h2>
+            <button
+              onClick={() => setShowInterviewModal(false)}
+              className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('interview.date')} <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={interviewForm.date}
+              min={new Date().toISOString().split('T')[0]}
+              onChange={e => setInterviewForm(f => ({ ...f, date: e.target.value }))}
+              style={{ colorScheme: 'light', backgroundColor: '#ffffff' }}
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+
+          {/* Time */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('interview.time')} <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="time"
+              value={interviewForm.time}
+              onChange={e => setInterviewForm(f => ({ ...f, time: e.target.value }))}
+              style={{ colorScheme: 'light', backgroundColor: '#ffffff' }}
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('interview.location')}
+            </label>
+            <input
+              type="text"
+              value={interviewForm.location}
+              placeholder={t('interview.locationPlaceholder')}
+              onChange={e => setInterviewForm(f => ({ ...f, location: e.target.value }))}
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('interview.notes')}
+            </label>
+            <textarea
+              value={interviewForm.notes}
+              placeholder={t('interview.notesPlaceholder')}
+              rows={3}
+              onChange={e => setInterviewForm(f => ({ ...f, notes: e.target.value }))}
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={() => setShowInterviewModal(false)}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium text-sm"
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              onClick={handleScheduleInterview}
+              disabled={interviewSubmitting}
+              className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {interviewSubmitting ? t('common.saving') : t('interview.confirm')}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

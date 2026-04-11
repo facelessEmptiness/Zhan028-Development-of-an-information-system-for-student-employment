@@ -29,6 +29,7 @@ func SetupRouter(sh *handler.StudentHandler, dh *handler.DocumentHandler, nh *ha
 		docs.GET("/my", dh.ListMy)
 		docs.GET("/student/:user_id", dh.ListByStudent)
 		docs.GET("/:id/download", dh.Download)
+		docs.PUT("/auto-verify/:user_id", dh.AutoVerify)
 		docs.PUT("/:id/verify", dh.Verify)
 		docs.PUT("/:id/reject", dh.Reject)
 		docs.DELETE("/:id", dh.Delete)

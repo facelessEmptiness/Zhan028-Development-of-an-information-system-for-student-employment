@@ -143,6 +143,28 @@ const UniversityAnalyticsPage = () => {
     }
   };
 
+  const handleAutoVerify = async (userId: string) => {
+    try {
+      const result = await documentService.autoVerify(userId);
+      if (result.verified_count === 0) {
+        toast.info(t('universityAnalytics.autoVerify.noPending'));
+        return;
+      }
+      // Update local state — mark all non-CV pending docs as verified
+      setStudentDocs(prev => ({
+        ...prev,
+        [userId]: (prev[userId] ?? []).map(d =>
+          d.status === 'pending' && d.type !== 'cv'
+            ? { ...d, status: 'verified' as const }
+            : d
+        ),
+      }));
+      toast.success(t('universityAnalytics.autoVerify.success', { count: result.verified_count }));
+    } catch {
+      toast.error(t('universityAnalytics.autoVerify.error'));
+    }
+  };
+
   const employmentRate = data
     ? data.applications.total > 0
       ? Math.round((data.applications.offered_count / data.applications.total) * 100)
@@ -361,21 +383,29 @@ const UniversityAnalyticsPage = () => {
                   {docStudents.map(s => (
                     <div key={s.user_id} className="border border-gray-200 rounded-xl overflow-hidden">
                       {/* Student row */}
-                      <button
-                        onClick={() => toggleStudent(s.user_id)}
-                        className="w-full flex items-center justify-between px-6 py-4 bg-white hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-between px-6 py-4 bg-white">
+                        <button
+                          onClick={() => toggleStudent(s.user_id)}
+                          className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity"
+                        >
                           <div className="w-9 h-9 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-semibold">
                             {s.first_name.charAt(0)}
                           </div>
-                          <div className="text-left">
+                          <div>
                             <p className="font-medium text-gray-900">{s.first_name} {s.last_name}</p>
                             <p className="text-xs text-gray-500">{s.specialization || t('universityAnalytics.docReview.specializationNotSet')}</p>
                           </div>
+                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleAutoVerify(s.user_id)}
+                            className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700 whitespace-nowrap"
+                          >
+                            🎓 {t('universityAnalytics.autoVerify.button')}
+                          </button>
+                          <span className="text-gray-400 text-lg">{expandedStudent === s.user_id ? '▲' : '▼'}</span>
                         </div>
-                        <span className="text-gray-400 text-lg">{expandedStudent === s.user_id ? '▲' : '▼'}</span>
-                      </button>
+                      </div>
 
                       {/* Documents panel */}
                       {expandedStudent === s.user_id && (
@@ -390,7 +420,7 @@ const UniversityAnalyticsPage = () => {
                               return (
                                 <div key={doc.id} className="flex items-center justify-between bg-white rounded-lg px-5 py-3 border border-gray-200">
                                   <div className="flex items-center gap-3">
-                                    <span className="text-xl">{doc.type === 'cv' ? '📄' : '📜'}</span>
+                                    <span className="text-xl">{doc.type === 'cv' ? '📄' : doc.type === 'diploma' ? '🎓' : '📜'}</span>
                                     <div>
                                       <p className="font-medium text-gray-900 text-sm">{doc.file_name}</p>
                                       <p className="text-xs text-gray-500">{getTypeLabel(doc.type)} · {(doc.file_size / 1024).toFixed(0)} KB</p>

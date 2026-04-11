@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"time"
 	"student-service/internal/models"
 
 	"github.com/google/uuid"
@@ -17,6 +18,7 @@ type DocumentRepository interface {
 	FindByUserID(userID uuid.UUID) ([]*models.Document, error)
 	Update(doc *models.Document) error
 	Delete(id uuid.UUID) error
+	VerifyAllPendingByUserID(userID uuid.UUID, verifierID uuid.UUID) ([]*models.Document, error)
 }
 
 type documentRepository struct {
@@ -65,4 +67,41 @@ func (r *documentRepository) Delete(id uuid.UUID) error {
 		return ErrDocumentNotFound
 	}
 	return result.Error
+}
+
+// VerifyAllPendingByUserID verifies all pending non-CV documents for a student
+// and returns the updated documents.
+func (r *documentRepository) VerifyAllPendingByUserID(userID uuid.UUID, verifierID uuid.UUID) ([]*models.Document, error) {
+	now := time.Now()
+
+	// Find all pending non-CV documents for this user
+	var docs []*models.Document
+	if err := r.db.Omit("file_data").
+		Where("user_id = ? AND status = ? AND type != ?", userID, models.DocStatusPending, models.DocTypeCV).
+		Find(&docs).Error; err != nil {
+		return nil, err
+	}
+
+	if len(docs) == 0 {
+		return docs, nil
+	}
+
+	// Bulk update status
+	if err := r.db.Model(&models.Document{}).
+		Where("user_id = ? AND status = ? AND type != ?", userID, models.DocStatusPending, models.DocTypeCV).
+		Updates(map[string]interface{}{
+			"status":      models.DocStatusVerified,
+			"verified_by": verifierID,
+			"verified_at": now,
+		}).Error; err != nil {
+		return nil, err
+	}
+
+	// Return updated docs
+	for _, d := range docs {
+		d.Status = models.DocStatusVerified
+		d.VerifiedBy = &verifierID
+		d.VerifiedAt = &now
+	}
+	return docs, nil
 }

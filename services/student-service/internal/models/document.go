@@ -13,6 +13,7 @@ const (
 	DocStatusRejected = "rejected"
 
 	DocTypeCV          = "cv"
+	DocTypeDiploma     = "diploma"
 	DocTypeCertificate = "certificate"
 )
 

@@ -600,7 +600,7 @@
     "documents": "Документы",
     "docsLoading": "Загрузка...",
     "noDocs": "Документов нет",
-    "docVerifiedByUniversity": "Verified by University",
+    "docVerifiedByUniversity": "Подтверждено университетом",
     "docRejected": "Отклонён",
     "docPending": "На проверке",
     "identification": "Идентификация",
@@ -897,6 +897,36 @@
     "success": {
       "docVerified": "Документ подтверждён",
       "docRejected": "Документ отклонён"
+    },
+    "autoVerify": {
+      "button": "Авто-подтвердить диплом",
+      "success": "{{count}} документ(ов) подтверждено автоматически",
+      "noPending": "Нет документов ожидающих подтверждения",
+      "error": "Не удалось авто-подтвердить документы"
+    }
+  },
+  "interview": {
+    "title": "Собеседование",
+    "modalTitle": "Назначить собеседование",
+    "schedule": "Назначить собеседование",
+    "reschedule": "Перенести",
+    "cancel": "Отменить собеседование",
+    "confirm": "Назначить",
+    "scheduled": "Собеседование назначено",
+    "wasCancelled": "Собеседование было отменено",
+    "date": "Дата",
+    "time": "Время",
+    "datetime": "Дата и время",
+    "location": "Место проведения",
+    "locationPlaceholder": "напр. адрес офиса или ссылка на видеозвонок",
+    "notes": "Примечания",
+    "notesPlaceholder": "Дополнительная информация для кандидата",
+    "scheduledSuccess": "Собеседование назначено. Кандидат получил уведомление.",
+    "scheduleError": "Не удалось назначить собеседование",
+    "cancelledSuccess": "Собеседование отменено",
+    "cancelError": "Не удалось отменить собеседование",
+    "validation": {
+      "dateTimeRequired": "Пожалуйста, выберите дату и время"
     }
   }
 }

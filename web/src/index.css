@@ -572,9 +572,7 @@ input[type="radio"] {
   }
 }
 
-/* Dark mode consideration */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
+/* Force light mode — dark theme not supported */
+:root {
+  color-scheme: light;
 }

@@ -612,7 +612,7 @@ const StudentProfilePage = () => {
 
               {/* Upload buttons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(['cv', 'certificate'] as DocumentType[]).map(type => (
+                {(['cv', 'diploma', 'certificate'] as DocumentType[]).map(type => (
                   <button
                     key={type}
                     onClick={() => handleUploadClick(type)}
@@ -648,7 +648,7 @@ const StudentProfilePage = () => {
                 <div key={doc.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="flex items-center gap-4">
                     <span className="text-2xl">
-                      {doc.type === 'cv' ? '📄' : '📜'}
+                      {doc.type === 'cv' ? '📄' : doc.type === 'diploma' ? '🎓' : '📜'}
                     </span>
                     <div>
                       <p className="font-medium text-gray-900">{doc.file_name}</p>
@@ -695,7 +695,6 @@ const StudentProfilePage = () => {
                 <div key={app.id} className="bg-gray-50 rounded-lg p-6 border border-gray-200 hover:shadow-md transition-all">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <p className="text-xs text-gray-500 mb-1">Вакансия ID: {app.vacancy_id}</p>
                       {app.cover_letter && (
                         <p className="text-sm text-gray-600 mt-1 italic">«{app.cover_letter.slice(0, 100)}{app.cover_letter.length > 100 ? '...' : ''}»</p>
                       )}
@@ -710,7 +709,7 @@ const StudentProfilePage = () => {
                     </div>
                     {app.match_score > 0 && (
                       <div className="ml-4">
-                        <MatchIndex percentage={app.match_score} size="sm" showLabel={true} />
+                        <MatchIndex percentage={app.match_score} size="sm" showLabel={false} />
                       </div>
                     )}
                   </div>

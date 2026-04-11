@@ -48,6 +48,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	applicationHandler := handler.NewApplicationHandler(applicationClient, studentClient, vacancyClient, notifClient)
 	employerProfileHandler := handler.NewEmployerProfileHandler(vacancyClient)
 	analyticsHandler := handler.NewAnalyticsHandler(studentClient, vacancyClient, applicationClient)
+	interviewHandler := handler.NewInterviewHandler(cfg.ApplicationServiceHttpUrl, notifClient)
 
 	api := r.Group("/api")
 
@@ -136,6 +137,18 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		applications.GET("/vacancy/:vacancy_id", applicationHandler.GetVacancyApplications)
 		applications.PUT("/:id/status", applicationHandler.UpdateStatus)
 		applications.DELETE("/:id", applicationHandler.Withdraw)
+	}
+
+	// ============================================
+	// INTERVIEWS - proxied to application-service HTTP
+	// ============================================
+	interviews := api.Group("/interviews", middleware.AuthMiddleware(cfg.JWTSecret))
+	{
+		interviews.POST("", interviewHandler.Schedule)
+		interviews.GET("/employer", interviewHandler.GetForEmployer)
+		interviews.GET("/student", interviewHandler.GetForStudent)
+		interviews.GET("/application/:application_id", interviewHandler.GetByApplication)
+		interviews.DELETE("/:id", interviewHandler.Cancel)
 	}
 
 	// ============================================

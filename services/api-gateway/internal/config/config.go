@@ -8,14 +8,15 @@ import (
 )
 
 type Config struct {
-	Port                       string
-	AuthServiceUrl             string
-	DocumentServiceUrl         string
-	StudentServiceGRPCUrl      string
-	EmployerServiceGRPCUrl     string
-	UniversityServiceGRPCUrl   string
-	ApplicationServiceGRPCUrl  string
-	JWTSecret                  string
+	Port                        string
+	AuthServiceUrl              string
+	DocumentServiceUrl          string
+	ApplicationServiceHttpUrl   string
+	StudentServiceGRPCUrl       string
+	EmployerServiceGRPCUrl      string
+	UniversityServiceGRPCUrl    string
+	ApplicationServiceGRPCUrl   string
+	JWTSecret                   string
 }
 
 func LoadConfig() (*Config, error) {
@@ -26,14 +27,15 @@ func LoadConfig() (*Config, error) {
 	}
 
 	config := &Config{
-		Port:                      getEnvOrDefault("PORT", "8080"),
-		AuthServiceUrl:            getEnvOrDefault("AUTH_SERVICE_URL", "http://localhost:8081"),
-		DocumentServiceUrl:        getEnvOrDefault("DOCUMENT_SERVICE_URL", "http://localhost:8082"),
-		StudentServiceGRPCUrl:     getEnvOrDefault("STUDENT_GRPC_URL", "localhost:50051"),
-		EmployerServiceGRPCUrl:    getEnvOrDefault("EMPLOYER_GRPC_URL", "localhost:50052"),
-		UniversityServiceGRPCUrl:  getEnvOrDefault("UNIVERSITY_GRPC_URL", "localhost:50053"),
-		ApplicationServiceGRPCUrl: getEnvOrDefault("APPLICATION_GRPC_URL", "localhost:50054"),
-		JWTSecret:                 getEnvOrDefault("JWT_SECRET", "your_super_secret_jwt_key_change_in_production"),
+		Port:                       getEnvOrDefault("PORT", "8080"),
+		AuthServiceUrl:             getEnvOrDefault("AUTH_SERVICE_URL", "http://localhost:8081"),
+		DocumentServiceUrl:         getEnvOrDefault("DOCUMENT_SERVICE_URL", "http://localhost:8082"),
+		ApplicationServiceHttpUrl:  getEnvOrDefault("APPLICATION_HTTP_URL", "http://localhost:8083"),
+		StudentServiceGRPCUrl:      getEnvOrDefault("STUDENT_GRPC_URL", "localhost:50051"),
+		EmployerServiceGRPCUrl:     getEnvOrDefault("EMPLOYER_GRPC_URL", "localhost:50052"),
+		UniversityServiceGRPCUrl:   getEnvOrDefault("UNIVERSITY_GRPC_URL", "localhost:50053"),
+		ApplicationServiceGRPCUrl:  getEnvOrDefault("APPLICATION_GRPC_URL", "localhost:50054"),
+		JWTSecret:                  getEnvOrDefault("JWT_SECRET", "your_super_secret_jwt_key_change_in_production"),
 	}
 
 	return config, nil

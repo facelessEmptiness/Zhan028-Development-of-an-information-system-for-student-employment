@@ -7,6 +7,8 @@ import (
 	grpcserver "application-service/internal/grpc"
 	"application-service/internal/grpc/pb"
 	"application-service/internal/config"
+	httphandler "application-service/internal/http/handler"
+	httprouter "application-service/internal/http/router"
 	"application-service/internal/models"
 	"application-service/internal/repository"
 	"application-service/internal/service"
@@ -28,22 +30,38 @@ func main() {
 	}
 
 	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.Application{}); err != nil {
+	if err := db.AutoMigrate(&models.Application{}, &models.Interview{}); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 
 	// 4. Initialize layers
 	appRepo := repository.NewApplicationRepository(db)
+	interviewRepo := repository.NewInterviewRepository(db)
 	appSvc := service.NewApplicationService(appRepo)
 	grpcSrv := grpcserver.NewApplicationGRPCServer(appSvc, appRepo)
 
-	// 5. Determine gRPC port
+	// 5. Start HTTP server for interviews in background
+	go func() {
+		interviewHandler := httphandler.NewInterviewHandler(interviewRepo, appRepo)
+		r := httprouter.SetupRouter(interviewHandler)
+
+		httpPort := cfg.HTTPPort
+		if httpPort == "" {
+			httpPort = "8083"
+		}
+		log.Printf("Application Service HTTP running on :%s", httpPort)
+		if err := r.Run(":" + httpPort); err != nil {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+	}()
+
+	// 6. Determine gRPC port
 	grpcPort := cfg.GRPCPort
 	if grpcPort == "" {
 		grpcPort = "50054"
 	}
 
-	// 6. Start gRPC server
+	// 7. Start gRPC server
 	lis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

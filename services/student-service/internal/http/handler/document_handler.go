@@ -33,8 +33,8 @@ func (h *DocumentHandler) Upload(c *gin.Context) {
 	}
 
 	docType := c.PostForm("type")
-	if docType != models.DocTypeCV && docType != models.DocTypeCertificate {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "type must be cv or certificate"})
+	if docType != models.DocTypeCV && docType != models.DocTypeDiploma && docType != models.DocTypeCertificate {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "type must be cv, diploma or certificate"})
 		return
 	}
 
@@ -231,6 +231,50 @@ func (h *DocumentHandler) setStatus(c *gin.Context, newStatus string) {
 	}
 
 	c.JSON(http.StatusOK, doc)
+}
+
+// PUT /api/documents/auto-verify/:user_id
+// University admin auto-verifies all pending non-CV documents for a student.
+func (h *DocumentHandler) AutoVerify(c *gin.Context) {
+	verifierID, err := uuid.Parse(c.GetHeader("X-User-ID"))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid X-User-ID"})
+		return
+	}
+
+	targetUID, err := uuid.Parse(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user_id"})
+		return
+	}
+
+	updatedDocs, err := h.repo.VerifyAllPendingByUserID(targetUID, verifierID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to auto-verify documents"})
+		return
+	}
+
+	if len(updatedDocs) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "no pending documents to verify", "verified_count": 0})
+		return
+	}
+
+	// Send a single notification to the student
+	if h.notifRepo != nil {
+		_ = h.notifRepo.Create(&models.Notification{
+			UserID:    targetUID,
+			Type:      models.NotifTypeDocumentVerified,
+			Title:     "Диплом подтверждён университетом 🎓",
+			Body:      "Ваши документы автоматически подтверждены университетом.",
+			RelatedID: updatedDocs[0].ID.String(),
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":        "documents auto-verified successfully",
+		"verified_count": len(updatedDocs),
+		"documents":      updatedDocs,
+	})
 }
 
 // DELETE /api/documents/:id
