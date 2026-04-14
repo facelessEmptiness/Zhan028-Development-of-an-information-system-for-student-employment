@@ -31,6 +31,7 @@ export interface BackendStudentProfile {
   bio: string;
   phone: string;
   location_city: string;
+  github_url?: string;
   diploma_verified: boolean;
   diploma_verified_at?: string;
   created_at: string;
@@ -77,6 +78,7 @@ export const studentService = {
     bio?: string;
     phone?: string;
     location_city?: string;
+    github_url?: string;
   }): Promise<BackendStudentProfile> => {
     const res = await apiFetch(`${API_BASE}/students/profile`, {
       method: 'POST',
@@ -103,6 +105,7 @@ export const studentService = {
     bio?: string;
     phone?: string;
     location_city?: string;
+    github_url?: string;
   }): Promise<BackendStudentProfile> => {
     const res = await apiFetch(`${API_BASE}/students/profile`, {
       method: 'PUT',

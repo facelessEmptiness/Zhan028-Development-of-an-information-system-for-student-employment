@@ -42,13 +42,14 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 
 	notifClient := handler.NewNotificationClient(cfg.DocumentServiceUrl)
 
-	studentHandler := handler.NewStudentHandler(studentClient)
+	studentHandler := handler.NewStudentHandler(studentClient, cfg.DocumentServiceUrl)
 	vacancyHandler := handler.NewVacancyHandler(vacancyClient)
 	universityHandler := handler.NewUniversityHandler(universityClient)
-	applicationHandler := handler.NewApplicationHandler(applicationClient, studentClient, vacancyClient, notifClient)
+	applicationHandler := handler.NewApplicationHandler(applicationClient, studentClient, vacancyClient, notifClient, cfg.ApplicationServiceHttpUrl)
 	employerProfileHandler := handler.NewEmployerProfileHandler(vacancyClient)
 	analyticsHandler := handler.NewAnalyticsHandler(studentClient, vacancyClient, applicationClient)
 	interviewHandler := handler.NewInterviewHandler(cfg.ApplicationServiceHttpUrl, notifClient)
+	employmentHandler := handler.NewEmploymentHandler(cfg.ApplicationServiceHttpUrl)
 
 	api := r.Group("/api")
 
@@ -149,6 +150,16 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		interviews.GET("/student", interviewHandler.GetForStudent)
 		interviews.GET("/application/:application_id", interviewHandler.GetByApplication)
 		interviews.DELETE("/:id", interviewHandler.Cancel)
+	}
+
+	// ============================================
+	// EMPLOYMENT MONITORING - proxied to application-service HTTP
+	// ============================================
+	employment := api.Group("/employment", middleware.AuthMiddleware(cfg.JWTSecret))
+	{
+		employment.GET("/student", employmentHandler.GetForStudent)
+		employment.GET("/university", employmentHandler.GetForUniversity)
+		employment.PUT("/:id/end", employmentHandler.End)
 	}
 
 	// ============================================

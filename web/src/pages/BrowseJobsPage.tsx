@@ -19,6 +19,8 @@ const BrowseJobsPage = () => {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') ?? '');
   const [selectedType, setSelectedType] = useState(searchParams.get('job_type') ?? '');
   const [selectedLocation, setSelectedLocation] = useState(searchParams.get('location') ?? '');
+  const [salaryMin, setSalaryMin] = useState(searchParams.get('salary_min') ?? '');
+  const [salaryMax, setSalaryMax] = useState(searchParams.get('salary_max') ?? '');
   const [page, setPage] = useState(1);
 
   const [vacancies, setVacancies] = useState<JobPosting[]>([]);
@@ -56,6 +58,8 @@ const BrowseJobsPage = () => {
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (selectedType) params.set('job_type', selectedType);
       if (selectedLocation) params.set('location', selectedLocation);
+      if (salaryMin) params.set('salary_min', salaryMin);
+      if (salaryMax) params.set('salary_max', salaryMax);
 
       const res = await apiFetch(`/api/vacancies/?${params.toString()}`, {
       });
@@ -69,13 +73,15 @@ const BrowseJobsPage = () => {
       if (debouncedSearch) urlParams.q = debouncedSearch;
       if (selectedType) urlParams.job_type = selectedType;
       if (selectedLocation) urlParams.location = selectedLocation;
+      if (salaryMin) urlParams.salary_min = salaryMin;
+      if (salaryMax) urlParams.salary_max = salaryMax;
       setSearchParams(urlParams, { replace: true });
     } catch {
       toast.error(t('jobs.browse.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, selectedType, selectedLocation, page, setSearchParams, t]);
+  }, [debouncedSearch, selectedType, selectedLocation, salaryMin, salaryMax, page, setSearchParams, t]);
 
   useEffect(() => {
     fetchVacancies();
@@ -178,11 +184,36 @@ const BrowseJobsPage = () => {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('jobs.browse.salary')}</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  placeholder={t('jobs.browse.salaryFrom')}
+                  value={salaryMin}
+                  onChange={(e) => { setSalaryMin(e.target.value); setPage(1); }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-gray-400 shrink-0">—</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder={t('jobs.browse.salaryTo')}
+                  value={salaryMax}
+                  onChange={(e) => { setSalaryMax(e.target.value); setPage(1); }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
             <button
               onClick={() => {
                 setSearchTerm('');
                 setSelectedType('');
                 setSelectedLocation('');
+                setSalaryMin('');
+                setSalaryMax('');
                 setPage(1);
               }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
@@ -249,6 +280,8 @@ const BrowseJobsPage = () => {
                         setSearchTerm('');
                         setSelectedType('');
                         setSelectedLocation('');
+                        setSalaryMin('');
+                        setSalaryMax('');
                         setPage(1);
                       }}
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"

@@ -63,28 +63,75 @@ func (h *VacancyHandler) GetAllVacancies(c *gin.Context) {
 	search := c.Query("search")
 	jobType := c.Query("job_type")
 	location := c.Query("location")
+	salaryMinStr := c.Query("salary_min")
+	salaryMaxStr := c.Query("salary_max")
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
 
+	salaryMin, _ := strconv.ParseFloat(salaryMinStr, 64)
+	salaryMax, _ := strconv.ParseFloat(salaryMaxStr, 64)
+	hasSalaryFilter := salaryMin > 0 || salaryMax > 0
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	// When salary filter is active, fetch all matching vacancies then filter+paginate in gateway
+	fetchPage := int32(page)
+	fetchSize := int32(pageSize)
+	if hasSalaryFilter {
+		fetchPage = 1
+		fetchSize = 1000
+	}
 
 	resp, err := h.client.GetAllVacancies(ctx, &vacancypb.GetAllVacanciesRequest{
 		Search:   search,
 		JobType:  jobType,
 		Location: location,
-		Page:     int32(page),
-		PageSize: int32(pageSize),
+		Page:     fetchPage,
+		PageSize: fetchSize,
 	})
 	if err != nil {
 		handleGRPCError(c, err)
 		return
 	}
 
+	if !hasSalaryFilter {
+		c.JSON(http.StatusOK, gin.H{
+			"vacancies": resp.Vacancies,
+			"total":     resp.Total,
+			"page":      page,
+			"page_size": pageSize,
+		})
+		return
+	}
+
+	// Apply salary filter
+	filtered := resp.Vacancies[:0]
+	for _, v := range resp.Vacancies {
+		if salaryMin > 0 && v.SalaryMax > 0 && v.SalaryMax < salaryMin {
+			continue
+		}
+		if salaryMax > 0 && v.SalaryMin > 0 && v.SalaryMin > salaryMax {
+			continue
+		}
+		filtered = append(filtered, v)
+	}
+
+	// Manual pagination
+	total := len(filtered)
+	start := (page - 1) * pageSize
+	end := start + pageSize
+	if start > total {
+		start = total
+	}
+	if end > total {
+		end = total
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"vacancies": resp.Vacancies,
-		"total":     resp.Total,
+		"vacancies": filtered[start:end],
+		"total":     total,
 		"page":      page,
 		"page_size": pageSize,
 	})

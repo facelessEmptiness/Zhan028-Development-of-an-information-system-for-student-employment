@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -5,6 +6,7 @@ import { toast } from 'sonner';
 import { apiFetch } from '../utils/apiClient';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 import { documentService, type Document, getTypeLabel } from '../services/documentService';
+import { employmentService, type EmploymentRecord } from '../services/employmentService';
 
 interface SpecializationCount { specialization: string; count: number; }
 interface StatusCount         { status: string; count: number; }
@@ -47,11 +49,15 @@ const UniversityAnalyticsPage = () => {
     verified: { label: t('universityAnalytics.docStatus.verified'), cls: 'bg-green-100 text-green-700' },
     rejected: { label: t('universityAnalytics.docStatus.rejected'),    cls: 'bg-red-100 text-red-700' },
   };
-  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'employers' | 'statistics' | 'my-students' | 'doc-review'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'employers' | 'statistics' | 'my-students' | 'doc-review' | 'employment'>('overview');
   const [data, setData] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [myStudents, setMyStudents] = useState<BackendStudentProfile[]>([]);
   const [myStudentsLoading, setMyStudentsLoading] = useState(false);
+
+  // Employment monitoring state
+  const [employmentRecords, setEmploymentRecords] = useState<EmploymentRecord[]>([]);
+  const [employmentLoading, setEmploymentLoading] = useState(false);
 
   // Document review state
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
@@ -94,6 +100,28 @@ const UniversityAnalyticsPage = () => {
       .catch(() => toast.error(t('universityAnalytics.errors.loadStudents')))
       .finally(() => setDocStudentsLoading(false));
   }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'employment') return;
+    setEmploymentLoading(true);
+    employmentService.getAllRecords()
+      .then(recs => setEmploymentRecords(recs))
+      .catch(() => toast.error(t('employment.errors.loadRecords')))
+      .finally(() => setEmploymentLoading(false));
+  }, [activeTab]);
+
+  const handleEndEmployment = async (id: string) => {
+    if (!window.confirm(t('employment.endConfirm'))) return;
+    try {
+      await employmentService.endEmployment(id);
+      setEmploymentRecords(prev =>
+        prev.map(r => r.id === id ? { ...r, status: 'terminated_early' as const, ended_at: new Date().toISOString() } : r)
+      );
+      toast.success(t('employment.endSuccess'));
+    } catch {
+      toast.error(t('employment.endError'));
+    }
+  };
 
   const loadStudentDocs = async (userId: string) => {
     if (studentDocs[userId]) return; // already loaded
@@ -204,7 +232,7 @@ const UniversityAnalyticsPage = () => {
           {/* Tabs */}
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="flex border-b border-gray-200 overflow-x-auto">
-              {(['overview', 'my-students', 'doc-review', 'students', 'employers', 'statistics'] as const).map((tab) => (
+              {(['overview', 'my-students', 'doc-review', 'employment', 'students', 'employers', 'statistics'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -214,11 +242,12 @@ const UniversityAnalyticsPage = () => {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {tab === 'overview'    ? t('universityAnalytics.tabs.overview')         :
-                   tab === 'my-students' ? t('universityAnalytics.tabs.myStudents')     :
-                   tab === 'doc-review'  ? t('universityAnalytics.tabs.docReview')     :
-                   tab === 'students'    ? t('universityAnalytics.tabs.students')         :
-                   tab === 'employers'   ? t('universityAnalytics.tabs.employers')        : t('universityAnalytics.tabs.statistics')}
+                  {tab === 'overview'    ? t('universityAnalytics.tabs.overview')    :
+                   tab === 'my-students' ? t('universityAnalytics.tabs.myStudents')  :
+                   tab === 'doc-review'  ? t('universityAnalytics.tabs.docReview')   :
+                   tab === 'employment'  ? t('universityAnalytics.tabs.employment')  :
+                   tab === 'students'    ? t('universityAnalytics.tabs.students')    :
+                   tab === 'employers'   ? t('universityAnalytics.tabs.employers')   : t('universityAnalytics.tabs.statistics')}
                 </button>
               ))}
             </div>
@@ -460,6 +489,99 @@ const UniversityAnalyticsPage = () => {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Employment Monitoring */}
+              {activeTab === 'employment' && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('employment.title')}</h2>
+                    <p className="text-sm text-gray-500 mb-6">{t('employment.subtitle')}</p>
+                  </div>
+
+                  {employmentLoading && (
+                    <div className="text-center py-10 text-gray-500">{t('employment.loading')}</div>
+                  )}
+
+                  {!employmentLoading && employmentRecords.length === 0 && (
+                    <div className="text-center py-16 text-gray-500">
+                      <p className="text-lg font-medium">📊 {t('employment.noRecords')}</p>
+                      <p className="text-sm mt-2 text-gray-400">{t('employment.noRecordsHint')}</p>
+                    </div>
+                  )}
+
+                  {!employmentLoading && employmentRecords.length > 0 && (
+                    <div className="overflow-x-auto rounded-xl border border-gray-200">
+                      <table className="w-full">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('employment.table.company')}</th>
+                            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('employment.table.position')}</th>
+                            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('employment.table.startDate')}</th>
+                            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('employment.table.daysWorked')}</th>
+                            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('employment.table.progress')}</th>
+                            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('employment.table.status')}</th>
+                            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase">{t('employment.table.actions')}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 bg-white">
+                          {employmentRecords.map(rec => {
+                            const statusColors: Record<string, string> = {
+                              active: 'bg-green-100 text-green-700',
+                              completed: 'bg-blue-100 text-blue-700',
+                              terminated_early: 'bg-red-100 text-red-700',
+                            };
+                            const statusCls = statusColors[rec.status] ?? 'bg-gray-100 text-gray-700';
+                            const startDate = new Date(rec.started_at).toLocaleDateString('ru-RU');
+                            return (
+                              <tr key={rec.id} className="hover:bg-gray-50">
+                                <td className="px-5 py-4">
+                                  <p className="font-medium text-gray-900">{rec.company_name || '—'}</p>
+                                </td>
+                                <td className="px-5 py-4 text-gray-700">{rec.job_title || '—'}</td>
+                                <td className="px-5 py-4 text-gray-600 text-sm">{startDate}</td>
+                                <td className="px-5 py-4 text-gray-700 font-medium">{rec.days_worked}</td>
+                                <td className="px-5 py-4 min-w-[160px]">
+                                  {rec.grant_fulfilled ? (
+                                    <span className="text-green-600 font-semibold text-sm">{t('employment.grantFulfilled')}</span>
+                                  ) : (
+                                    <div>
+                                      <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                        <span>{rec.progress}%</span>
+                                        <span>{t('employment.remaining', { days: rec.remaining_days })}</span>
+                                      </div>
+                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                          className="bg-blue-500 h-2 rounded-full transition-all"
+                                          style={{ width: `${rec.progress}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="px-5 py-4">
+                                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${statusCls}`}>
+                                    {t(`employment.status.${rec.status}` as const, rec.status)}
+                                  </span>
+                                </td>
+                                <td className="px-5 py-4">
+                                  {rec.status === 'active' && (
+                                    <button
+                                      onClick={() => handleEndEmployment(rec.id)}
+                                      className="px-3 py-1 border border-red-300 text-red-700 rounded-lg text-xs font-medium hover:bg-red-50"
+                                    >
+                                      {t('employment.endEmployment')}
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               )}
 

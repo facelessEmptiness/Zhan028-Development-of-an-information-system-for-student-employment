@@ -73,7 +73,8 @@
       "applicationsDesc": "Track your application status",
       "recommended": "Recommended Jobs",
       "fillProfileForRec": "Fill in your profile to get personalized recommendations",
-      "viewAllJobs": "View all jobs"
+      "viewAllJobs": "View all jobs",
+      "match": "match"
     },
     "employer": {
       "subtitle": "Manage vacancies and find the best candidates",
@@ -240,6 +241,7 @@
       "cityPlaceholder": "Astana",
       "specialization": "Specialization",
       "specializationPlaceholder": "Information Systems",
+      "githubHint": "· optional, for IT specializations",
       "university": "University",
       "universityNotSet": "— not selected —",
       "graduationYear": "Graduation Year",
@@ -307,7 +309,8 @@
     "loading": "Loading profile...",
     "iinError": {
       "format": "IIN must be exactly 12 digits",
-      "checksum": "IIN failed checksum validation"
+      "checksum": "IIN failed checksum validation",
+      "tooYoung": "According to your IIN, you are under 16 — student registration is not available"
     }
   },
   "employer": {
@@ -532,6 +535,9 @@
       "contract": "Contract",
       "location": "Location",
       "locationPlaceholder": "City...",
+      "salary": "Salary (₸)",
+      "salaryFrom": "from",
+      "salaryTo": "to",
       "resetFilters": "Reset Filters",
       "loading": "Loading jobs...",
       "found": "Found",
@@ -805,6 +811,7 @@
       "overview": "Overview",
       "myStudents": "My Students",
       "docReview": "Documents",
+      "employment": "Employment",
       "students": "Students",
       "employers": "Employers",
       "statistics": "Statistics"
@@ -927,6 +934,40 @@
     "cancelError": "Failed to cancel interview",
     "validation": {
       "dateTimeRequired": "Please select a date and time"
+    }
+  },
+  "employment": {
+    "tabs": {
+      "monitoring": "Employment Monitoring"
+    },
+    "title": "Employment Monitoring (Grant)",
+    "subtitle": "Tracking the 3-year grant work obligation",
+    "loading": "Loading employment data...",
+    "noRecords": "No employment records",
+    "noRecordsHint": "Records will appear when an employer sets 'Offered' status on a student application",
+    "table": {
+      "student": "Student",
+      "company": "Company",
+      "position": "Position",
+      "startDate": "Start Date",
+      "daysWorked": "Days Worked",
+      "progress": "Progress (3 years)",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Employed",
+      "completed": "Completed (grant fulfilled)",
+      "terminated_early": "Terminated early"
+    },
+    "grantFulfilled": "Grant fulfilled ✅",
+    "remaining": "{{days}} days left",
+    "endEmployment": "End",
+    "endConfirm": "Mark this employment as terminated early?",
+    "endSuccess": "Employment record ended",
+    "endError": "Failed to end employment record",
+    "errors": {
+      "loadRecords": "Failed to load employment data"
     }
   }
 }

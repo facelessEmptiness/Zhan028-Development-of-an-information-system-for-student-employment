@@ -13,6 +13,7 @@ type CreateProfileRequest struct {
 	Bio            string  `json:"bio,omitempty"`
 	Phone          string  `json:"phone,omitempty"`
 	LocationCity   string  `json:"location_city,omitempty"`
+	GithubUrl      string  `json:"github_url,omitempty"`
 }
 
 // UpdateProfileRequest - запрос на обновление профиля
@@ -27,4 +28,5 @@ type UpdateProfileRequest struct {
 	Bio            string  `json:"bio,omitempty"`
 	Phone          string  `json:"phone,omitempty"`
 	LocationCity   string  `json:"location_city,omitempty"`
+	GithubUrl      string  `json:"github_url,omitempty"`
 }

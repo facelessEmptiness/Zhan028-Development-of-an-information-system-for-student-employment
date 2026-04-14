@@ -58,7 +58,7 @@ func (h *StudentHandler) CreateProfile(c *gin.Context) {
 			c.JSON(http.StatusConflict, dto.ErrorResponse{Error: err.Error()})
 			return
 		}
-		if errors.Is(err, service.ErrIINInvalidFormat) || errors.Is(err, service.ErrIINInvalidChecksum) {
+		if errors.Is(err, service.ErrIINInvalidFormat) || errors.Is(err, service.ErrIINInvalidChecksum) || errors.Is(err, service.ErrIINTooYoung) {
 			c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
 			return
 		}
@@ -97,6 +97,7 @@ func (h *StudentHandler) GetProfile(c *gin.Context) {
 }
 
 // GetByID - GET /api/students/:id (для других сервисов)
+// :id is the auth-service user_id, not the student profile primary key
 func (h *StudentHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -105,7 +106,7 @@ func (h *StudentHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	student, err := h.service.GetByID(id)
+	student, err := h.service.GetProfile(id)
 	if err != nil {
 		if errors.Is(err, repository.ErrStudentNotFound) {
 			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Студент не найден"})
@@ -137,6 +138,7 @@ func (h *StudentHandler) UpdateProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
+	// github_url comes directly from JSON body (already in dto.UpdateProfileRequest)
 
 	student, err := h.service.UpdateProfile(userID, req)
 	if err != nil {
@@ -159,6 +161,14 @@ func toStudentResponse(s *models.Student) dto.StudentResponse {
 		FirstName:         s.FirstName,
 		LastName:          s.LastName,
 		IIN:               s.IIN,
+		Skills:            s.Skills,
+		GPA:               s.GPA,
+		Specialization:    s.Specialization,
+		GraduationYear:    s.GraduationYear,
+		Bio:               s.Bio,
+		Phone:             s.Phone,
+		LocationCity:      s.LocationCity,
+		GithubUrl:         s.GithubUrl,
 		DiplomaVerified:   s.DiplomaVerified,
 		DiplomaVerifiedAt: s.DiplomaVerifiedAt,
 		CreatedAt:         s.CreatedAt,

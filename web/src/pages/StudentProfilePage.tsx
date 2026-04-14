@@ -3,12 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 
-/** Проверяет казахстанский ИИН (12 цифр + контрольная сумма) */
+const MIN_STUDENT_AGE = 16;
+
+/** Проверяет казахстанский ИИН (12 цифр, контрольная сумма, возраст ≥ 16) */
 function validateIIN(iin: string, t: (key: string) => string): string | null {
   if (iin.length !== 12 || !/^\d{12}$/.test(iin)) {
     return t('profile.iinError.format');
   }
   const d = iin.split('').map(Number);
+
+  // Контрольная сумма
   const w1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
   let sum = w1.reduce((acc, w, i) => acc + d[i] * w, 0);
   let check = sum % 11;
@@ -20,6 +24,30 @@ function validateIIN(iin: string, t: (key: string) => string): string | null {
   if (check === 10 || check !== d[11]) {
     return t('profile.iinError.checksum');
   }
+
+  // Возраст: ГГММДД + 7-я цифра (век: 3-4 → 1900-е, 5-6 → 2000-е)
+  const yy = d[0] * 10 + d[1];
+  const mm = d[2] * 10 + d[3];
+  const dd = d[4] * 10 + d[5];
+  const century = d[6];
+  let fullYear: number;
+  if (century === 1 || century === 2) fullYear = 1800 + yy;
+  else if (century === 3 || century === 4) fullYear = 1900 + yy;
+  else if (century === 5 || century === 6) fullYear = 2000 + yy;
+  else return t('profile.iinError.format');
+
+  const birthDate = new Date(fullYear, mm - 1, dd);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const notYetHadBirthday =
+    today.getMonth() < birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate());
+  if (notYetHadBirthday) age--;
+
+  if (age < MIN_STUDENT_AGE) {
+    return t('profile.iinError.tooYoung');
+  }
+
   return null;
 }
 import { applicationService, type Application } from '../services/applicationService';
@@ -41,6 +69,7 @@ interface FormData {
   bio: string;
   skills: string; // comma-separated string for the input
   university_id: string;
+  github_url: string;
 }
 
 const emptyForm: FormData = {
@@ -55,6 +84,7 @@ const emptyForm: FormData = {
   bio: '',
   skills: '',
   university_id: '',
+  github_url: '',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -138,6 +168,7 @@ const StudentProfilePage = () => {
           bio: p.bio || '',
           skills: p.skills || '',
           university_id: p.university_id || '',
+          github_url: p.github_url || '',
         });
       } catch {
         setProfileExists(false);
@@ -245,6 +276,7 @@ const StudentProfilePage = () => {
         bio: formData.bio,
         skills: formData.skills,
         university_id: formData.university_id || undefined,
+        github_url: formData.github_url || undefined,
       };
 
       let updated: BackendStudentProfile;
@@ -374,6 +406,18 @@ const StudentProfilePage = () => {
                     </div>
                   </div>
 
+                  {profile?.github_url && (
+                    <a
+                      href={profile.github_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors w-fit"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                      GitHub Profile
+                    </a>
+                  )}
+
                   <div className="grid grid-cols-2 gap-4">
                     {profile?.phone && (
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -479,6 +523,23 @@ const StudentProfilePage = () => {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      <span className="inline-flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                        GitHub
+                        <span className="text-xs font-normal text-gray-400">{t('profile.form.githubHint')}</span>
+                      </span>
+                    </label>
+                    <input
+                      name="github_url"
+                      value={formData.github_url}
+                      onChange={handleChange}
+                      placeholder="https://github.com/username"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
 
                   <div>

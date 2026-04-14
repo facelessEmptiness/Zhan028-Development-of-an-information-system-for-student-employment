@@ -18,6 +18,7 @@ type ApplicationHandler struct {
 	studentClient studentpb.StudentServiceClient
 	vacancyClient vacancypb.VacancyServiceClient
 	notif         *NotificationClient
+	appHTTPURL    string
 }
 
 func NewApplicationHandler(
@@ -25,12 +26,14 @@ func NewApplicationHandler(
 	studentClient studentpb.StudentServiceClient,
 	vacancyClient vacancypb.VacancyServiceClient,
 	notif *NotificationClient,
+	appHTTPURL string,
 ) *ApplicationHandler {
 	return &ApplicationHandler{
 		appClient:     appClient,
 		studentClient: studentClient,
 		vacancyClient: vacancyClient,
 		notif:         notif,
+		appHTTPURL:    appHTTPURL,
 	}
 }
 
@@ -233,6 +236,32 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 	if title, ok := statusLabels[req.Status]; ok {
 		body := "Работодатель изменил статус вашей заявки на «" + req.Status + "»."
 		go h.notif.Send(resp.GetStudentId(), "application_status", title, body, id)
+	}
+
+	// When employer offers a job — create employment record for grant monitoring
+	if req.Status == "offered" && h.appHTTPURL != "" {
+		go func() {
+			// Fetch vacancy info to get company name and job title
+			companyName := ""
+			jobTitle := ""
+			vCtx, vCancel := context.WithTimeout(context.Background(), 3*time.Second)
+			vacancyResp, vErr := h.vacancyClient.GetVacancyByID(vCtx, &vacancypb.GetByIDRequest{Id: resp.GetVacancyId()})
+			vCancel()
+			if vErr == nil && vacancyResp != nil {
+				companyName = vacancyResp.GetCompanyName()
+				jobTitle = vacancyResp.GetTitle()
+			}
+
+			payload := map[string]interface{}{
+				"student_id":     resp.GetStudentId(),
+				"employer_id":    employerID,
+				"application_id": id,
+				"vacancy_id":     resp.GetVacancyId(),
+				"company_name":   companyName,
+				"job_title":      jobTitle,
+			}
+			CreateEmploymentRecord(h.appHTTPURL, payload)
+		}()
 	}
 
 	c.JSON(http.StatusOK, resp)

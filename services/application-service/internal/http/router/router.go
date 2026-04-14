@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(ih *handler.InterviewHandler) *gin.Engine {
+func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
@@ -20,6 +20,14 @@ func SetupRouter(ih *handler.InterviewHandler) *gin.Engine {
 		interviews.GET("/student", ih.GetForStudent)
 		interviews.GET("/application/:application_id", ih.GetByApplication)
 		interviews.DELETE("/:id", ih.Cancel)
+	}
+
+	employment := r.Group("/api/employment")
+	{
+		employment.POST("/internal", eh.CreateInternal)
+		employment.GET("/student", eh.GetForStudent)
+		employment.GET("/university", eh.GetForUniversity)
+		employment.PUT("/:id/end", eh.End)
 	}
 
 	return r

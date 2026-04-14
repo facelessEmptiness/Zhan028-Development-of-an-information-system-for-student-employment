@@ -11,12 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
+const minStudentAge = 16
+
 var (
 	ErrProfileAlreadyExists = errors.New("профиль студента уже существует")
 	ErrProfileNotFound      = errors.New("профиль студента не найден")
 	ErrIINAlreadyTaken      = errors.New("ИИН уже зарегистрирован")
 	ErrIINInvalidFormat     = errors.New("ИИН должен содержать ровно 12 цифр")
 	ErrIINInvalidChecksum   = errors.New("ИИН не прошёл проверку контрольной суммы")
+	ErrIINTooYoung          = errors.New("по данным ИИН вам меньше 16 лет — регистрация студентов недоступна")
 )
 
 // autoVerifyDiploma автоматически верифицирует диплом студента,
@@ -34,7 +37,7 @@ func autoVerifyDiploma(s *models.Student) {
 	}
 }
 
-// validateIIN проверяет казахстанский ИИН (12 цифр + контрольная сумма).
+// validateIIN проверяет казахстанский ИИН (12 цифр, контрольная сумма, возраст ≥ 16).
 func validateIIN(iin string) error {
 	if len(iin) != 12 {
 		return ErrIINInvalidFormat
@@ -47,6 +50,7 @@ func validateIIN(iin string) error {
 		digits[i] = int(ch - '0')
 	}
 
+	// Контрольная сумма
 	weights1 := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 	sum := 0
 	for i := 0; i < 11; i++ {
@@ -67,6 +71,37 @@ func validateIIN(iin string) error {
 	if check != digits[11] {
 		return ErrIINInvalidChecksum
 	}
+
+	// Возраст: первые 6 цифр — ГГММДД, 7-я — век (3-4 → 1900-е, 5-6 → 2000-е)
+	yy := digits[0]*10 + digits[1]
+	mm := digits[2]*10 + digits[3]
+	dd := digits[4]*10 + digits[5]
+	century := digits[6]
+
+	var fullYear int
+	switch {
+	case century == 1 || century == 2:
+		fullYear = 1800 + yy
+	case century == 3 || century == 4:
+		fullYear = 1900 + yy
+	case century == 5 || century == 6:
+		fullYear = 2000 + yy
+	default:
+		return ErrIINInvalidFormat
+	}
+
+	birthDate := time.Date(fullYear, time.Month(mm), dd, 0, 0, 0, 0, time.UTC)
+	age := time.Now().UTC().Year() - birthDate.Year()
+	// Корректируем если день рождения ещё не наступил в этом году
+	anniversary := birthDate.AddDate(age, 0, 0)
+	if time.Now().UTC().Before(anniversary) {
+		age--
+	}
+
+	if age < minStudentAge {
+		return ErrIINTooYoung
+	}
+
 	return nil
 }
 
@@ -117,6 +152,7 @@ func (s *StudentService) CreateProfile(userID uuid.UUID, req dto.CreateProfileRe
 		Bio:            req.Bio,
 		Phone:          req.Phone,
 		LocationCity:   req.LocationCity,
+		GithubUrl:      req.GithubUrl,
 	}
 
 	// Если указан университет
@@ -188,6 +224,8 @@ func (s *StudentService) UpdateProfile(userID uuid.UUID, req dto.UpdateProfileRe
 	if req.LocationCity != "" {
 		student.LocationCity = req.LocationCity
 	}
+	// github_url is always updated (allows clearing to empty)
+	student.GithubUrl = req.GithubUrl
 
 	// Автоматически верифицируем/снимаем диплом при изменении академических данных
 	autoVerifyDiploma(student)

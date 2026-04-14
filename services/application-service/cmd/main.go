@@ -30,20 +30,22 @@ func main() {
 	}
 
 	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.Application{}, &models.Interview{}); err != nil {
+	if err := db.AutoMigrate(&models.Application{}, &models.Interview{}, &models.EmploymentRecord{}); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 
 	// 4. Initialize layers
 	appRepo := repository.NewApplicationRepository(db)
 	interviewRepo := repository.NewInterviewRepository(db)
+	employmentRepo := repository.NewEmploymentRepository(db)
 	appSvc := service.NewApplicationService(appRepo)
 	grpcSrv := grpcserver.NewApplicationGRPCServer(appSvc, appRepo)
 
-	// 5. Start HTTP server for interviews in background
+	// 5. Start HTTP server for interviews and employment in background
 	go func() {
 		interviewHandler := httphandler.NewInterviewHandler(interviewRepo, appRepo)
-		r := httprouter.SetupRouter(interviewHandler)
+		employmentHandler := httphandler.NewEmploymentHandler(employmentRepo)
+		r := httprouter.SetupRouter(interviewHandler, employmentHandler)
 
 		httpPort := cfg.HTTPPort
 		if httpPort == "" {

@@ -20,6 +20,7 @@ type Student struct {
 	Bio              string     `gorm:"type:text" json:"bio"`
 	Phone            string     `gorm:"type:varchar(50)" json:"phone"`
 	LocationCity     string     `gorm:"type:varchar(200)" json:"location_city"`
+	GithubUrl        string     `gorm:"type:varchar(500)" json:"github_url"`
 	DiplomaVerified  bool       `gorm:"default:false" json:"diploma_verified"`
 	DiplomaVerifiedAt *time.Time `gorm:"" json:"diploma_verified_at,omitempty"`
 	CreatedAt        time.Time
