@@ -626,23 +626,6 @@
     "employerDashboard": "Employer Dashboard",
     "analytics": "Analytics"
   },
-  "sessions": {
-    "titles": {
-      "student": "Complete Your Student Profile",
-      "employer": "Complete Your Employer Profile",
-      "university": "Complete Your University Profile",
-      "default": "Complete Your Profile"
-    },
-    "descriptions": {
-      "student": "Provide your personal information to get started with finding opportunities",
-      "employer": "Enter your company details to start posting job opportunities",
-      "university": "Provide your university information to manage campus activities",
-      "default": "Complete your profile information"
-    },
-    "loggedInAs": "Logged in as",
-    "logout": "Logout",
-    "skip": "Skip for now"
-  },
   "docTypes": {
     "cv": "CV / Resume",
     "certificate": "Certificate"
@@ -800,6 +783,7 @@
     },
     "loggedInAs": "Logged in as",
     "logout": "Logout",
+    "skip": "Skip for now",
     "successMessage": "Profile created successfully!",
     "loading": "Loading..."
   },
