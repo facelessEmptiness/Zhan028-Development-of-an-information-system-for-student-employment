@@ -235,7 +235,8 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 	}
 	if title, ok := statusLabels[req.Status]; ok {
 		body := "Работодатель изменил статус вашей заявки на «" + req.Status + "»."
-		go h.notif.Send(resp.GetStudentId(), "application_status", title, body, id)
+		// related_id format: "applicationId|status" — used by frontend for i18n translation
+		go h.notif.Send(resp.GetStudentId(), "application_status", title, body, id+"|"+req.Status)
 	}
 
 	// When employer offers a job — create employment record for grant monitoring

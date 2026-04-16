@@ -71,8 +71,8 @@ export default function Header() {
 
   useEffect(() => {
     fetchNotifications();
-    // Poll every 30 seconds
-    const interval = setInterval(fetchNotifications, 30_000);
+    // Poll every 15 seconds
+    const interval = setInterval(fetchNotifications, 15_000);
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
@@ -274,6 +274,8 @@ export default function Header() {
                               key={n.id}
                               notification={n}
                               onMarkRead={handleMarkRead}
+                              userRole={user?.role}
+                              navigate={navigate}
                             />
                           ))
                         )}
@@ -384,40 +386,108 @@ const TYPE_ICONS: Record<string, string> = {
   application_status:    '💼',
   document_verified:     '📄',
   document_rejected:     '❌',
+  chat_message:          '💬',
 };
 
-function formatRelativeTime(iso: string): string {
+function useNotifTexts(notification: Notification, userRole?: string) {
+  const { t } = useTranslation();
+  const { type, related_id } = notification;
+
+  switch (type) {
+    case 'application_submitted':
+      return {
+        title: t('notifications.application_submitted.title'),
+        body: t('notifications.application_submitted.body'),
+      };
+    case 'application_status': {
+      // related_id format: "applicationId|status"
+      const status = related_id?.split('|')[1] ?? '';
+      const sub = ['interview', 'shortlisted', 'offered', 'rejected'].includes(status)
+        ? status
+        : 'interview';
+      return {
+        title: t(`notifications.application_status.${sub}.title`),
+        body: t(`notifications.application_status.${sub}.body`),
+      };
+    }
+    case 'chat_message':
+      return {
+        title: t('notifications.chat_message.title'),
+        body: userRole === 'employer'
+          ? t('notifications.chat_message.bodyForEmployer')
+          : t('notifications.chat_message.bodyForStudent'),
+      };
+    case 'document_verified':
+      return {
+        title: t('notifications.document_verified.title'),
+        body: t('notifications.document_verified.body'),
+      };
+    case 'document_rejected':
+      return {
+        title: t('notifications.document_rejected.title'),
+        body: t('notifications.document_rejected.body'),
+      };
+    default:
+      return { title: notification.title, body: notification.body };
+  }
+}
+
+function useRelativeTime(iso: string) {
+  const { t } = useTranslation();
   const diff = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diff / 60_000);
-  if (min < 1) return 'только что';
-  if (min < 60) return `${min} мин назад`;
+  if (min < 1) return t('notifications.time.justNow');
+  if (min < 60) return t('notifications.time.minutesAgo', { min });
   const h = Math.floor(min / 60);
-  if (h < 24) return `${h} ч назад`;
+  if (h < 24) return t('notifications.time.hoursAgo', { h });
   const d = Math.floor(h / 24);
-  if (d === 1) return 'вчера';
-  return `${d} дн назад`;
+  if (d === 1) return t('notifications.time.yesterday');
+  return t('notifications.time.daysAgo', { d });
 }
 
 function NotifItem({
   notification,
   onMarkRead,
+  userRole,
+  navigate,
 }: {
   notification: Notification;
   onMarkRead: (id: string) => void;
+  userRole?: string;
+  navigate: (path: string) => void;
 }) {
   const icon = TYPE_ICONS[notification.type] ?? '🔔';
+  const { title, body } = useNotifTexts(notification, userRole);
+  const timeAgo = useRelativeTime(notification.created_at);
+
+  const handleClick = () => {
+    if (!notification.is_read) onMarkRead(notification.id);
+    if (notification.type === 'chat_message') {
+      const parts = notification.related_id?.split(':') ?? [];
+      const appId = parts[0];
+      const vacancyId = parts[1];
+      if (userRole === 'employer' && appId && vacancyId) {
+        navigate(`/employer-dashboard?openChat=${appId}&vacancyId=${vacancyId}`);
+      } else if (appId) {
+        navigate(`/profile?openChat=${appId}`);
+      } else {
+        navigate(userRole === 'employer' ? '/employer-dashboard' : '/profile');
+      }
+    }
+  };
+
   return (
     <div
       className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer ${!notification.is_read ? 'bg-blue-50/40' : ''}`}
-      onClick={() => !notification.is_read && onMarkRead(notification.id)}
+      onClick={handleClick}
     >
       <span className="text-lg shrink-0 mt-0.5">{icon}</span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-800 leading-snug">{notification.title}</p>
-        {notification.body && (
-          <p className="text-xs text-gray-500 mt-0.5 leading-snug">{notification.body}</p>
+        <p className="text-sm font-medium text-gray-800 leading-snug">{title}</p>
+        {body && (
+          <p className="text-xs text-gray-500 mt-0.5 leading-snug">{body}</p>
         )}
-        <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(notification.created_at)}</p>
+        <p className="text-xs text-gray-400 mt-1">{timeAgo}</p>
       </div>
       {!notification.is_read && (
         <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0 mt-1.5" />

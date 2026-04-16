@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
+import { ChatModal } from '../components';
 
 const MIN_STUDENT_AGE = 16;
 
@@ -51,6 +53,7 @@ function validateIIN(iin: string, t: (key: string) => string): string | null {
   return null;
 }
 import { applicationService, type Application } from '../services/applicationService';
+import { apiFetch } from '../utils/apiClient';
 import { getUniversities, type University } from '../services/universityService';
 import { documentService, type Document, type DocumentType, getTypeLabel } from '../services/documentService';
 import MatchIndex from '../components/MatchIndex';
@@ -103,6 +106,8 @@ const DOC_STATUS_CLASSES: Record<string, string> = {
 
 const StudentProfilePage = () => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const openedFromUrl = useRef(false);
 
   const STATUS_LABELS: Record<string, string> = {
     applied: t('profile.status.applied'),
@@ -137,6 +142,24 @@ const StudentProfilePage = () => {
 
   const [applications, setApplications] = useState<Application[]>([]);
   const [appsLoading, setAppsLoading] = useState(false);
+  const [chatAppId, setChatAppId] = useState<string | null>(null);
+  const [chatCompanyName, setChatCompanyName] = useState<string>('');
+
+  const openChatForApp = async (app: Application) => {
+    setChatAppId(app.id);
+    // Fetch vacancy to get company name
+    try {
+      const res = await apiFetch(`/api/vacancies/${app.vacancy_id}`);
+      if (res.ok) {
+        const v = await res.json();
+        setChatCompanyName(v.company_name || t('chat.employer'));
+      } else {
+        setChatCompanyName(t('chat.employer'));
+      }
+    } catch {
+      setChatCompanyName(t('chat.employer'));
+    }
+  };
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [docsLoading, setDocsLoading] = useState(false);
@@ -179,6 +202,25 @@ const StudentProfilePage = () => {
     };
     load();
   }, []);
+
+  // Auto-switch to applications tab when navigated from a chat notification
+  useEffect(() => {
+    if (searchParams.get('openChat')) {
+      setActiveTab('applications');
+    }
+  }, []);
+
+  // Once applications load, find the one from the URL and open its chat
+  useEffect(() => {
+    if (openedFromUrl.current) return;
+    const openChatId = searchParams.get('openChat');
+    if (!openChatId || applications.length === 0) return;
+    const app = applications.find(a => a.id === openChatId);
+    if (app) {
+      openedFromUrl.current = true;
+      openChatForApp(app);
+    }
+  }, [applications]);
 
   // Load applications when tab changes
   useEffect(() => {
@@ -768,14 +810,30 @@ const StudentProfilePage = () => {
                         </span>
                       </div>
                     </div>
-                    {app.match_score > 0 && (
-                      <div className="ml-4">
+                    <div className="flex items-center gap-3 ml-4">
+                      {app.match_score > 0 && (
                         <MatchIndex percentage={app.match_score} size="sm" showLabel={false} />
-                      </div>
-                    )}
+                      )}
+                      <button
+                        onClick={() => openChatForApp(app)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" />
+                        </svg>
+                        {t('chat.open')}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
+              {chatAppId && (
+                <ChatModal
+                  applicationId={chatAppId}
+                  otherPartyName={chatCompanyName || t('chat.employer')}
+                  onClose={() => { setChatAppId(null); setChatCompanyName(''); }}
+                />
+              )}
             </div>
           )}
         </div>

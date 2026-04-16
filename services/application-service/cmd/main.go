@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.Application{}, &models.Interview{}, &models.EmploymentRecord{}); err != nil {
+	if err := db.AutoMigrate(&models.Application{}, &models.Interview{}, &models.EmploymentRecord{}, &models.ChatMessage{}); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 
@@ -43,9 +43,11 @@ func main() {
 
 	// 5. Start HTTP server for interviews and employment in background
 	go func() {
+		chatRepo := repository.NewChatRepository(db)
 		interviewHandler := httphandler.NewInterviewHandler(interviewRepo, appRepo)
 		employmentHandler := httphandler.NewEmploymentHandler(employmentRepo)
-		r := httprouter.SetupRouter(interviewHandler, employmentHandler)
+		chatHandler := httphandler.NewChatHandler(chatRepo, appRepo)
+		r := httprouter.SetupRouter(interviewHandler, employmentHandler, chatHandler)
 
 		httpPort := cfg.HTTPPort
 		if httpPort == "" {

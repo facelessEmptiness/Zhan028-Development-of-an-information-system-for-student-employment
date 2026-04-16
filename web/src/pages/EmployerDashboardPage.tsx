@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import MatchIndex from '../components/MatchIndex';
+import { ChatModal } from '../components';
 import { employerService, type JobPosting } from '../services/employerService';
 import { applicationService, type Application } from '../services/applicationService';
 import { employerProfileService, type EmployerProfile } from '../services/employerProfileService';
@@ -49,6 +50,8 @@ const COMPANY_SIZES = ['1–10', '11–50', '51–200', '201–500', '500+'];
 const EmployerDashboardPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const openedFromUrl = useRef(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'applications' | 'profile'>('overview');
   const [showJobForm, setShowJobForm] = useState(false);
   const [formData, setFormData] = useState<FormData>(emptyForm);
@@ -65,6 +68,7 @@ const EmployerDashboardPage = () => {
   const [appsError, setAppsError] = useState('');
   const [selectedVacancyId, setSelectedVacancyId] = useState('');
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
+  const [chatApp, setChatApp] = useState<{ id: string; studentName: string } | null>(null);
 
   // Employer Profile state
   const [profile, setProfile] = useState<Omit<EmployerProfile, 'employer_id' | 'created_at' | 'updated_at'>>(emptyProfile);
@@ -130,6 +134,33 @@ const EmployerDashboardPage = () => {
       setProfileLoading(false);
     }
   };
+
+  // Auto-open chat when navigated from a notification
+  useEffect(() => {
+    const openChatId = searchParams.get('openChat');
+    const vacancyId = searchParams.get('vacancyId');
+    if (openChatId && vacancyId) {
+      setActiveTab('applications');
+      setSelectedVacancyId(vacancyId);
+    }
+  }, []);
+
+  // Once applications load, find the one from the URL and open its chat
+  useEffect(() => {
+    if (openedFromUrl.current) return;
+    const openChatId = searchParams.get('openChat');
+    if (!openChatId || applications.length === 0) return;
+    const app = applications.find(a => a.id === openChatId);
+    if (app) {
+      openedFromUrl.current = true;
+      setChatApp({
+        id: app.id,
+        studentName: app.student
+          ? `${app.student.first_name} ${app.student.last_name}`.trim() || t('chat.student')
+          : t('chat.student'),
+      });
+    }
+  }, [applications]);
 
   useEffect(() => {
     if (activeTab === 'jobs' || activeTab === 'applications') {
@@ -513,6 +544,20 @@ const EmployerDashboardPage = () => {
                     )}
 
                     <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setChatApp({
+                          id: app.id,
+                          studentName: app.student
+                            ? `${app.student.first_name} ${app.student.last_name}`.trim() || t('chat.student')
+                            : t('chat.student'),
+                        })}
+                        className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium text-sm transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" />
+                        </svg>
+                        {t('chat.open')}
+                      </button>
                       {app.student_id && (
                         <button
                           onClick={() => navigate(`/candidate/${app.student_id}`, {
@@ -544,6 +589,13 @@ const EmployerDashboardPage = () => {
                   </div>
                 ))}
               </div>
+              {chatApp && (
+                <ChatModal
+                  applicationId={chatApp.id}
+                  otherPartyName={chatApp.studentName}
+                  onClose={() => setChatApp(null)}
+                />
+              )}
             </div>
           )}
 

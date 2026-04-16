@@ -953,5 +953,59 @@
     "errors": {
       "loadRecords": "Failed to load employment data"
     }
+  },
+  "chat": {
+    "open": "Chat",
+    "send": "Send",
+    "placeholder": "Type a message...",
+    "enterHint": "Enter to send, Shift+Enter for new line",
+    "empty": "No messages yet. Start the conversation!",
+    "online": "Online",
+    "employer": "Employer",
+    "student": "Student"
+  },
+  "notifications": {
+    "application_submitted": {
+      "title": "Application submitted ✅",
+      "body": "Your application has been successfully sent."
+    },
+    "application_status": {
+      "interview": {
+        "title": "Interview invitation 🎯",
+        "body": "The employer has invited you for an interview."
+      },
+      "shortlisted": {
+        "title": "You are shortlisted 📋",
+        "body": "Your candidacy has been added to the shortlist."
+      },
+      "offered": {
+        "title": "Job offer received! 🎉",
+        "body": "The employer has made you a job offer."
+      },
+      "rejected": {
+        "title": "Application rejected",
+        "body": "Unfortunately, your application was rejected."
+      }
+    },
+    "chat_message": {
+      "title": "💬 New message",
+      "bodyForStudent": "The employer wrote to you in chat",
+      "bodyForEmployer": "The student replied to your message"
+    },
+    "document_verified": {
+      "title": "Document verified ✅",
+      "body": "Your document has been confirmed by the university."
+    },
+    "document_rejected": {
+      "title": "Document rejected ❌",
+      "body": "Your document has been rejected."
+    },
+    "time": {
+      "justNow": "just now",
+      "minutesAgo": "{{min}} min ago",
+      "hoursAgo": "{{h}} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{{d}} days ago"
+    }
   }
 }

@@ -50,6 +50,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	analyticsHandler := handler.NewAnalyticsHandler(studentClient, vacancyClient, applicationClient)
 	interviewHandler := handler.NewInterviewHandler(cfg.ApplicationServiceHttpUrl, notifClient)
 	employmentHandler := handler.NewEmploymentHandler(cfg.ApplicationServiceHttpUrl)
+	chatHandler := handler.NewChatHandler(cfg.ApplicationServiceHttpUrl, notifClient, vacancyClient)
 
 	api := r.Group("/api")
 
@@ -160,6 +161,15 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		employment.GET("/student", employmentHandler.GetForStudent)
 		employment.GET("/university", employmentHandler.GetForUniversity)
 		employment.PUT("/:id/end", employmentHandler.End)
+	}
+
+	// ============================================
+	// CHAT - proxied to application-service HTTP
+	// ============================================
+	chatRoutes := api.Group("/chat", middleware.AuthMiddleware(cfg.JWTSecret))
+	{
+		chatRoutes.GET("/:application_id", chatHandler.GetMessages)
+		chatRoutes.POST("/:application_id", chatHandler.SendMessage)
 	}
 
 	// ============================================
