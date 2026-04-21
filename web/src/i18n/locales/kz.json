@@ -48,11 +48,17 @@
       "searchPlaceholder": "Лауазым, кілт сөздер",
       "searchBtn": "Іздеу",
       "register": "Тіркелу",
-      "login": "Кіру"
+      "login": "Кіру",
+      "onlineStudents": "10 720 белсенді студент онлайн"
+    },
+    "stats": {
+      "offerRate": "Ұсыныс алады"
     },
     "categories": {
       "title": "Мамандық бойынша жұмыс орындары",
-      "openPositions": "ашық орындар"
+      "openPositions": "ашық орындар",
+      "subtitle": "Бағытыңызды таңдап, жаңа ұсыныстарды қараңыз",
+      "all": "Барлық санаттар"
     },
     "welcome": {
       "greeting": "Қош келдіңіз, {{name}}!",
@@ -306,6 +312,10 @@
       "saveError": "Профильді сақтау қатесі. Қайталап көріңіз.",
       "tryUpdate": " — профильді жаңартып көріңіз"
     },
+    "stats": {
+      "completion": "Толтырылуы",
+      "diploma": "Диплом"
+    },
     "loading": "Профиль жүктелуде...",
     "iinError": {
       "format": "ЖСН дәл 12 таңбадан тұруы керек",
@@ -535,7 +545,14 @@
       "quickActions": "Жылдам әрекеттер",
       "postJob": "Бос орын жариялау",
       "viewApplications": "Өтініштерді қарау",
-      "editProfile": "Профильді өңдеу"
+      "editProfile": "Профильді өңдеу",
+      "hiringFunnel": "Жалдау воронкасы"
+    },
+    "funnel": {
+      "submitted": "Берілді",
+      "review": "Тексеруде",
+      "interview": "Сұхбат",
+      "offered": "Ұсыныс"
     },
     "jobs": {
       "postNew": "+ Жаңа бос орын жариялау",
@@ -645,13 +662,25 @@
       "partTime": "Жарты жұмыс күні",
       "internship": "Тағылымдама",
       "contract": "Келісімшарт",
+      "remote": "Қашықтан",
       "location": "Орналасқан жері",
       "locationPlaceholder": "Қала...",
+      "city": "Қала",
+      "anyCity": "Кез келген қала",
       "salary": "Жалақы (₸)",
+      "salaryThousands": "Жалақы, мың ₸",
       "salaryFrom": "бастап",
       "salaryTo": "дейін",
-      "resetFilters": "Сүзгілерді тазалау",
+      "skills": "Дағдылар",
+      "applyFilters": "Сүзгілерді қолдану",
+      "resetFilters": "Тазалау",
+      "sortLabel": "Сұрыптау:",
+      "sortRelevance": "Өзектілігі бойынша",
+      "sortDate": "Күні бойынша",
+      "sortSalaryDesc": "Жалақы ↓",
+      "sortSalaryAsc": "Жалақы ↑",
       "loading": "Жүктелуде...",
+      "updatedRecently": "жаңа ғана жаңартылды",
       "found": "Табылды",
       "vacanciesCount": "бос орын",
       "page": "{{page}} / {{total}} бет",

@@ -7,6 +7,11 @@ import { applicationService } from '../services/applicationService';
 import { useAuth } from '../context/AuthContext';
 import { type JobPosting } from '../services/employerService';
 
+function getCompanyColor(company: string): string {
+  const colors = ['#EF2D30','#00B74F','#FF7A00','#0033A0','#7C3AED','#2563EB','#E11D48','#0891B2'];
+  return colors[company.charCodeAt(0) % colors.length];
+}
+
 const JobDetailsPage = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -81,54 +86,54 @@ const JobDetailsPage = () => {
   const skills = job.skills ? job.skills.split(',').map(s => s.trim()).filter(Boolean) : [];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+    <div className="max-w-6xl mx-auto space-y-6">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 font-medium">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
         {t('common.back')}
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Header */}
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
-                <p className="text-xl text-gray-600 mb-4">{job.company_name || t('jobs.details.employer')}</p>
-                <div className="flex flex-wrap gap-4 text-gray-700">
-                  {job.location && <span>📍 {job.location}</span>}
-                  <span>💼 {job.job_type}</span>
-                  {(job.salary_min > 0 || job.salary_max > 0) && (
-                    <span>
-                      💰{' '}
-                      {job.salary_min > 0 ? `${job.salary_min.toLocaleString()}` : ''}
-                      {job.salary_min > 0 && job.salary_max > 0 ? ' – ' : ''}
-                      {job.salary_max > 0 ? `${job.salary_max.toLocaleString()} ₸` : ''}
-                    </span>
-                  )}
-                  <span className="text-gray-400 text-sm">
-                    {t('jobs.details.published')} {new Date(job.created_at).toLocaleDateString('ru-RU')}
-                  </span>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        {/* Main */}
+        <div className="space-y-5">
+          {/* Banner header card */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="h-20" style={{ background: `linear-gradient(135deg, ${getCompanyColor(job.company_name || '')}30, ${getCompanyColor(job.company_name || '')}08)` }} />
+            <div className="px-6 pb-6 -mt-8">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex items-end gap-4">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-sm" style={{ background: getCompanyColor(job.company_name || '') }}>
+                    {(job.company_name || '?').charAt(0).toUpperCase()}
+                  </div>
+                  <div className="pb-1">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{job.title}</h1>
+                    <p className="text-gray-600">{job.company_name || t('jobs.details.employer')}</p>
+                  </div>
                 </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-5 border-t border-gray-100 text-left">
+                {job.location && <div><p className="text-[11px] text-gray-500 mb-0.5">{t('jobs.browse.location')}</p><p className="text-sm font-semibold text-gray-900">📍 {job.location}</p></div>}
+                {(job.salary_min > 0 || job.salary_max > 0) && (
+                  <div><p className="text-[11px] text-gray-500 mb-0.5">₸</p><p className="text-sm font-semibold text-gray-900">{job.salary_min > 0 ? job.salary_min.toLocaleString() : ''}{job.salary_min > 0 && job.salary_max > 0 ? ' – ' : ''}{job.salary_max > 0 ? job.salary_max.toLocaleString() + ' ₸' : ''}</p></div>
+                )}
+                <div><p className="text-[11px] text-gray-500 mb-0.5">{t('jobs.browse.jobType')}</p><span className="px-2 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-full font-medium">{job.job_type}</span></div>
+                <div><p className="text-[11px] text-gray-500 mb-0.5">{t('jobs.details.published')}</p><p className="text-sm font-semibold text-gray-900">{new Date(job.created_at).toLocaleDateString('ru-RU')}</p></div>
               </div>
             </div>
           </div>
 
           {/* Description */}
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('jobs.details.description')}</h2>
+          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">{t('jobs.details.description')}</h2>
             <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{job.description}</p>
           </div>
 
           {/* Skills */}
           {skills.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('jobs.details.skills')}</h2>
-              <div className="flex flex-wrap gap-3">
+            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-3">{t('jobs.details.skills')}</h2>
+              <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span key={skill} className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium">
-                    {skill}
-                  </span>
+                  <span key={skill} className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg font-medium text-sm">{skill}</span>
                 ))}
               </div>
             </div>
@@ -136,73 +141,65 @@ const JobDetailsPage = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24 space-y-4">
-
-            {/* Apply success */}
+        <div className="space-y-4 lg:sticky lg:top-20 self-start">
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
             {(applySuccess || alreadyApplied) && !showForm && (
               <div className="text-center py-4">
-                <div className="text-5xl mb-3">✅</div>
-                <p className="text-lg font-semibold text-gray-900 mb-1">{t('jobs.details.successTitle')}</p>
+                <div className="text-4xl mb-3">✅</div>
+                <p className="font-semibold text-gray-900 mb-1">{t('jobs.details.successTitle')}</p>
                 <p className="text-sm text-gray-500">{t('jobs.details.successMessage')}</p>
-                <button
-                  onClick={() => navigate('/profile')}
-                  className="mt-4 w-full px-4 py-2 bg-blue-50 text-blue-600 font-medium rounded-lg hover:bg-blue-100"
-                >
+                <button onClick={() => navigate('/profile')} className="mt-4 w-full px-4 py-2 bg-blue-50 text-blue-600 font-medium rounded-lg hover:bg-blue-100 text-sm">
                   {t('jobs.details.myApplications')}
                 </button>
               </div>
             )}
 
-            {/* Apply button for students */}
             {user?.role === 'student' && !alreadyApplied && !applySuccess && !showForm && (
-              <button
-                onClick={() => setShowForm(true)}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-              >
+              <button onClick={() => setShowForm(true)} className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors">
                 {t('jobs.details.applyBtn')}
               </button>
             )}
 
-            {/* Apply form */}
             {showForm && (
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">{t('jobs.details.coverLetter')}</h3>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-gray-900 text-sm">{t('jobs.details.coverLetter')}</h3>
                 <textarea
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}
                   placeholder={t('jobs.details.coverLetterPlaceholder')}
                   rows={5}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <button
-                  onClick={handleApply}
-                  disabled={applying}
-                  className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
+                <button onClick={handleApply} disabled={applying} className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm">
                   {applying ? t('jobs.details.submitting') : t('jobs.details.submit')}
                 </button>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="w-full px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                >
+                <button onClick={() => setShowForm(false)} className="w-full py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 text-sm">
                   {t('common.cancel')}
                 </button>
               </div>
             )}
 
-            {/* Info for non-students */}
-            {user?.role !== 'student' && (
-              <p className="text-sm text-gray-500 text-center">
-                {t('jobs.details.onlyStudents')}
-              </p>
+            {user?.role !== 'student' && !showForm && !(applySuccess || alreadyApplied) && (
+              <p className="text-sm text-gray-500 text-center py-2">{t('jobs.details.onlyStudents')}</p>
             )}
 
-            {/* Status badge */}
             <div className="pt-2 border-t border-gray-100">
               <span className={`text-xs font-medium px-3 py-1 rounded-full ${job.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                 {job.status === 'active' ? t('jobs.details.active') : t('jobs.details.closed')}
               </span>
+            </div>
+          </div>
+
+          {/* Company card */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold" style={{ background: getCompanyColor(job.company_name || '') }}>
+                {(job.company_name || '?').charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">{job.company_name || t('jobs.details.employer')}</p>
+                {job.location && <p className="text-xs text-gray-500">📍 {job.location}</p>}
+              </div>
             </div>
           </div>
         </div>

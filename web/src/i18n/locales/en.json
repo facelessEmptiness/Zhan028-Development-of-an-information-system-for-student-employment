@@ -48,11 +48,17 @@
       "searchPlaceholder": "Position, keywords",
       "searchBtn": "Search",
       "register": "Sign Up",
-      "login": "Log In"
+      "login": "Log In",
+      "onlineStudents": "10,720 active students online"
+    },
+    "stats": {
+      "offerRate": "Receive an offer"
     },
     "categories": {
       "title": "Jobs by profession",
-      "openPositions": "open positions"
+      "openPositions": "open positions",
+      "subtitle": "Choose a field and explore fresh opportunities",
+      "all": "All categories"
     },
     "welcome": {
       "greeting": "Welcome, {{name}}!",
@@ -306,6 +312,10 @@
       "saveError": "Error saving profile. Please try again.",
       "tryUpdate": " — try updating the profile"
     },
+    "stats": {
+      "completion": "Completion",
+      "diploma": "Diploma"
+    },
     "loading": "Loading profile...",
     "iinError": {
       "format": "IIN must be exactly 12 digits",
@@ -533,13 +543,25 @@
       "partTime": "Part-time",
       "internship": "Internship",
       "contract": "Contract",
+      "remote": "Remote",
       "location": "Location",
       "locationPlaceholder": "City...",
+      "city": "City",
+      "anyCity": "Any city",
       "salary": "Salary (₸)",
+      "salaryThousands": "Salary, k ₸",
       "salaryFrom": "from",
       "salaryTo": "to",
-      "resetFilters": "Reset Filters",
+      "skills": "Skills",
+      "applyFilters": "Apply Filters",
+      "resetFilters": "Reset",
+      "sortLabel": "Sort by:",
+      "sortRelevance": "Relevance",
+      "sortDate": "Date",
+      "sortSalaryDesc": "Salary ↓",
+      "sortSalaryAsc": "Salary ↑",
       "loading": "Loading jobs...",
+      "updatedRecently": "updated just now",
       "found": "Found",
       "vacanciesCount": "vacancies",
       "page": "Page {{page}} of {{total}}",
@@ -671,7 +693,14 @@
       "quickActions": "Quick Actions",
       "postJob": "Post a Job",
       "viewApplications": "View Applications",
-      "editProfile": "Edit Profile"
+      "editProfile": "Edit Profile",
+      "hiringFunnel": "Hiring Funnel"
+    },
+    "funnel": {
+      "submitted": "Submitted",
+      "review": "In Review",
+      "interview": "Interview",
+      "offered": "Offered"
     },
     "jobs": {
       "postNew": "+ Post New Job",

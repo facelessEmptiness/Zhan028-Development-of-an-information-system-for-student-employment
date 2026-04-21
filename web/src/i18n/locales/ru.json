@@ -48,11 +48,17 @@
       "searchPlaceholder": "Должность, ключевые слова",
       "searchBtn": "Найти",
       "register": "Зарегистрироваться",
-      "login": "Войти"
+      "login": "Войти",
+      "onlineStudents": "10 720 активных студентов онлайн"
+    },
+    "stats": {
+      "offerRate": "Получают оффер"
     },
     "categories": {
       "title": "Вакансии по профессиям",
-      "openPositions": "открытых позиций"
+      "openPositions": "открытых позиций",
+      "subtitle": "Выбери направление и посмотри свежие предложения",
+      "all": "Все категории"
     },
     "categories_list": {
       "it": "IT и разработка",
@@ -306,6 +312,10 @@
       "saveError": "Ошибка сохранения профиля. Попробуйте ещё раз.",
       "tryUpdate": " — попробуйте обновить профиль"
     },
+    "stats": {
+      "completion": "Заполненность",
+      "diploma": "Диплом"
+    },
     "loading": "Загрузка профиля...",
     "iinError": {
       "format": "ИИН должен содержать ровно 12 цифр",
@@ -533,13 +543,25 @@
       "partTime": "Частичная занятость",
       "internship": "Стажировка",
       "contract": "Контракт",
+      "remote": "Удалённо",
       "location": "Город",
       "locationPlaceholder": "Город...",
+      "city": "Город",
+      "anyCity": "Любой город",
       "salary": "Зарплата (₸)",
+      "salaryThousands": "Зарплата, тыс. ₸",
       "salaryFrom": "от",
       "salaryTo": "до",
-      "resetFilters": "Сбросить фильтры",
+      "skills": "Навыки",
+      "applyFilters": "Применить фильтры",
+      "resetFilters": "Сбросить",
+      "sortLabel": "Сортировка:",
+      "sortRelevance": "По релевантности",
+      "sortDate": "По дате",
+      "sortSalaryDesc": "Зарплата ↓",
+      "sortSalaryAsc": "Зарплата ↑",
       "loading": "Загрузка вакансий...",
+      "updatedRecently": "обновлено только что",
       "found": "Найдено",
       "vacanciesCount": "вакансий",
       "page": "Страница {{page}} из {{total}}",
@@ -671,7 +693,14 @@
       "quickActions": "Быстрые действия",
       "postJob": "Опубликовать вакансию",
       "viewApplications": "Просмотреть заявки",
-      "editProfile": "Редактировать профиль"
+      "editProfile": "Редактировать профиль",
+      "hiringFunnel": "Воронка найма"
+    },
+    "funnel": {
+      "submitted": "Подано",
+      "review": "На проверке",
+      "interview": "Собеседование",
+      "offered": "Оффер"
     },
     "jobs": {
       "postNew": "+ Опубликовать вакансию",

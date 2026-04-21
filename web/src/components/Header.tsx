@@ -47,6 +47,7 @@ export default function Header() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const ROLE_LABELS: Record<string, string> = {
     student: t('role.student'),
@@ -110,6 +111,7 @@ export default function Header() {
     setDropdownOpen(false);
     setNotifOpen(false);
     setLangDropdownOpen(false);
+    setMobileMenuOpen(false);
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -141,7 +143,7 @@ export default function Header() {
             <span className="text-xl font-bold text-gray-900">CareerBond</span>
           </Link>
 
-          {/* Nav links — authenticated only */}
+          {/* Desktop Nav links — authenticated only */}
           {isAuthenticated && (
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map(({ to, label }) => {
@@ -164,21 +166,21 @@ export default function Header() {
           )}
 
           {/* Right side */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Language selector */}
             <div className="relative" ref={langDropdownRef}>
               <button
                 onClick={() => setLangDropdownOpen(v => !v)}
                 style={{ color: '#374151' }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 text-sm font-medium hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="hidden sm:block w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                 </svg>
-                <span className="uppercase font-semibold" style={{ color: '#111827' }}>
+                <span className="uppercase font-semibold text-xs sm:text-sm" style={{ color: '#111827' }}>
                   {i18n.language === 'kz' ? 'KZ' : i18n.language === 'en' ? 'EN' : 'RU'}
                 </span>
-                <svg className={`w-3.5 h-3.5 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -251,22 +253,35 @@ export default function Header() {
                   </button>
 
                   {notifOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                        <span className="font-semibold text-gray-800 text-sm">{t('nav.notifications')}</span>
+                    <div className="absolute right-0 mt-2 w-[calc(100vw-1rem)] sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                      style={{ maxHeight: '480px', display: 'flex', flexDirection: 'column' }}
+                    >
+                      {/* Panel header */}
+                      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-2.5">
+                          <span className="font-bold text-gray-900">{t('nav.notifications')}</span>
+                          {unreadCount > 0 && (
+                            <span className="bg-blue-600 text-white text-[11px] font-bold rounded-full px-2 py-0.5 leading-none">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </div>
                         {unreadCount > 0 && (
                           <button
                             onClick={handleMarkAllRead}
-                            className="text-xs text-blue-600 hover:underline"
+                            className="text-xs text-blue-600 hover:text-blue-800 font-semibold"
                           >
                             {t('nav.markAllRead')}
                           </button>
                         )}
                       </div>
-                      <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
+
+                      {/* List */}
+                      <div className="overflow-y-auto divide-y divide-gray-100">
                         {notifications.length === 0 ? (
-                          <div className="px-4 py-8 text-center text-sm text-gray-400">
-                            {t('nav.noNotifications')}
+                          <div className="flex flex-col items-center justify-center py-14">
+                            <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center text-2xl mb-3">🔔</div>
+                            <p className="text-sm font-semibold text-gray-500">{t('nav.noNotifications')}</p>
                           </div>
                         ) : (
                           notifications.map(n => (
@@ -284,8 +299,8 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* User dropdown */}
-                <div className="relative" ref={dropdownRef}>
+                {/* User dropdown — desktop only */}
+                <div className="relative hidden md:block" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(v => !v)}
                     className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl hover:bg-gray-100 transition-colors"
@@ -357,18 +372,34 @@ export default function Header() {
                     </div>
                   )}
                 </div>
+                {/* Hamburger — mobile only */}
+                <button
+                  onClick={() => setMobileMenuOpen(v => !v)}
+                  className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+                  aria-label="Menu"
+                >
+                  {mobileMenuOpen ? (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  )}
+                </button>
               </>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   {t('nav.login')}
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
+                  className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm whitespace-nowrap"
                 >
                   {t('nav.register')}
                 </Link>
@@ -376,17 +407,65 @@ export default function Header() {
             )}
           </div>
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileMenuOpen && isAuthenticated && (
+          <div className="md:hidden border-t border-gray-100 pb-3 pt-2">
+            {/* User info */}
+            <div className="flex items-center gap-3 px-3 py-2.5 mb-1">
+              <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${ROLE_AVATAR_COLORS[user?.role ?? 'student']} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+                {avatarLetter}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
+                <span className={`inline-block text-[11px] font-semibold px-1.5 py-0.5 rounded-md ${ROLE_COLORS[user?.role ?? 'student']}`}>
+                  {ROLE_LABELS[user?.role ?? ''] ?? user?.role}
+                </span>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 pt-2 space-y-0.5">
+              {/* Nav links */}
+              {navLinks.map(({ to, label }) => {
+                const active = location.pathname === to || location.pathname.startsWith(to + '/');
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      active ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+
+              {/* Logout */}
+              <button
+                onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                {t('nav.logout')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
 }
 
-const TYPE_ICONS: Record<string, string> = {
-  application_submitted: '✅',
-  application_status:    '💼',
-  document_verified:     '📄',
-  document_rejected:     '❌',
-  chat_message:          '💬',
+const TYPE_CONFIG: Record<string, { icon: string; bg: string; text: string }> = {
+  application_submitted: { icon: '📨', bg: 'bg-blue-100',   text: 'text-blue-600'  },
+  application_status:    { icon: '💼', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+  document_verified:     { icon: '✅', bg: 'bg-green-100',  text: 'text-green-600' },
+  document_rejected:     { icon: '❌', bg: 'bg-red-100',    text: 'text-red-600'   },
+  chat_message:          { icon: '💬', bg: 'bg-purple-100', text: 'text-purple-600' },
 };
 
 function useNotifTexts(notification: Notification, userRole?: string) {
@@ -456,7 +535,7 @@ function NotifItem({
   userRole?: string;
   navigate: (path: string) => void;
 }) {
-  const icon = TYPE_ICONS[notification.type] ?? '🔔';
+  const cfg = TYPE_CONFIG[notification.type] ?? { icon: '🔔', bg: 'bg-gray-100', text: 'text-gray-600' };
   const { title, body } = useNotifTexts(notification, userRole);
   const timeAgo = useRelativeTime(notification.created_at);
 
@@ -478,20 +557,37 @@ function NotifItem({
 
   return (
     <div
-      className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer ${!notification.is_read ? 'bg-blue-50/40' : ''}`}
       onClick={handleClick}
+      className={`flex items-start gap-3 px-4 py-4 cursor-pointer transition-all hover:bg-gray-50 relative ${
+        !notification.is_read ? 'bg-blue-50/60' : ''
+      }`}
     >
-      <span className="text-lg shrink-0 mt-0.5">{icon}</span>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-800 leading-snug">{title}</p>
-        {body && (
-          <p className="text-xs text-gray-500 mt-0.5 leading-snug">{body}</p>
-        )}
-        <p className="text-xs text-gray-400 mt-1">{timeAgo}</p>
-      </div>
+      {/* Unread accent bar */}
       {!notification.is_read && (
-        <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0 mt-1.5" />
+        <span className="absolute left-0 top-2 bottom-2 w-[3px] bg-blue-500 rounded-r-full" />
       )}
+
+      {/* Icon circle */}
+      <div className={`w-10 h-10 rounded-full ${cfg.bg} flex items-center justify-center shrink-0 text-[18px] shadow-sm`}>
+        {cfg.icon}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <p className={`text-sm leading-snug ${!notification.is_read ? 'font-semibold text-gray-900' : 'font-medium text-gray-600'}`}>
+            {title}
+          </p>
+          {!notification.is_read && (
+            <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0 mt-1" />
+          )}
+        </div>
+        {body && (
+          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed line-clamp-2">{body}</p>
+        )}
+        <p className={`text-[11px] mt-1.5 font-medium ${!notification.is_read ? 'text-blue-500' : 'text-gray-400'}`}>
+          {timeAgo}
+        </p>
+      </div>
     </div>
   );
 }
