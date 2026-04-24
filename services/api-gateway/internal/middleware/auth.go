@@ -63,6 +63,8 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 		role, ok := claims["role"].(string)
 		if !ok {
 			c.JSON(401, gin.H{"error": "Role not found in token"})
+			c.Abort()
+			return
 		}
 
 		// Extract optional university_id (only present for university-role users)

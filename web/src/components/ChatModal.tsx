@@ -18,8 +18,21 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [modalHeight, setModalHeight] = useState<string>('92dvh');
   const bottomRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const h = Math.round(vv.height * 0.95);
+      setModalHeight(`${h}px`);
+    };
+    vv.addEventListener('resize', update);
+    update();
+    return () => vv.removeEventListener('resize', update);
+  }, []);
 
   const load = () => {
     chatService.getMessages(applicationId)
@@ -68,7 +81,7 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-lg flex flex-col h-[92dvh] sm:h-[560px]">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-lg flex flex-col sm:h-[560px]" style={{ height: modalHeight }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
@@ -125,7 +138,7 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
               onKeyDown={handleKey}
               placeholder={t('chat.placeholder')}
               rows={1}
-              className="flex-1 resize-none px-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 resize-none px-4 py-2.5 border border-gray-300 rounded-xl text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={send}
@@ -135,7 +148,7 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
               {t('chat.send')}
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-1.5">{t('chat.enterHint')}</p>
+          <p className="hidden sm:block text-xs text-gray-400 mt-1.5">{t('chat.enterHint')}</p>
         </div>
       </div>
     </div>

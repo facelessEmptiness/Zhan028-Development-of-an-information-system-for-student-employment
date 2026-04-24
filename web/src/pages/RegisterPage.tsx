@@ -82,6 +82,11 @@ const RegisterPage = () => {
         role: formData.role,
         university_id: formData.university || undefined,
       });
+      if (formData.role === 'student') {
+        localStorage.setItem('reg_first_name', formData.firstName);
+        localStorage.setItem('reg_last_name', formData.lastName);
+        if (formData.university) localStorage.setItem('reg_university_id', formData.university);
+      }
       toast.success(t('auth.register.success'));
       navigate(`/verify-email?email=${encodeURIComponent(response.email)}`);
     } catch (err) {
@@ -179,7 +184,7 @@ const RegisterPage = () => {
             </div>
 
             {/* Form Card */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('auth.register.title')}</h2>
               <p className="text-gray-500 text-sm mb-6">{t('auth.register.subtitle')}</p>
 
@@ -187,11 +192,11 @@ const RegisterPage = () => {
                 {/* Role selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.iAm')}</label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {roles.map((r) => (
                       <label
                         key={r.value}
-                        className={`flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`flex sm:flex-col items-center gap-3 sm:gap-0 p-3 rounded-lg border-2 cursor-pointer transition-all ${
                           formData.role === r.value
                             ? 'border-blue-500 bg-blue-50 text-blue-700'
                             : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
@@ -205,11 +210,13 @@ const RegisterPage = () => {
                           onChange={handleChange}
                           className="sr-only"
                         />
-                        <span className={`mb-1 ${formData.role === r.value ? 'text-blue-600' : 'text-gray-400'}`}>
+                        <span className={`sm:mb-1 ${formData.role === r.value ? 'text-blue-600' : 'text-gray-400'}`}>
                           {r.icon}
                         </span>
-                        <span className="text-xs font-semibold">{r.label}</span>
-                        <span className="text-xs text-gray-400">{r.desc}</span>
+                        <div className="sm:text-center">
+                          <span className="text-xs font-semibold block">{r.label}</span>
+                          <span className="text-xs text-gray-400 hidden sm:block">{r.desc}</span>
+                        </div>
                       </label>
                     ))}
                   </div>

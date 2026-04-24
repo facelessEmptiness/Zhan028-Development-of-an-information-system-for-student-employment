@@ -6,10 +6,11 @@ import (
 	"auth-service/internal/repository"
 	"auth-service/pkg/email"
 	"auth-service/pkg/jwt"
+	crand "crypto/rand"
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"time"
 
 	"github.com/google/uuid"
@@ -73,10 +74,13 @@ func NewAuthService(
 	}
 }
 
-// generateCode генерирует 6-значный числовой код
+// generateCode генерирует криптографически безопасный 6-значный числовой код
 func generateCode() string {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return fmt.Sprintf("%06d", r.Intn(1000000))
+	n, err := crand.Int(crand.Reader, big.NewInt(1_000_000))
+	if err != nil {
+		log.Fatalf("не удалось сгенерировать код: %v", err)
+	}
+	return fmt.Sprintf("%06d", n.Int64())
 }
 
 // Register регистрирует нового пользователя и отправляет код подтверждения
@@ -108,8 +112,7 @@ func (s *authService) Register(req *dto.RegisterRequest) (*dto.MessageResponse, 
 
 	// Отправка кода подтверждения
 	if err := s.sendCode(req.Email, models.CodeTypeEmailVerification); err != nil {
-		// Не блокируем регистрацию, но логируем
-		_ = err
+		log.Printf("[Register] ошибка отправки кода на %s: %v", req.Email, err)
 	}
 
 	return &dto.MessageResponse{
@@ -164,8 +167,9 @@ func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 
 	// Проверка подтверждения email
 	if !user.IsEmailVerified {
-		// Отправляем новый код
-		_ = s.sendCode(req.Email, models.CodeTypeEmailVerification)
+		if err := s.sendCode(req.Email, models.CodeTypeEmailVerification); err != nil {
+			log.Printf("[Login] ошибка отправки кода на %s: %v", req.Email, err)
+		}
 		return nil, ErrEmailNotVerified
 	}
 
@@ -247,7 +251,9 @@ func (s *authService) SendEmailVerification(emailAddr string) error {
 	}
 
 	// SMTP ошибки не блокируют ответ — код уже сохранён в БД
-	_ = s.emailService.SendVerificationCode(emailAddr, code)
+	if err := s.emailService.SendVerificationCode(emailAddr, code); err != nil {
+		log.Printf("[SendEmailVerification] SMTP ошибка для %s: %v", emailAddr, err)
+	}
 	return nil
 }
 

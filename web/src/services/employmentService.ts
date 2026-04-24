@@ -30,6 +30,14 @@ export const employmentService = {
     return data.records ?? [];
   },
 
+  // Employer: get employment records they created
+  async getForEmployer(): Promise<EmploymentRecord[]> {
+    const res = await apiFetch('/api/employment/employer');
+    if (!res.ok) throw new Error(`Failed to load employment records: ${res.status}`);
+    const data = await res.json();
+    return data.records ?? [];
+  },
+
   // University: get all employment records (optionally filtered by student IDs)
   async getAllRecords(studentIds?: string[]): Promise<EmploymentRecord[]> {
     let url = '/api/employment/university';

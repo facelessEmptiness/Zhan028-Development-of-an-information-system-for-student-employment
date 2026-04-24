@@ -169,7 +169,11 @@ func (h *DocumentHandler) setStatus(c *gin.Context, newStatus string) {
 		return
 	}
 
-	verifierID, _ := uuid.Parse(c.GetHeader("X-User-ID"))
+	verifierID, err := uuid.Parse(c.GetHeader("X-User-ID"))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user id"})
+		return
+	}
 
 	var body struct {
 		Comment string `json:"comment"`

@@ -27,6 +27,7 @@ func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch
 		employment.POST("/internal", eh.CreateInternal)
 		employment.GET("/student", eh.GetForStudent)
 		employment.GET("/university", eh.GetForUniversity)
+		employment.GET("/employer", eh.GetForEmployer)
 		employment.PUT("/:id/end", eh.End)
 	}
 

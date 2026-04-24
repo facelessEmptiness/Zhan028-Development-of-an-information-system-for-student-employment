@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"application-service/internal/models"
@@ -34,10 +35,26 @@ func (h *EmploymentHandler) CreateInternal(c *gin.Context) {
 		return
 	}
 
-	studentID, _ := uuid.Parse(req.StudentID)
-	employerID, _ := uuid.Parse(req.EmployerID)
-	appID, _ := uuid.Parse(req.ApplicationID)
-	vacancyID, _ := uuid.Parse(req.VacancyID)
+	studentID, err := uuid.Parse(req.StudentID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid student_id"})
+		return
+	}
+	employerID, err := uuid.Parse(req.EmployerID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid employer_id"})
+		return
+	}
+	appID, err := uuid.Parse(req.ApplicationID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid application_id"})
+		return
+	}
+	vacancyID, err := uuid.Parse(req.VacancyID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid vacancy_id"})
+		return
+	}
 
 	// Check if record already exists for this application
 	existing, err := h.repo.GetByApplicationID(appID)
@@ -119,6 +136,25 @@ func (h *EmploymentHandler) GetForUniversity(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"records": enrichWithDuration(recs)})
 }
 
+// GET /api/employment/employer — employer views their own employment records
+func (h *EmploymentHandler) GetForEmployer(c *gin.Context) {
+	employerID, err := uuid.Parse(c.GetHeader("X-User-ID"))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user"})
+		return
+	}
+
+	recs, err := h.repo.GetByEmployerID(employerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch records"})
+		return
+	}
+	if recs == nil {
+		recs = []models.EmploymentRecord{}
+	}
+	c.JSON(http.StatusOK, gin.H{"records": enrichWithDuration(recs)})
+}
+
 // PUT /api/employment/:id/end — mark employment as ended
 func (h *EmploymentHandler) End(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
@@ -166,10 +202,8 @@ func enrichWithDuration(recs []models.EmploymentRecord) []EmploymentRecordWithDu
 			progress = 100
 		}
 
-		// Auto-update status if grant fulfilled
-		status := r.Status
-		if fulfilled && status == "active" {
-			status = "completed"
+		if fulfilled && r.Status == "active" {
+			r.Status = "completed"
 		}
 
 		result = append(result, EmploymentRecordWithDuration{
@@ -180,26 +214,10 @@ func enrichWithDuration(recs []models.EmploymentRecord) []EmploymentRecordWithDu
 			RemainingDays:    remaining,
 			Progress:         progress,
 		})
-		_ = status
 	}
 	return result
 }
 
 func splitCSV(s string) []string {
-	var result []string
-	current := ""
-	for _, c := range s {
-		if c == ',' {
-			if current != "" {
-				result = append(result, current)
-				current = ""
-			}
-		} else {
-			current += string(c)
-		}
-	}
-	if current != "" {
-		result = append(result, current)
-	}
-	return result
+	return strings.Split(s, ",")
 }

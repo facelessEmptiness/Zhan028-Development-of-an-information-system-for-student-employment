@@ -6,6 +6,7 @@ import { ChatModal } from '../components';
 import { employerService, type JobPosting } from '../services/employerService';
 import { applicationService, type Application } from '../services/applicationService';
 import { employerProfileService, type EmployerProfile } from '../services/employerProfileService';
+import { employmentService, type EmploymentRecord } from '../services/employmentService';
 
 interface FormData {
   title: string;
@@ -82,7 +83,7 @@ const EmployerDashboardPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const openedFromUrl = useRef(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'applications' | 'profile'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'applications' | 'profile' | 'employment'>('overview');
   const [showJobForm, setShowJobForm] = useState(false);
   const [formData, setFormData] = useState<FormData>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
@@ -106,6 +107,9 @@ const EmployerDashboardPage = () => {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
+
+  const [employmentRecords, setEmploymentRecords] = useState<EmploymentRecord[]>([]);
+  const [employmentLoading, setEmploymentLoading] = useState(false);
 
   const fetchMyJobs = async () => {
     setJobsLoading(true);
@@ -189,10 +193,35 @@ const EmployerDashboardPage = () => {
     }
   }, [applications]);
 
+  const fetchEmploymentRecords = async () => {
+    setEmploymentLoading(true);
+    try {
+      const recs = await employmentService.getForEmployer();
+      setEmploymentRecords(recs);
+    } catch {
+      // silent
+    } finally {
+      setEmploymentLoading(false);
+    }
+  };
+
+  const handleEndEmployment = async (id: string) => {
+    if (!window.confirm(t('employment.endConfirm'))) return;
+    try {
+      await employmentService.endEmployment(id);
+      setEmploymentRecords(prev =>
+        prev.map(r => r.id === id ? { ...r, status: 'terminated_early' as const, ended_at: new Date().toISOString() } : r)
+      );
+    } catch {
+      // silent
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'jobs' || activeTab === 'applications') fetchMyJobs();
     if (activeTab === 'profile') fetchProfile();
     if (activeTab === 'overview') { fetchMyJobs(); fetchProfile(); }
+    if (activeTab === 'employment') fetchEmploymentRecords();
   }, [activeTab]);
 
   useEffect(() => {
@@ -290,6 +319,7 @@ const EmployerDashboardPage = () => {
     { key: 'overview' as const,      label: t('employerDashboard.tabs.overview') },
     { key: 'jobs' as const,          label: t('employerDashboard.tabs.jobs'),         badge: myJobs.length || undefined },
     { key: 'applications' as const,  label: t('employerDashboard.tabs.applications'), badge: applications.length || undefined },
+    { key: 'employment' as const,    label: t('employment.title') },
     { key: 'profile' as const,       label: t('employerDashboard.tabs.profile') },
   ];
 
@@ -302,7 +332,7 @@ const EmployerDashboardPage = () => {
             {companyName.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('employerDashboard.title')}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t('employerDashboard.title')}</h1>
             <p className="text-sm text-gray-500">
               {profileExists && profile.company_name ? profile.company_name : 'Manage your jobs & applications'} · {t('employerDashboard.updatedNow', { defaultValue: 'обновлено сейчас' })}
             </p>
@@ -759,6 +789,90 @@ const EmployerDashboardPage = () => {
         </div>
       )}
 
+      {/* ── Employment Monitoring ── */}
+      {activeTab === 'employment' && (
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-900">{t('employment.title')}</h2>
+            <p className="text-xs text-gray-400 mt-0.5">{t('employment.subtitle')}</p>
+          </div>
+          {employmentLoading && <div className="p-10 text-center text-gray-400">{t('employment.loading')}</div>}
+          {!employmentLoading && employmentRecords.length === 0 && (
+            <div className="p-16 text-center">
+              <p className="font-medium text-gray-500">{t('employment.noRecords')}</p>
+              <p className="text-sm text-gray-400 mt-1">{t('employment.noRecordsHint')}</p>
+            </div>
+          )}
+          {!employmentLoading && employmentRecords.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.company')}</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.position')}</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.startDate')}</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.daysWorked')}</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.progress')}</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.status')}</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {employmentRecords.map(rec => {
+                    const statusColors: Record<string, string> = {
+                      active: 'bg-green-50 text-green-700',
+                      completed: 'bg-blue-50 text-blue-700',
+                      terminated_early: 'bg-red-50 text-red-700',
+                    };
+                    const statusCls = statusColors[rec.status] ?? 'bg-gray-100 text-gray-600';
+                    const startDate = new Date(rec.started_at).toLocaleDateString('ru-RU');
+                    return (
+                      <tr key={rec.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-5 py-4 font-medium text-gray-900 text-sm">{rec.company_name || '—'}</td>
+                        <td className="px-5 py-4 text-gray-600 text-sm">
+                          <button onClick={() => navigate(`/candidate/${rec.student_id}`)} className="hover:text-blue-600">
+                            {rec.job_title || '—'}
+                          </button>
+                        </td>
+                        <td className="px-5 py-4 text-gray-500 text-sm">{startDate}</td>
+                        <td className="px-5 py-4 text-gray-700 font-semibold text-sm">{rec.days_worked}</td>
+                        <td className="px-5 py-4 min-w-[160px]">
+                          {rec.grant_fulfilled ? (
+                            <span className="text-green-600 font-semibold text-sm">{t('employment.grantFulfilled')}</span>
+                          ) : (
+                            <div>
+                              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                                <span>{rec.progress}%</span>
+                                <span>{t('employment.remaining', { days: rec.remaining_days })}</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                <div className="bg-blue-500 h-1.5 rounded-full transition-all" style={{ width: `${rec.progress}%` }} />
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusCls}`}>
+                            {t(`employment.status.${rec.status}` as const, rec.status)}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4">
+                          {rec.status === 'active' && (
+                            <button onClick={() => handleEndEmployment(rec.id)} className="px-3 py-1 border border-red-200 text-red-700 rounded-lg text-xs font-semibold hover:bg-red-50">
+                              {t('employment.endEmployment')}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Job Posting Modal */}
       {showJobForm && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
@@ -768,7 +882,7 @@ const EmployerDashboardPage = () => {
               <button onClick={() => { setShowJobForm(false); setFormData(emptyForm); setFormError(''); setFormSuccess(''); }}
                 className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500">✕</button>
             </div>
-            <div className="p-6 overflow-y-auto max-h-[70vh] space-y-4">
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[80dvh] sm:max-h-[70vh] space-y-4">
               {formError && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formError}</div>}
               {formSuccess && <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-medium">{formSuccess}</div>}
 
@@ -800,7 +914,7 @@ const EmployerDashboardPage = () => {
                   <option value="Internship">Internship</option>
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('employerDashboard.jobModal.minSalaryLabel')}</label>
                   <input type="number" name="salary_min" value={formData.salary_min} onChange={handleFormChange}

@@ -43,10 +43,20 @@ func (h *EmploymentHandler) GetForUniversity(c *gin.Context) {
 	h.proxy(c, "GET", path, nil)
 }
 
-// PUT /api/employment/:id/end - mark employment as ended
+// GET /api/employment/employer - employer views employment records they created
+func (h *EmploymentHandler) GetForEmployer(c *gin.Context) {
+	role := c.GetHeader("X-User-Role")
+	if role != "employer" && role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+		return
+	}
+	h.proxy(c, "GET", "/api/employment/employer", nil)
+}
+
+// PUT /api/employment/:id/end - mark employment as ended (employer or university/admin)
 func (h *EmploymentHandler) End(c *gin.Context) {
 	role := c.GetHeader("X-User-Role")
-	if role != "university" && role != "admin" {
+	if role != "employer" && role != "university" && role != "admin" {
 		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
 		return
 	}
@@ -79,7 +89,11 @@ func (h *EmploymentHandler) proxy(c *gin.Context, method, path string, extraBody
 		if extraBody != nil {
 			bodyReader = bytes.NewReader(extraBody)
 		} else {
-			body, _ := io.ReadAll(c.Request.Body)
+			body, err := io.ReadAll(c.Request.Body)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "failed to read request body"})
+				return
+			}
 			bodyReader = bytes.NewReader(body)
 		}
 	}

@@ -20,14 +20,8 @@ export interface Document {
   updated_at: string;
 }
 
-const TYPE_LABELS: Record<DocumentType, string> = {
-  cv: 'CV / Резюме',
-  diploma: 'Диплом',
-  certificate: 'Сертификат',
-};
-
-export const getTypeLabel = (type: string) =>
-  TYPE_LABELS[type as DocumentType] ?? type;
+export const getTypeKey = (type: string) =>
+  `docTypes.${type}`;
 
 export const documentService = {
   /** Student: upload a document */

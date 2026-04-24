@@ -155,6 +155,13 @@ export const studentService = {
     return res.json();
   },
 
+  // Get any student by their auth user_id (for university/employer lookup)
+  getById: async (userId: string): Promise<BackendStudentProfile> => {
+    const res = await apiFetch(`${API_BASE}/students/${userId}`);
+    if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+    return res.json();
+  },
+
   getRecommendedJobs: async (_studentId: string) => {
     return [];
   },

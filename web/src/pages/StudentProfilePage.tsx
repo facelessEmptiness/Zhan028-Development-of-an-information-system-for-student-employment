@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 import { ChatModal } from '../components';
+import { useAuth } from '../context';
 
 const MIN_STUDENT_AGE = 16;
 
@@ -40,7 +41,7 @@ function validateIIN(iin: string, t: (key: string) => string): string | null {
 import { applicationService, type Application } from '../services/applicationService';
 import { apiFetch } from '../utils/apiClient';
 import { getUniversities, type University } from '../services/universityService';
-import { documentService, type Document, type DocumentType, getTypeLabel } from '../services/documentService';
+import { documentService, type Document, type DocumentType, getTypeKey } from '../services/documentService';
 import MatchIndex from '../components/MatchIndex';
 
 type TabType = 'profile' | 'applications' | 'documents';
@@ -67,6 +68,7 @@ const DOC_STATUS_CLASSES: Record<string, string> = {
 
 const StudentProfilePage = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const openedFromUrl = useRef(false);
 
@@ -133,6 +135,12 @@ const StudentProfilePage = () => {
       } catch {
         setProfileExists(false);
         setIsCreating(true);
+        setFormData({
+          ...emptyForm,
+          first_name: localStorage.getItem('reg_first_name') ?? '',
+          last_name: localStorage.getItem('reg_last_name') ?? '',
+          university_id: localStorage.getItem('reg_university_id') ?? user?.university_id ?? '',
+        });
       } finally {
         setProfileLoading(false);
       }
@@ -173,7 +181,7 @@ const StudentProfilePage = () => {
     try {
       const doc = await documentService.upload(file, uploadingType);
       setDocuments(prev => [doc, ...prev]);
-      toast.success(t('profile.documents.uploadSuccess', { type: getTypeLabel(uploadingType) }));
+      toast.success(t('profile.documents.uploadSuccess', { type: t(getTypeKey(uploadingType)) }));
     } catch { toast.error(t('profile.documents.uploadError')); }
     finally { setUploadingType(null); }
   };
@@ -221,6 +229,9 @@ const StudentProfilePage = () => {
         updated = await studentService.createProfile(payload as Parameters<typeof studentService.createProfile>[0]);
         setProfileExists(true);
         setIsCreating(false);
+        localStorage.removeItem('reg_first_name');
+        localStorage.removeItem('reg_last_name');
+        localStorage.removeItem('reg_university_id');
       } else {
         updated = await studentService.updateProfile(payload);
       }
@@ -265,13 +276,13 @@ const StudentProfilePage = () => {
     <div className="space-y-5">
       {/* Profile header card */}
       <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6">
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col sm:flex-row items-start gap-4">
           {/* Avatar */}
-          <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shrink-0" style={{ background: 'linear-gradient(135deg,#3B82F6,#6366F1)' }}>
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shrink-0" style={{ background: 'linear-gradient(135deg,#3B82F6,#6366F1)' }}>
             {initials || '?'}
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 w-full">
             {/* Name row + buttons */}
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -622,7 +633,7 @@ const StudentProfilePage = () => {
                 className="flex flex-col items-center gap-2 p-5 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50">
                 <span className="text-3xl">{type === 'cv' ? '📄' : '📜'}</span>
                 <span className="font-medium text-gray-700 text-sm">
-                  {uploadingType === type ? t('profile.documents.uploading') : t('profile.documents.upload', { type: getTypeLabel(type) })}
+                  {uploadingType === type ? t('profile.documents.uploading') : t('profile.documents.upload', { type: t(getTypeKey(type)) })}
                 </span>
               </button>
             ))}
@@ -646,7 +657,7 @@ const StudentProfilePage = () => {
                     <p className="font-semibold text-gray-900 text-sm truncate">{doc.file_name}</p>
                     <StatusBadge status={doc.status} />
                   </div>
-                  <p className="text-xs text-gray-500">{getTypeLabel(doc.type)} · {(doc.file_size / 1024).toFixed(0)} KB · {new Date(doc.created_at).toLocaleDateString('ru-RU')}</p>
+                  <p className="text-xs text-gray-500">{t(getTypeKey(doc.type))} · {(doc.file_size / 1024).toFixed(0)} KB · {new Date(doc.created_at).toLocaleDateString('ru-RU')}</p>
                   {doc.comment && <p className="text-xs text-gray-600 mt-1 italic">{doc.comment}</p>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">

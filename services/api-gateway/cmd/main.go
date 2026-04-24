@@ -18,5 +18,5 @@ func main() {
 
 	address := ":" + cfg.Port // ✅ :8080
 	log.Printf("Starting server at %s...", address)
-	r.Run(address)
+	log.Fatal(r.Run(address))
 }

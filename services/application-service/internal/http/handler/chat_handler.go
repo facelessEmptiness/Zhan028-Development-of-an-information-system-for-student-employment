@@ -34,13 +34,18 @@ func (h *ChatHandler) GetMessages(c *gin.Context) {
 		return
 	}
 
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user id"})
+		return
+	}
+
 	// Verify the user is part of this application
 	app, err := h.applicationRepo.GetByID(appID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "application not found"})
 		return
 	}
-	uid, _ := uuid.Parse(userID)
 	if role == "student" && app.StudentID != uid {
 		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
 		return
@@ -87,13 +92,18 @@ func (h *ChatHandler) SendMessage(c *gin.Context) {
 		return
 	}
 
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user id"})
+		return
+	}
+
 	// Verify the user is part of this application
 	app, err := h.applicationRepo.GetByID(appID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "application not found"})
 		return
 	}
-	uid, _ := uuid.Parse(userID)
 	if role == "student" && app.StudentID != uid {
 		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
 		return

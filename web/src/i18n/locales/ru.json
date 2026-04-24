@@ -650,6 +650,7 @@
   },
   "docTypes": {
     "cv": "CV / Резюме",
+    "diploma": "Диплом",
     "certificate": "Сертификат"
   },
   "industries": {

@@ -6,7 +6,7 @@ import MatchIndex from '../components/MatchIndex';
 import { apiFetch } from '../utils/apiClient';
 import { applicationService } from '../services/applicationService';
 import { type BackendStudentProfile } from '../services/studentService';
-import { documentService, type Document, getTypeLabel } from '../services/documentService';
+import { documentService, type Document, getTypeKey } from '../services/documentService';
 import { interviewService, type Interview } from '../services/interviewService';
 
 interface LocationState {
@@ -171,14 +171,14 @@ const CandidateDetailPage = () => {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Header */}
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-8">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold flex-shrink-0">
                   {student.first_name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-1">{fullName}</h1>
+                <div className="min-w-0">
+                  <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 break-words">{fullName}</h1>
                   {student.specialization && (
                     <p className="text-lg text-gray-600 mb-3">🎓 {student.specialization}</p>
                   )}
@@ -213,7 +213,7 @@ const CandidateDetailPage = () => {
 
           {/* Bio */}
           {student.bio && (
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">{t('candidate.about')}</h2>
               <p className="text-gray-700 leading-relaxed">{student.bio}</p>
             </div>
@@ -221,7 +221,7 @@ const CandidateDetailPage = () => {
 
           {/* Skills */}
           {skills.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-8">
               <h2 className="text-xl font-bold text-gray-900 mb-4">{t('candidate.skills')}</h2>
               <div className="flex flex-wrap gap-3">
                 {skills.map((skill) => (
@@ -234,7 +234,7 @@ const CandidateDetailPage = () => {
           )}
 
           {/* Details table */}
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">{t('candidate.data')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {student.gpa > 0 && (
@@ -372,7 +372,7 @@ const CandidateDetailPage = () => {
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{doc.file_name}</p>
-                    <p className="text-xs text-gray-500">{getTypeLabel(doc.type)}</p>
+                    <p className="text-xs text-gray-500">{t(getTypeKey(doc.type))}</p>
                     <div className="mt-1 flex items-center gap-2">
                       {doc.status === 'verified' ? (
                         <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">

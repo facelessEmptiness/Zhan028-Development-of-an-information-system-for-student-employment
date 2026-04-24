@@ -84,7 +84,7 @@ const LoginPage = () => {
             </div>
 
             {/* Form Card */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('auth.login.title')}</h2>
               <p className="text-gray-500 text-sm mb-6">{t('auth.login.subtitle')}</p>
 

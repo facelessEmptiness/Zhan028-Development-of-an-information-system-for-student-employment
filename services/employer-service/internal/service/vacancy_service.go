@@ -9,6 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
+var ErrAccessDenied = errors.New("доступ запрещён")
+
 type SearchParams struct {
 	Search   string
 	JobType  string
@@ -78,7 +80,7 @@ func (s *vacancyService) UpdateVacancy(id uuid.UUID, employerID uuid.UUID, req *
 	}
 
 	if vacancy.EmployerID != employerID {
-		return nil, errors.New("доступ запрещён")
+		return nil, ErrAccessDenied
 	}
 
 	if req.Title != "" {
@@ -119,7 +121,7 @@ func (s *vacancyService) DeleteVacancy(id uuid.UUID, employerID uuid.UUID) error
 	}
 
 	if vacancy.EmployerID != employerID {
-		return errors.New("доступ запрещён")
+		return ErrAccessDenied
 	}
 
 	return s.repo.Delete(id)

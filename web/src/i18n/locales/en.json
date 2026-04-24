@@ -649,7 +649,8 @@
     "analytics": "Analytics"
   },
   "docTypes": {
-    "cv": "CV / Resume",
+    "cv": "CV",
+    "diploma": "Diploma",
     "certificate": "Certificate"
   },
   "industries": {

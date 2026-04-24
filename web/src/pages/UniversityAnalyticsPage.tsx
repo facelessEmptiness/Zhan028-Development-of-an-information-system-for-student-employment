@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { apiFetch } from '../utils/apiClient';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
-import { documentService, type Document, getTypeLabel } from '../services/documentService';
+import { documentService, type Document, getTypeKey } from '../services/documentService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
 
 interface SpecializationCount { specialization: string; count: number; }
@@ -45,13 +45,14 @@ const UniversityAnalyticsPage = () => {
     rejected: { label: t('universityAnalytics.docStatus.rejected'), cls: 'bg-red-50 text-red-700' },
   };
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'employers' | 'statistics' | 'my-students' | 'doc-review' | 'employment'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'employers' | 'statistics' | 'my-students' | 'doc-review' | 'employment'>('overview');
   const [data, setData] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [myStudents, setMyStudents] = useState<BackendStudentProfile[]>([]);
   const [myStudentsLoading, setMyStudentsLoading] = useState(false);
   const [employmentRecords, setEmploymentRecords] = useState<EmploymentRecord[]>([]);
   const [employmentLoading, setEmploymentLoading] = useState(false);
+  const [studentDetailsMap, setStudentDetailsMap] = useState<Record<string, BackendStudentProfile>>({});
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [studentDocs, setStudentDocs] = useState<Record<string, Document[]>>({});
   const [docsLoading, setDocsLoading] = useState<Record<string, boolean>>({});
@@ -96,24 +97,25 @@ const UniversityAnalyticsPage = () => {
   useEffect(() => {
     if (activeTab !== 'employment') return;
     setEmploymentLoading(true);
-    employmentService.getAllRecords()
-      .then(recs => setEmploymentRecords(recs))
+    Promise.all([
+      employmentService.getAllRecords(),
+      myStudents.length === 0 ? studentService.listByUniversity().then(r => r.students ?? []) : Promise.resolve(myStudents),
+    ])
+      .then(([recs, students]) => {
+        setEmploymentRecords(recs);
+        const knownStudents = myStudents.length > 0 ? myStudents : students;
+        if (myStudents.length === 0) setMyStudents(students);
+        const knownIds = new Set(knownStudents.map(s => s.user_id));
+        const missingIds = [...new Set(recs.map(r => r.student_id))].filter(id => !knownIds.has(id));
+        missingIds.forEach(id => {
+          studentService.getById(id)
+            .then(profile => setStudentDetailsMap(prev => ({ ...prev, [id]: profile })))
+            .catch(() => {});
+        });
+      })
       .catch(() => toast.error(t('employment.errors.loadRecords')))
       .finally(() => setEmploymentLoading(false));
   }, [activeTab]);
-
-  const handleEndEmployment = async (id: string) => {
-    if (!window.confirm(t('employment.endConfirm'))) return;
-    try {
-      await employmentService.endEmployment(id);
-      setEmploymentRecords(prev =>
-        prev.map(r => r.id === id ? { ...r, status: 'terminated_early' as const, ended_at: new Date().toISOString() } : r)
-      );
-      toast.success(t('employment.endSuccess'));
-    } catch {
-      toast.error(t('employment.endError'));
-    }
-  };
 
   const loadStudentDocs = async (userId: string) => {
     if (studentDocs[userId]) return;
@@ -193,7 +195,6 @@ const UniversityAnalyticsPage = () => {
     { key: 'my-students' as const,  label: t('universityAnalytics.tabs.myStudents'),  badge: !myStudentsLoading && myStudents.length > 0 ? myStudents.length : undefined },
     { key: 'doc-review' as const,   label: t('universityAnalytics.tabs.docReview'),   badge: !docStudentsLoading && docStudents.length > 0 ? docStudents.length : undefined },
     { key: 'employment' as const,   label: t('universityAnalytics.tabs.employment') },
-    { key: 'students' as const,     label: t('universityAnalytics.tabs.students') },
     { key: 'employers' as const,    label: t('universityAnalytics.tabs.employers') },
     { key: 'statistics' as const,   label: t('universityAnalytics.tabs.statistics') },
   ];
@@ -346,35 +347,36 @@ const UniversityAnalyticsPage = () => {
                 </div>
               )}
               {!myStudentsLoading && myStudents.length > 0 && (
-                <table className="w-full">
+                <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px]">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.student')}</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.specialization')}</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.gpa')}</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.graduation')}</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.skills')}</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.student')}</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.specialization')}</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.gpa')}</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.graduation')}</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('universityAnalytics.myStudents.table.skills')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {myStudents.map(s => (
                       <tr key={s.id} className="hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => navigate(`/candidate/${s.user_id}`)}>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ background: 'linear-gradient(135deg,#3B82F6,#6366F1)' }}>
                               {s.first_name.charAt(0)}
                             </div>
-                            <span className="font-medium text-gray-900 text-sm">{s.first_name} {s.last_name}</span>
+                            <span className="font-medium text-gray-900 text-sm whitespace-nowrap">{s.first_name} {s.last_name}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{s.specialization || '—'}</td>
-                        <td className="px-6 py-4 text-sm font-semibold text-green-600">{s.gpa > 0 ? s.gpa.toFixed(2) : '—'}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{s.graduation_year > 0 ? s.graduation_year : '—'}</td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{s.specialization || '—'}</td>
+                        <td className="px-4 sm:px-6 py-4 text-sm font-semibold text-green-600">{s.gpa > 0 ? s.gpa.toFixed(2) : '—'}</td>
+                        <td className="px-4 sm:px-6 py-4 text-sm text-gray-600">{s.graduation_year > 0 ? s.graduation_year : '—'}</td>
+                        <td className="px-4 sm:px-6 py-4">
                           <div className="flex flex-wrap gap-1">
                             {s.skills
                               ? s.skills.split(',').slice(0, 3).map(skill => (
-                                  <span key={skill.trim()} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">{skill.trim()}</span>
+                                  <span key={skill.trim()} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium whitespace-nowrap">{skill.trim()}</span>
                                 ))
                               : <span className="text-gray-400 text-xs">—</span>}
                           </div>
@@ -383,6 +385,7 @@ const UniversityAnalyticsPage = () => {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           )}
@@ -450,7 +453,7 @@ const UniversityAnalyticsPage = () => {
                               </div>
                               <div>
                                 <p className="font-medium text-gray-900 text-sm">{doc.file_name}</p>
-                                <p className="text-xs text-gray-400">{getTypeLabel(doc.type)} · {(doc.file_size / 1024).toFixed(0)} KB</p>
+                                <p className="text-xs text-gray-400">{t(getTypeKey(doc.type))} · {(doc.file_size / 1024).toFixed(0)} KB</p>
                                 {doc.comment && <p className="text-xs text-gray-500 italic mt-0.5">«{doc.comment}»</p>}
                               </div>
                             </div>
@@ -502,17 +505,20 @@ const UniversityAnalyticsPage = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
+                        <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.student')}</th>
                         <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.company')}</th>
                         <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.position')}</th>
                         <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.startDate')}</th>
                         <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.daysWorked')}</th>
                         <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.progress')}</th>
                         <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.status')}</th>
-                        <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {employmentRecords.map(rec => {
+                        const student = myStudents.find(s => s.user_id === rec.student_id) ?? studentDetailsMap[rec.student_id];
+                        const studentName = student ? `${student.first_name} ${student.last_name}` : '…';
+                        const studentUserId = student?.user_id ?? rec.student_id;
                         const statusColors: Record<string, string> = {
                           active: 'bg-green-50 text-green-700',
                           completed: 'bg-blue-50 text-blue-700',
@@ -522,6 +528,17 @@ const UniversityAnalyticsPage = () => {
                         const startDate = new Date(rec.started_at).toLocaleDateString('ru-RU');
                         return (
                           <tr key={rec.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-5 py-4">
+                              <button
+                                onClick={() => navigate(`/candidate/${studentUserId}`)}
+                                className="flex items-center gap-2 text-left group"
+                              >
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0" style={{ background: 'linear-gradient(135deg,#3B82F6,#6366F1)' }}>
+                                  {studentName.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="text-sm font-medium text-gray-900 group-hover:text-blue-600 whitespace-nowrap">{studentName}</span>
+                              </button>
+                            </td>
                             <td className="px-5 py-4 font-medium text-gray-900 text-sm">{rec.company_name || '—'}</td>
                             <td className="px-5 py-4 text-gray-600 text-sm">{rec.job_title || '—'}</td>
                             <td className="px-5 py-4 text-gray-500 text-sm">{startDate}</td>
@@ -546,51 +563,11 @@ const UniversityAnalyticsPage = () => {
                                 {t(`employment.status.${rec.status}` as const, rec.status)}
                               </span>
                             </td>
-                            <td className="px-5 py-4">
-                              {rec.status === 'active' && (
-                                <button onClick={() => handleEndEmployment(rec.id)} className="px-3 py-1 border border-red-200 text-red-700 rounded-lg text-xs font-semibold hover:bg-red-50">
-                                  {t('employment.endEmployment')}
-                                </button>
-                              )}
-                            </td>
                           </tr>
                         );
                       })}
                     </tbody>
                   </table>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── Students by Specialization ── */}
-          {activeTab === 'students' && (
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <h2 className="font-semibold text-gray-900 mb-5">
-                {t('universityAnalytics.students.bySpecialization')}
-                <span className="ml-2 text-sm font-normal text-gray-400">{t('universityAnalytics.students.totalStudents', { total: data.students.total })}</span>
-              </h2>
-              {data.students.by_specialization.length === 0 ? (
-                <p className="text-center py-10 text-gray-400">{t('universityAnalytics.students.noSpecializations')}</p>
-              ) : (
-                <div className="space-y-3">
-                  {data.students.by_specialization.map(item => {
-                    const pct = data.students.total > 0 ? Math.round((item.count / data.students.total) * 100) : 0;
-                    return (
-                      <div key={item.specialization} className="p-4 bg-gray-50 rounded-xl">
-                        <div className="flex justify-between items-center mb-2">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 text-sm">{item.specialization}</h3>
-                            <p className="text-xs text-gray-500">{t('universityAnalytics.students.studentsCount', { count: item.count })}</p>
-                          </div>
-                          <span className="text-lg font-bold text-green-600">{pct}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-green-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               )}
             </div>

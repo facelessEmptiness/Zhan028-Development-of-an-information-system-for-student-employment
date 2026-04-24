@@ -6,6 +6,7 @@ import (
 	"university-service/internal/repository"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 var (
@@ -38,7 +39,10 @@ func (s *universityService) CreateUniversity(name, city, country, website string
 	}
 
 	if err := s.repo.Create(university); err != nil {
-		return nil, ErrNameAlreadyTaken
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, ErrNameAlreadyTaken
+		}
+		return nil, err
 	}
 	return university, nil
 }
@@ -50,7 +54,10 @@ func (s *universityService) GetAllUniversities() ([]models.University, error) {
 func (s *universityService) GetUniversityByID(id uuid.UUID) (*models.University, error) {
 	university, err := s.repo.GetByID(id)
 	if err != nil {
-		return nil, ErrUniversityNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrUniversityNotFound
+		}
+		return nil, err
 	}
 	return university, nil
 }

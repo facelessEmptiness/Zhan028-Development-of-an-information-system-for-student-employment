@@ -179,8 +179,8 @@ const BrowseJobsPage = () => {
     setPendingSkills(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
   };
 
-  const salaryMinNum = pendingMin ? parseInt(pendingMin) / 1000 : 0;
-  const salaryMaxNum = pendingMax ? parseInt(pendingMax) / 1000 : 2000;
+  const salaryMinNum = pendingMin ? parseInt(pendingMin) : 0;
+  const salaryMaxNum = pendingMax ? parseInt(pendingMax) : 2000000;
 
   return (
     <div>
@@ -297,18 +297,18 @@ const BrowseJobsPage = () => {
 
             {/* Salary range */}
             <div>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">{t('jobs.browse.salaryThousands')}</p>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">ЗАРПЛАТА, ₸</p>
               <div className="flex gap-2 mb-3">
                 <input
                   type="number" min={0} placeholder={t('jobs.browse.salaryFrom')}
-                  value={pendingMin ? Math.round(parseInt(pendingMin) / 1000) : ''}
-                  onChange={e => setPendingMin(e.target.value ? String(parseInt(e.target.value) * 1000) : '')}
+                  value={pendingMin ?? ''}
+                  onChange={e => setPendingMin(e.target.value ? e.target.value : '')}
                   className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
                 <input
                   type="number" min={0} placeholder={t('jobs.browse.salaryTo')}
-                  value={pendingMax ? Math.round(parseInt(pendingMax) / 1000) : ''}
-                  onChange={e => setPendingMax(e.target.value ? String(parseInt(e.target.value) * 1000) : '')}
+                  value={pendingMax ?? ''}
+                  onChange={e => setPendingMax(e.target.value ? e.target.value : '')}
                   className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
@@ -318,15 +318,15 @@ const BrowseJobsPage = () => {
                   <div
                     className="absolute h-1.5 bg-blue-500 rounded-full"
                     style={{
-                      left: `${Math.min((salaryMinNum / 2000) * 100, 100)}%`,
-                      right: `${Math.max(100 - (salaryMaxNum / 2000) * 100, 0)}%`,
+                      left: `${Math.min((salaryMinNum / 2000000) * 100, 100)}%`,
+                      right: `${Math.max(100 - (salaryMaxNum / 2000000) * 100, 0)}%`,
                     }}
                   />
                 </div>
                 <input
-                  type="range" min={0} max={2000} step={50}
+                  type="range" min={0} max={2000000} step={50000}
                   value={salaryMinNum}
-                  onChange={e => setPendingMin(String(parseInt(e.target.value) * 1000))}
+                  onChange={e => setPendingMin(e.target.value)}
                   className="absolute inset-0 w-full opacity-0 h-4 cursor-pointer"
                 />
               </div>
@@ -383,7 +383,7 @@ const BrowseJobsPage = () => {
               )}
               {(salaryMin || salaryMax) && (
                 <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-white text-gray-700 font-medium">
-                  {salaryMin ? Math.round(parseInt(salaryMin) / 1000) : '0'}–{salaryMax ? Math.round(parseInt(salaryMax) / 1000) : '∞'}k ₸
+                  {salaryMin ? parseInt(salaryMin).toLocaleString('ru-RU') : '0'} – {salaryMax ? parseInt(salaryMax).toLocaleString('ru-RU') : '∞'} ₸
                   <button onClick={() => { setSalaryMin(''); setSalaryMax(''); setPendingMin(''); setPendingMax(''); setPage(1); }} className="text-gray-400 hover:text-gray-700 ml-0.5">×</button>
                 </span>
               )}

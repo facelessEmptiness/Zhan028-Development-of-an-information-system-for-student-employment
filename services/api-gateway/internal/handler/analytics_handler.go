@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -149,19 +150,14 @@ func (h *AnalyticsHandler) GetSummary(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// sortedEntries converts a map to a sorted slice of {skill/type/location, count} limited to top N
+// sortedEntries converts a map to a sorted slice of {name, count} limited to top N
 func sortedEntries(m map[string]int, limit int) []gin.H {
 	type kv struct{ k string; v int }
-	var sorted []kv
+	sorted := make([]kv, 0, len(m))
 	for k, v := range m {
 		sorted = append(sorted, kv{k, v})
 	}
-	// Simple insertion sort (small slices)
-	for i := 1; i < len(sorted); i++ {
-		for j := i; j > 0 && sorted[j].v > sorted[j-1].v; j-- {
-			sorted[j], sorted[j-1] = sorted[j-1], sorted[j]
-		}
-	}
+	slices.SortFunc(sorted, func(a, b kv) int { return b.v - a.v })
 	if limit > len(sorted) {
 		limit = len(sorted)
 	}
