@@ -46,9 +46,17 @@ func (h *ChatHandler) GetMessages(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "application not found"})
 		return
 	}
-	if role == "student" && app.StudentID != uid {
-		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
-		return
+	switch role {
+	case "student":
+		if app.StudentID != uid {
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+			return
+		}
+	case "employer":
+		if app.EmployerID != uid {
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+			return
+		}
 	}
 
 	messages, err := h.chatRepo.GetByApplicationID(appID)
@@ -104,9 +112,17 @@ func (h *ChatHandler) SendMessage(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "application not found"})
 		return
 	}
-	if role == "student" && app.StudentID != uid {
-		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
-		return
+	switch role {
+	case "student":
+		if app.StudentID != uid {
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+			return
+		}
+	case "employer":
+		if app.EmployerID != uid {
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+			return
+		}
 	}
 
 	var req struct {

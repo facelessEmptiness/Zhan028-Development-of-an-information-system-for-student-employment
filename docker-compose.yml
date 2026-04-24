@@ -97,6 +97,20 @@ services:
       timeout: 5s
       retries: 5
 
+  # =============== CACHE ===============
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # =============== MICROSERVICES ===============
   auth-service:
     build:
@@ -118,8 +132,11 @@ services:
       SMTP_USER: ${SMTP_USER}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_FROM: ${SMTP_FROM}
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       users-db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - diploma-network
@@ -165,8 +182,11 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: employer_db
       GRPC_PORT: 50052
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       employer-db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - diploma-network

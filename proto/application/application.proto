@@ -37,6 +37,7 @@ message ApplicationMessage {
   string student_iin = 10;
   string university_id = 11;
   int32 match_score = 12;
+  string employer_id = 13;
 }
 
 message ApplyRequest {
@@ -44,6 +45,7 @@ message ApplyRequest {
   string vacancy_id = 2;
   string cover_letter = 3;
   int32 match_score = 4;
+  string employer_id = 5;
 }
 
 message GetMyApplicationsRequest {

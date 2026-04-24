@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 
@@ -11,6 +12,7 @@ import (
 	"employer-service/internal/repository"
 	"employer-service/internal/service"
 
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 )
 
@@ -32,9 +34,21 @@ func main() {
 		log.Fatalf("migration error: %v", err)
 	}
 
-	// 4. Initialize layers
+	// 4. Connect to Redis
+	redisOpts, err := redis.ParseURL(cfg.RedisURL)
+	if err != nil {
+		log.Fatalf("Failed to parse Redis URL: %v", err)
+	}
+	redisClient := redis.NewClient(redisOpts)
+	if err := redisClient.Ping(context.Background()).Err(); err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+	defer redisClient.Close()
+	log.Println("Redis connection established")
+
+	// 5. Initialize layers
 	vacancyRepo := repository.NewVacancyRepository(db)
-	vacancySvc := service.NewVacancyService(vacancyRepo)
+	vacancySvc := service.NewCachedVacancyService(service.NewVacancyService(vacancyRepo), redisClient)
 
 	profileRepo := repository.NewEmployerProfileRepository(db)
 	profileSvc := service.NewEmployerProfileService(profileRepo)

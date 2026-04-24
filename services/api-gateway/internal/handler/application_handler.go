@@ -79,9 +79,19 @@ func (h *ApplicationHandler) Apply(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	employerID := ""
+	if vErr == nil && vacancyResp != nil {
+		employerID = vacancyResp.GetEmployerId()
+	}
+	if employerID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "vacancy not found"})
+		return
+	}
+
 	resp, err := h.appClient.Apply(ctx, &applicationpb.ApplyRequest{
 		StudentId:   studentID,
 		VacancyId:   req.VacancyID,
+		EmployerId:  employerID,
 		CoverLetter: req.CoverLetter,
 		MatchScore:  matchScore,
 	})

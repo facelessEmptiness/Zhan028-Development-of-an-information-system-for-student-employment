@@ -8,7 +8,10 @@ import (
 	"auth-service/internal/service"
 	"auth-service/pkg/email"
 	"auth-service/pkg/jwt"
+	"context"
 	"log"
+
+	"github.com/redis/go-redis/v9"
 )
 
 // @title Auth Service API
@@ -42,9 +45,21 @@ func main() {
 		cfg.SMTPFrom,
 	)
 
+	// Подключение к Redis
+	redisOpts, err := redis.ParseURL(cfg.RedisURL)
+	if err != nil {
+		log.Fatalf("Ошибка парсинга Redis URL: %v", err)
+	}
+	redisClient := redis.NewClient(redisOpts)
+	if err := redisClient.Ping(context.Background()).Err(); err != nil {
+		log.Fatalf("Ошибка подключения к Redis: %v", err)
+	}
+	defer redisClient.Close()
+	log.Println("Подключение к Redis установлено")
+
 	// Инициализация слоёв приложения
 	userRepo := repository.NewUserRepository(db)
-	codeRepo := repository.NewVerificationCodeRepository(db)
+	codeRepo := repository.NewRedisVerificationCodeRepository(redisClient)
 	authService := service.NewAuthService(userRepo, codeRepo, jwtManager, emailService)
 	authHandler := handler.NewAuthHandler(authService)
 

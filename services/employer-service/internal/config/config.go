@@ -19,6 +19,7 @@ type Config struct {
 	DBPassword string
 	DBName     string
 	DBSSLMode  string
+	RedisURL   string
 }
 
 func LoadConfig() (*Config, error) {
@@ -33,6 +34,7 @@ func LoadConfig() (*Config, error) {
 		DBPassword: getEnv("DB_PASSWORD", "admin"),
 		DBName:     getEnv("DB_NAME", "employer_db"),
 		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
+		RedisURL:   getEnv("REDIS_URL", "redis://localhost:6379/0"),
 	}, nil
 }
 

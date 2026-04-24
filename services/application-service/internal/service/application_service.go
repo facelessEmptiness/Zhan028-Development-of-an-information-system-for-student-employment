@@ -15,7 +15,7 @@ var (
 )
 
 type ApplicationService interface {
-	Apply(studentID, vacancyID uuid.UUID, coverLetter string, matchScore int32) (*models.Application, error)
+	Apply(studentID, vacancyID, employerID uuid.UUID, coverLetter string, matchScore int32) (*models.Application, error)
 	GetMyApplications(studentID uuid.UUID) ([]models.Application, error)
 	GetVacancyApplications(vacancyID uuid.UUID) ([]models.Application, error)
 	UpdateStatus(id, employerID uuid.UUID, status string) (*models.Application, error)
@@ -30,7 +30,7 @@ func NewApplicationService(repo repository.ApplicationRepository) ApplicationSer
 	return &applicationService{repo: repo}
 }
 
-func (s *applicationService) Apply(studentID, vacancyID uuid.UUID, coverLetter string, matchScore int32) (*models.Application, error) {
+func (s *applicationService) Apply(studentID, vacancyID, employerID uuid.UUID, coverLetter string, matchScore int32) (*models.Application, error) {
 	exists, err := s.repo.ExistsByStudentAndVacancy(studentID, vacancyID)
 	if err != nil {
 		return nil, err
@@ -42,6 +42,7 @@ func (s *applicationService) Apply(studentID, vacancyID uuid.UUID, coverLetter s
 	app := &models.Application{
 		StudentID:   studentID,
 		VacancyID:   vacancyID,
+		EmployerID:  employerID,
 		CoverLetter: coverLetter,
 		Status:      "applied",
 		MatchScore:  matchScore,

@@ -31,6 +31,9 @@ type Config struct {
 	SMTPUser     string
 	SMTPPassword string
 	SMTPFrom     string
+
+	// Redis
+	RedisURL string
 }
 
 // LoadConfig загружает конфигурацию из переменных окружения
@@ -47,6 +50,7 @@ func LoadConfig() (*Config, error) {
 		DBName:     getEnv("DB_NAME", "postgres"),
 		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
 		JWTSecret:    getEnv("JWT_SECRET", "some_jwt_secret"),
+		RedisURL:     getEnv("REDIS_URL", "redis://localhost:6379/0"),
 		SMTPHost:     getEnv("SMTP_HOST", "smtp.gmail.com"),
 		SMTPPort:     getEnv("SMTP_PORT", "587"),
 		SMTPUser:     getEnv("SMTP_USER", ""),
