@@ -93,8 +93,10 @@ const EmployerDashboardPage = () => {
   const [myJobs, setMyJobs] = useState<JobPosting[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
   const [jobsError, setJobsError] = useState('');
+  const [vacancyAppCounts, setVacancyAppCounts] = useState<Record<string, number>>({});
 
   const [applications, setApplications] = useState<Application[]>([]);
+  const [allApplications, setAllApplications] = useState<Application[]>([]);
   const [appsLoading, setAppsLoading] = useState(false);
   const [appsError, setAppsError] = useState('');
   const [selectedVacancyId, setSelectedVacancyId] = useState('');
@@ -135,6 +137,18 @@ const EmployerDashboardPage = () => {
       setAppsError(t('employerDashboard.errors.loadApplications'));
     } finally {
       setAppsLoading(false);
+    }
+  };
+
+  const fetchAllApplicationsForOverview = async (jobs: JobPosting[]) => {
+    if (jobs.length === 0) { setAllApplications([]); return; }
+    try {
+      const results = await Promise.all(
+        jobs.map(j => applicationService.getVacancyApplications(j.id).catch(() => [] as Application[]))
+      );
+      setAllApplications(results.flat());
+    } catch {
+      setAllApplications([]);
     }
   };
 
@@ -218,9 +232,27 @@ const EmployerDashboardPage = () => {
   };
 
   useEffect(() => {
-    if (activeTab === 'jobs' || activeTab === 'applications') fetchMyJobs();
+    if (activeTab === 'jobs') {
+      employerService.getJobPostings().then(jobs => {
+        setMyJobs(jobs);
+        Promise.all(
+          jobs.map(j => applicationService.getVacancyApplications(j.id).catch(() => [] as Application[]))
+        ).then(results => {
+          const counts: Record<string, number> = {};
+          jobs.forEach((j, i) => { counts[j.id] = results[i].length; });
+          setVacancyAppCounts(counts);
+        });
+      }).catch(() => {});
+    }
+    if (activeTab === 'applications') fetchMyJobs();
     if (activeTab === 'profile') fetchProfile();
-    if (activeTab === 'overview') { fetchMyJobs(); fetchProfile(); }
+    if (activeTab === 'overview') {
+      fetchProfile();
+      employerService.getJobPostings().then(jobs => {
+        setMyJobs(jobs);
+        fetchAllApplicationsForOverview(jobs);
+      }).catch(() => {});
+    }
     if (activeTab === 'employment') fetchEmploymentRecords();
   }, [activeTab]);
 
@@ -405,32 +437,42 @@ const EmployerDashboardPage = () => {
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h3 className="font-bold text-gray-900 mb-4">{t('employerDashboard.overview.hiringFunnel')}</h3>
               <div className="space-y-3">
-                {[
-                  { label: t('employerDashboard.funnel.submitted'),  n: applications.length || 0,                                        w: 100, color: '#2563EB' },
-                  { label: t('employerDashboard.funnel.review'),     n: Math.round((applications.length || 0) * 0.5),                    w: 50,  color: '#F59E0B' },
-                  { label: t('employerDashboard.funnel.interview'),  n: applications.filter(a => a.status === 'interview').length,       w: 22,  color: '#7C3AED' },
-                  { label: t('employerDashboard.funnel.offered'),    n: applications.filter(a => a.status === 'offered').length,         w: 7.7, color: '#10B981' },
-                ].map((r, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 w-24 sm:w-32 shrink-0 truncate">{r.label}</span>
-                    <div className="flex-1 h-7 bg-gray-100 rounded-md overflow-hidden">
-                      <div className="h-full rounded-md flex items-center px-2.5 text-white text-xs font-semibold transition-all" style={{ width: `${Math.max(r.w, 5)}%`, background: r.color }}>
-                        {r.n}
+                {(() => {
+                  const total = allApplications.length;
+                  const maxN = total || 1;
+                  const reviewN = allApplications.filter(a => a.status === 'applied' || a.status === 'shortlisted').length;
+                  const interviewN = allApplications.filter(a => a.status === 'interview').length;
+                  const offeredN = allApplications.filter(a => a.status === 'offered').length;
+                  return [
+                    { label: t('employerDashboard.funnel.submitted'),  n: total,      color: '#2563EB' },
+                    { label: t('employerDashboard.funnel.review'),     n: reviewN,    color: '#F59E0B' },
+                    { label: t('employerDashboard.funnel.interview'),  n: interviewN, color: '#7C3AED' },
+                    { label: t('employerDashboard.funnel.offered'),    n: offeredN,   color: '#10B981' },
+                  ].map((r, i) => {
+                    const pct = r.n > 0 ? Math.max((r.n / maxN) * 100, 5) : 0;
+                    return (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="text-sm text-gray-700 w-24 sm:w-32 shrink-0 truncate">{r.label}</span>
+                        <div className="flex-1 h-7 bg-gray-100 rounded-md overflow-hidden">
+                          <div className="h-full rounded-md flex items-center px-2.5 text-white text-xs font-semibold transition-all" style={{ width: `${pct}%`, background: r.color }}>
+                            {r.n}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  });
+                })()}
               </div>
             </div>
 
             {/* Recent applications */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h3 className="font-bold text-gray-900 mb-4">{t('employerDashboard.overview.recentApplications', { defaultValue: 'Последние заявки' })}</h3>
-              {applications.length === 0 ? (
+              {allApplications.length === 0 ? (
                 <p className="text-sm text-gray-500 py-4 text-center">{t('employerDashboard.applications.selectToView')}</p>
               ) : (
                 <div className="space-y-2">
-                  {applications.slice(0, 3).map(app => {
+                  {allApplications.slice(0, 3).map(app => {
                     const name = app.student ? `${app.student.first_name} ${app.student.last_name}`.trim() || 'Студент' : 'Студент';
                     const bg = statusBg[app.status] || '#EFF6FF';
                     const fg = statusFg[app.status] || '#1D4ED8';
@@ -526,14 +568,10 @@ const EmployerDashboardPage = () => {
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-center pt-3 border-t border-gray-100">
+                <div className="grid grid-cols-2 gap-2 text-center pt-3 border-t border-gray-100">
                   <div>
-                    <p className="text-base font-bold text-gray-900">—</p>
+                    <p className="text-base font-bold text-gray-900">{vacancyAppCounts[job.id] ?? '—'}</p>
                     <p className="text-[10px] text-gray-500">{t('employerDashboard.jobs.viewApplications')}</p>
-                  </div>
-                  <div>
-                    <p className="text-base font-bold text-gray-900">—</p>
-                    <p className="text-[10px] text-gray-500">{t('employerDashboard.jobs.views', { defaultValue: 'просмотров' })}</p>
                   </div>
                   <div>
                     <p className="text-base font-bold text-gray-900 text-xs">{new Date(job.created_at).toLocaleDateString('ru-RU')}</p>

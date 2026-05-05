@@ -179,6 +179,26 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	})
 }
 
+// Logout отзывает refresh токен пользователя
+func (h *AuthHandler) Logout(c *gin.Context) {
+	var req dto.RefreshRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Ошибка валидации",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.Logout(req.RefreshToken); err != nil {
+		handleServiceError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Выход выполнен успешно"})
+}
+
 // ResetPassword сбрасывает пароль по коду
 func (h *AuthHandler) ResetPassword(c *gin.Context) {
 	var req dto.ResetPasswordRequest

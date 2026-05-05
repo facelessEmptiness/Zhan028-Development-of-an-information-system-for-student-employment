@@ -28,6 +28,7 @@ func SetupRouter(authHandler *handler.AuthHandler, jwtManager *jwt.JWTManager) *
 			auth.POST("/register", authHandler.Register)
 			auth.POST("/login", authHandler.Login)
 			auth.POST("/refresh", authHandler.RefreshToken)
+			auth.POST("/logout", authHandler.Logout)
 
 			// Email подтверждение
 			auth.POST("/verify-email", authHandler.VerifyEmail)

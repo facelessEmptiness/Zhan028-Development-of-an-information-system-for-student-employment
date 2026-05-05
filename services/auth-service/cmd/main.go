@@ -60,7 +60,8 @@ func main() {
 	// Инициализация слоёв приложения
 	userRepo := repository.NewUserRepository(db)
 	codeRepo := repository.NewRedisVerificationCodeRepository(redisClient)
-	authService := service.NewAuthService(userRepo, codeRepo, jwtManager, emailService)
+	tokenRepo := repository.NewRedisRefreshTokenRepository(redisClient)
+	authService := service.NewAuthService(userRepo, codeRepo, tokenRepo, jwtManager, emailService)
 	authHandler := handler.NewAuthHandler(authService)
 
 	// Создание и настройка роутера

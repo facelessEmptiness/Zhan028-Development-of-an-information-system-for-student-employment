@@ -46,14 +46,13 @@ export interface ApplicationReview {
 export const employerService = {
   // Get company profile
   getCompanyProfile: async (_employerId: string) => {
-    // TODO: Replace with actual API call
-    return {
-      name: 'Tech Innovators Inc',
-      description: 'Leading software development company',
-      location: 'Astana, Kazakhstan',
-      website: 'https://example.com',
-      industry: 'Technology',
-    };
+    try {
+      const res = await apiFetch(`${API_BASE}/employers/profile`);
+      if (!res.ok) return null;
+      return res.json();
+    } catch {
+      return null;
+    }
   },
 
   // Get all job postings for employer (my vacancies)
@@ -109,55 +108,55 @@ export const employerService = {
     return res.ok;
   },
 
-  // Search candidates
+  // Search candidates — not yet supported by backend
   searchCandidates: async (_employerId: string, _filters?: any): Promise<CandidateProfile[]> => {
-    // TODO: Replace with actual API call
-    return [
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-        university: 'Kazakh National University',
-        major: 'Computer Science',
-        skills: ['JavaScript', 'React', 'Node.js'],
-        experience: '2 years of full-stack development',
-        matchIndex: 85,
+    return [];
+  },
+
+  // Get candidate profile by user_id
+  getCandidateProfile: async (_employerId: string, candidateId: number): Promise<CandidateProfile | null> => {
+    try {
+      const res = await apiFetch(`${API_BASE}/students/${candidateId}`);
+      if (!res.ok) return null;
+      const s = await res.json();
+      return {
+        id: candidateId,
+        name: `${s.first_name} ${s.last_name}`,
+        email: '',
+        university: s.university_id ?? '',
+        major: s.specialization ?? '',
+        skills: s.skills ? s.skills.split(',').map((x: string) => x.trim()) : [],
+        experience: s.bio ?? '',
+        matchIndex: 0,
         resumeUrl: '#',
-      },
-    ];
+      };
+    } catch {
+      return null;
+    }
   },
 
-  // Get candidate profile
-  getCandidateProfile: async (_employerId: string, candidateId: number): Promise<CandidateProfile> => {
-    // TODO: Replace with actual API call
-    return {
-      id: candidateId,
-      name: 'John Doe',
-      email: 'john@example.com',
-      university: 'Kazakh National University',
-      major: 'Computer Science',
-      skills: ['JavaScript', 'React', 'Node.js'],
-      experience: '2 years of full-stack development',
-      matchIndex: 85,
-      resumeUrl: '#',
-    };
-  },
-
-  // Get applications for job
+  // Get applications for a vacancy
   getApplicationsForJob: async (_employerId: string, jobId: number): Promise<ApplicationReview[]> => {
-    // TODO: Replace with actual API call
-    return [
-      {
-        id: 1,
+    try {
+      const res = await apiFetch(`${API_BASE}/applications/vacancy/${jobId}`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      const apps = Array.isArray(data) ? data : (data.applications ?? []);
+      return apps.map((a: any) => ({
+        id: a.id,
         jobId,
-        candidateId: 1,
-        candidateName: 'John Doe',
-        status: 'interview',
-        appliedDate: '2024-02-01',
-        matchIndex: 85,
-        notes: 'Strong candidate, good technical skills',
-      },
-    ];
+        candidateId: a.student_id,
+        candidateName: a.student
+          ? `${a.student.first_name} ${a.student.last_name}`
+          : a.student_id,
+        status: a.status,
+        appliedDate: new Date(a.created_at).toLocaleDateString('ru-RU'),
+        matchIndex: a.match_score ?? 0,
+        notes: a.cover_letter ?? '',
+      }));
+    } catch {
+      return [];
+    }
   },
 
   // Update application status
@@ -166,37 +165,57 @@ export const employerService = {
     applicationId: number,
     status: ApplicationReview['status']
   ): Promise<boolean> => {
-    // TODO: Replace with actual API call
-    console.log('Updating application status:', applicationId, status);
-    return true;
+    try {
+      const res = await apiFetch(`${API_BASE}/applications/${applicationId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
   },
 
-  // Send offer to candidate
-  sendOffer: async (_employerId: string, applicationId: number, offerData: any): Promise<boolean> => {
-    // TODO: Replace with actual API call
-    console.log('Sending offer for application:', applicationId, offerData);
-    return true;
+  // Send offer — sets application status to "offered"
+  sendOffer: async (_employerId: string, applicationId: number, _offerData: any): Promise<boolean> => {
+    try {
+      const res = await apiFetch(`${API_BASE}/applications/${applicationId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'offered' }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
   },
 
-  // Schedule interview
+  // Schedule interview — delegated to interviewService
   scheduleInterview: async (
     _employerId: string,
-    applicationId: number,
-    interviewData: any
+    _applicationId: number,
+    _interviewData: any
   ): Promise<boolean> => {
-    // TODO: Replace with actual API call
-    console.log('Scheduling interview for application:', applicationId, interviewData);
-    return true;
+    return false;
   },
 
-  // Get employer statistics
+  // Get employer statistics from analytics
   getStatistics: async (_employerId: string) => {
-    // TODO: Replace with actual API call
-    return {
-      activeJobs: 5,
-      totalApplications: 124,
-      interviewsScheduled: 12,
-      hiresThisMonth: 3,
-    };
+    try {
+      const [jobs, res] = await Promise.all([
+        employerService.getJobPostings(),
+        apiFetch('/api/analytics/summary'),
+      ]);
+      const summary = res.ok ? await res.json() : null;
+      return {
+        activeJobs: jobs.filter(j => j.status === 'active').length,
+        totalApplications: summary?.applications?.total ?? 0,
+        interviewsScheduled: 0,
+        hiresThisMonth: summary?.applications?.offered_count ?? 0,
+      };
+    } catch {
+      return { activeJobs: 0, totalApplications: 0, interviewsScheduled: 0, hiresThisMonth: 0 };
+    }
   },
 };

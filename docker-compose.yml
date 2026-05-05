@@ -118,7 +118,7 @@ services:
       dockerfile: Dockerfile
     container_name: auth-service
     ports:
-      - "8081:8080"
+      - "8081:8081"
     environment:
       DB_HOST: users-db
       DB_PORT: 5432
@@ -126,7 +126,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: postgres
       JWT_SECRET: ${JWT_SECRET}
-      SERVICE_PORT: 8080
+      SERVER_PORT: 8081
       SMTP_HOST: smtp.gmail.com
       SMTP_PORT: "587"
       SMTP_USER: ${SMTP_USER}

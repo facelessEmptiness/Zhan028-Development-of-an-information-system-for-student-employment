@@ -31,11 +31,11 @@ func universityIDFromRequest(raw string) *uuid.UUID {
 
 // Ошибки сервиса аутентификации
 var (
-	ErrInvalidCredentials  = errors.New("неверный email или пароль")
-	ErrUserNotActive       = errors.New("учётная запись деактивирована")
-	ErrInvalidRole         = errors.New("недопустимая роль пользователя")
-	ErrEmailNotVerified    = errors.New("email не подтверждён")
-	ErrInvalidCode         = errors.New("неверный или просроченный код")
+	ErrInvalidCredentials   = errors.New("неверный email или пароль")
+	ErrUserNotActive        = errors.New("учётная запись деактивирована")
+	ErrInvalidRole          = errors.New("недопустимая роль пользователя")
+	ErrEmailNotVerified     = errors.New("email не подтверждён")
+	ErrInvalidCode          = errors.New("неверный или просроченный код")
 	ErrEmailAlreadyVerified = errors.New("email уже подтверждён")
 )
 
@@ -45,6 +45,7 @@ type AuthService interface {
 	Login(req *dto.LoginRequest) (*dto.AuthResponse, error)
 	GetProfile(userID uuid.UUID) (*dto.UserResponse, error)
 	RefreshToken(refreshToken string) (*dto.TokenResponse, error)
+	Logout(refreshToken string) error
 	SendEmailVerification(emailAddr string) error
 	VerifyEmail(req *dto.VerifyEmailRequest) (*dto.AuthResponse, error)
 	ForgotPassword(req *dto.ForgotPasswordRequest) error
@@ -55,6 +56,7 @@ type AuthService interface {
 type authService struct {
 	userRepo     repository.UserRepository
 	codeRepo     repository.VerificationCodeRepository
+	tokenRepo    repository.RefreshTokenRepository
 	jwtManager   *jwt.JWTManager
 	emailService *email.EmailService
 }
@@ -63,12 +65,14 @@ type authService struct {
 func NewAuthService(
 	userRepo repository.UserRepository,
 	codeRepo repository.VerificationCodeRepository,
+	tokenRepo repository.RefreshTokenRepository,
 	jwtManager *jwt.JWTManager,
 	emailService *email.EmailService,
 ) AuthService {
 	return &authService{
 		userRepo:     userRepo,
 		codeRepo:     codeRepo,
+		tokenRepo:    tokenRepo,
 		jwtManager:   jwtManager,
 		emailService: emailService,
 	}
@@ -186,11 +190,17 @@ func (s *authService) GetProfile(userID uuid.UUID) (*dto.UserResponse, error) {
 	return &response, nil
 }
 
-// RefreshToken обновляет access токен
+// RefreshToken проверяет refresh токен, отзывает его и выдаёт новую пару (rotation)
 func (s *authService) RefreshToken(refreshToken string) (*dto.TokenResponse, error) {
 	claims, err := s.jwtManager.ValidateRefreshToken(refreshToken)
 	if err != nil {
 		return nil, err
+	}
+
+	// Проверяем, что токен ещё активен (не был отозван или использован)
+	exists, err := s.tokenRepo.Exists(claims.ID)
+	if err != nil || !exists {
+		return nil, jwt.ErrInvalidToken
 	}
 
 	user, err := s.userRepo.FindByID(claims.UserID)
@@ -202,15 +212,22 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.TokenResponse, err
 		return nil, ErrUserNotActive
 	}
 
-	refreshUniIDStr := ""
+	uniIDStr := ""
 	if user.UniversityID != nil {
-		refreshUniIDStr = user.UniversityID.String()
+		uniIDStr = user.UniversityID.String()
 	}
 
-	newAccessToken, newRefreshToken, err := s.jwtManager.GenerateTokenPair(
-		user.ID, user.Email, string(user.Role), refreshUniIDStr,
+	// Rotation: отзываем старый токен перед выдачей нового
+	_ = s.tokenRepo.Delete(claims.ID)
+
+	newAccessToken, newRefreshToken, refreshJTI, err := s.jwtManager.GenerateTokenPair(
+		user.ID, user.Email, string(user.Role), uniIDStr,
 	)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := s.tokenRepo.Store(refreshJTI, user.ID.String(), s.jwtManager.GetRefreshDuration()); err != nil {
 		return nil, err
 	}
 
@@ -220,6 +237,15 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.TokenResponse, err
 		TokenType:    "Bearer",
 		ExpiresIn:    s.jwtManager.GetAccessDuration(),
 	}, nil
+}
+
+// Logout отзывает refresh токен — повторный refresh вернёт 401
+func (s *authService) Logout(refreshToken string) error {
+	claims, err := s.jwtManager.ValidateRefreshToken(refreshToken)
+	if err != nil {
+		return err
+	}
+	return s.tokenRepo.Delete(claims.ID)
 }
 
 // SendEmailVerification повторно отправляет код подтверждения email
@@ -347,17 +373,21 @@ func (s *authService) ResetPassword(req *dto.ResetPasswordRequest) error {
 	return nil
 }
 
-// buildAuthResponse формирует ответ с токенами
+// buildAuthResponse формирует ответ с токенами и сохраняет refresh JTI в Redis
 func (s *authService) buildAuthResponse(user *models.User) (*dto.AuthResponse, error) {
 	uniIDStr := ""
 	if user.UniversityID != nil {
 		uniIDStr = user.UniversityID.String()
 	}
 
-	accessToken, refreshToken, err := s.jwtManager.GenerateTokenPair(
+	accessToken, refreshToken, refreshJTI, err := s.jwtManager.GenerateTokenPair(
 		user.ID, user.Email, string(user.Role), uniIDStr,
 	)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := s.tokenRepo.Store(refreshJTI, user.ID.String(), s.jwtManager.GetRefreshDuration()); err != nil {
 		return nil, err
 	}
 

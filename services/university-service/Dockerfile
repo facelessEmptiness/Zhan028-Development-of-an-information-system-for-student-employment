@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.23 AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/main.go
 
 # Run stage
-FROM alpine:latest
+FROM alpine:3.21
 
 WORKDIR /app
 

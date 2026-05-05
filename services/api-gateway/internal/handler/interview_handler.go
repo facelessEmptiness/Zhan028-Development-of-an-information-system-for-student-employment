@@ -127,11 +127,6 @@ func (h *InterviewHandler) GetByApplication(c *gin.Context) {
 // DELETE /api/interviews/:id - employer cancels an interview
 func (h *InterviewHandler) Cancel(c *gin.Context) {
 	id := c.Param("id")
-
-	// Get the interview first to find student_id for notification
-	getURL := fmt.Sprintf("%s/api/interviews/application/placeholder", h.appServiceURL)
-	_ = getURL // We'll notify after cancel
-
 	h.proxyToAppService(c, "DELETE", "/api/interviews/"+id)
 }
 

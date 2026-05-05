@@ -674,6 +674,7 @@
   },
   "employerDashboard": {
     "title": "Employer Dashboard",
+    "updatedNow": "updated just now",
     "tabs": {
       "overview": "Overview",
       "jobs": "Jobs",
@@ -704,7 +705,7 @@
       "offered": "Offered"
     },
     "jobs": {
-      "postNew": "+ Post New Job",
+      "postNew": "Post New Job",
       "loading": "Loading jobs...",
       "empty": "You have no vacancies yet",
       "emptyHint": "Click the button above to publish your first vacancy",
