@@ -39,6 +39,7 @@ function validateIIN(iin: string, t: (key: string) => string): string | null {
 }
 
 import { applicationService, type Application } from '../services/applicationService';
+import { EDUCATIONAL_PROGRAMS, PROGRAM_I18N_KEY } from '../constants/programs';
 import { apiFetch } from '../utils/apiClient';
 import { getUniversities, type University } from '../services/universityService';
 import { documentService, type Document, type DocumentType, getTypeKey } from '../services/documentService';
@@ -100,6 +101,7 @@ const StudentProfilePage = () => {
   const [universities, setUniversities] = useState<University[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [appsLoading, setAppsLoading] = useState(false);
+  const [vacancyMap, setVacancyMap] = useState<Record<string, { title: string; company_name: string }>>({});
   const [chatAppId, setChatAppId] = useState<string | null>(null);
   const [chatCompanyName, setChatCompanyName] = useState<string>('');
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -109,6 +111,10 @@ const StudentProfilePage = () => {
 
   const openChatForApp = async (app: Application) => {
     setChatAppId(app.id);
+    if (vacancyMap[app.vacancy_id]) {
+      setChatCompanyName(vacancyMap[app.vacancy_id].company_name || t('chat.employer'));
+      return;
+    }
     try {
       const res = await apiFetch(`/api/vacancies/${app.vacancy_id}`);
       if (res.ok) { const v = await res.json(); setChatCompanyName(v.company_name || t('chat.employer')); }
@@ -161,7 +167,25 @@ const StudentProfilePage = () => {
   useEffect(() => {
     if (activeTab === 'applications') {
       setAppsLoading(true);
-      applicationService.getMyApplications().then(setApplications).catch(() => setApplications([])).finally(() => setAppsLoading(false));
+      applicationService.getMyApplications()
+        .then(apps => {
+          setApplications(apps);
+          const uniqueIds = [...new Set(apps.map(a => a.vacancy_id))];
+          Promise.all(
+            uniqueIds.map(id =>
+              apiFetch(`/api/vacancies/${id}`)
+                .then(r => r.ok ? r.json() : null)
+                .then(v => v ? ([id, { title: v.title as string, company_name: v.company_name as string }] as const) : null)
+                .catch(() => null)
+            )
+          ).then(results => {
+            const map: Record<string, { title: string; company_name: string }> = {};
+            results.forEach(r => { if (r) map[r[0]] = r[1]; });
+            setVacancyMap(map);
+          });
+        })
+        .catch(() => setApplications([]))
+        .finally(() => setAppsLoading(false));
     }
   }, [activeTab]);
 
@@ -519,8 +543,13 @@ const StudentProfilePage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('profile.form.specialization')}</label>
-                <input name="specialization" value={formData.specialization} onChange={handleChange} placeholder={t('profile.form.specializationPlaceholder')}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <select name="specialization" value={formData.specialization} onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                  <option value="">{t('profile.form.specializationPlaceholder')}</option>
+                  {EDUCATIONAL_PROGRAMS.map(p => (
+                    <option key={p} value={p}>{t(`programNames.${PROGRAM_I18N_KEY[p]}`, p)}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -601,7 +630,9 @@ const StudentProfilePage = () => {
             <div key={app.id} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 flex-wrap sm:flex-nowrap">
               {app.match_score > 0 && <MatchIndex percentage={app.match_score} size="sm" showLabel={false} />}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate">{t('profile.applications.vacancy', { defaultValue: 'Вакансия' })} #{app.vacancy_id?.slice(0, 8)}</p>
+                <p className="font-semibold text-gray-900 truncate">
+                  {vacancyMap[app.vacancy_id]?.title ?? `${t('profile.applications.vacancy', { defaultValue: 'Вакансия' })} #${app.vacancy_id?.slice(0, 8)}`}
+                </p>
                 <p className="text-sm text-gray-500">{new Date(app.created_at).toLocaleDateString('ru-RU')}</p>
                 {app.cover_letter && (
                   <p className="text-xs text-gray-500 mt-1 italic line-clamp-1">«{app.cover_letter}»</p>

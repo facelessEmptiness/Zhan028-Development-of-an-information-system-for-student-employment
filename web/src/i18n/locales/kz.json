@@ -70,7 +70,7 @@
       "profileCompletion": "Профиль толтырылуы",
       "fillProfile": "Профильді толтыру →",
       "myApplications": "Менің өтініштерім",
-      "viewAll": "Барлығын қарау →",
+      "viewAll": "Барлығын қарау",
       "profileCard": "Менің профилім",
       "profileDesc": "Резюме мен ақпаратты толтырыңыз",
       "jobsCard": "Жұмыс орындары",
@@ -268,8 +268,8 @@
       "iin": "ЖСН",
       "graduationYear": "Бітіру жылы",
       "gpa": "GPA",
-      "diplomaVerified": "Диплом расталды ✅",
-      "diplomaNotVerified": "Диплом расталмады",
+      "diplomaVerified": "Анықтама расталды ✅",
+      "diplomaNotVerified": "Анықтама расталмады",
       "diplomaVerifiedHint": "{{date}} күні автоматты түрде расталды",
       "diplomaNotVerifiedHint": "Автоматты растау үшін университетті, мамандығыңызды және бітіру жылыңызды толтырыңыз"
     },
@@ -314,7 +314,7 @@
     },
     "stats": {
       "completion": "Толтырылуы",
-      "diploma": "Диплом"
+      "diploma": "Анықтама"
     },
     "loading": "Профиль жүктелуде...",
     "iinError": {
@@ -652,7 +652,7 @@
   },
   "docTypes": {
     "cv": "CV / Түйіндеме",
-    "diploma": "Диплом",
+    "diploma": "Анықтама",
     "certificate": "Сертификат"
   },
   "jobs": {
@@ -785,6 +785,7 @@
     "loading": "Аналитика жүктелуде...",
     "tabs": {
       "overview": "Шолу",
+      "programs": "ББ",
       "myStudents": "Менің студенттерім",
       "docReview": "Құжаттар",
       "employment": "Жұмысқа орналасу",
@@ -801,10 +802,12 @@
     "overview": {
       "applicationStatuses": "Студенттердің өтініш статусы",
       "noApplicationData": "Өтініш деректері әлі жоқ",
-      "conversionRate": "Ұсыныс конверсиясы",
+      "conversionRate": "Өтініштен ұсынысқа конверсия",
       "offersFromApplications": "{{offers}} ұсыныс {{total}} өтініштен",
       "vacanciesByLocation": "Қала бойынша бос орындар",
-      "noVacancies": "Бос орындар әлі жоқ"
+      "noVacancies": "Бос орындар әлі жоқ",
+      "realEmploymentRate": "Нақты жұмысқа орналасу",
+      "employedStudents": "{{total}} студенттің {{employed}}-і"
     },
     "myStudents": {
       "title": "Сіздің университетіңіздегі студенттер",
@@ -830,8 +833,19 @@
       "download": "Жүктеп алу",
       "verify": "Растау",
       "reject": "Бас тарту",
-      "specializationNotSet": "Мамандығы көрсетілмеген"
+      "specializationNotSet": "Мамандығы көрсетілмеген",
+      "verifiedAt": "Расталды {{date}}",
+      "rejectedAt": "Бас тартылды {{date}}",
+      "comment": "Себеп: {{text}}"
     },
+    "rejectModal": {
+      "title": "Анықтаманы бас тарту себебі",
+      "placeholder": "Себепті көрсетіңіз (міндетті емес)...",
+      "confirm": "Бас тарту",
+      "cancel": "Болдырмау"
+    },
+    "pendingAlert": "{{count}} студент анықтаманы тексеруді күтеді",
+    "pendingAlertSingle": "{{count}} студент анықтаманы тексеруді күтеді",
     "students": {
       "bySpecialization": "Мамандығы бойынша студенттер",
       "totalStudents": "({{total}} барлығы)",
@@ -840,7 +854,17 @@
     },
     "employers": {
       "vacanciesByType": "Түрі бойынша бос орындар таралуы",
-      "percentageOfTotal": "Барлық бос орындардың {{percentage}}%"
+      "percentageOfTotal": "Барлық бос орындардың {{percentage}}%",
+      "companiesTitle": "Студенттерді жалдаған компаниялар",
+      "companiesHint": "Жұмысқа орналасуды бақылау деректері бойынша",
+      "noHires": "Жұмысқа орналасу деректері жоқ",
+      "noHiresHint": "Деректерді жүктеу үшін «Жұмысқа орналасу» қойындысына өтіңіз",
+      "studentsHired": "{{count}} студент",
+      "active": "қазір жұмыс істейді",
+      "completed": "аяқталды",
+      "companyIndustry": "Сала",
+      "companyStudents": "Студенттер",
+      "companyPositions": "Лауазымдар"
     },
     "statistics": {
       "demandedSkills": "Ең сұранысқа ие дағдылар",
@@ -855,7 +879,17 @@
         "offersReceived": "Алынған ұсыныстар",
         "conversionRate": "Ұсыныс конверсиясы",
         "uniqueSkills": "Бос орындардағы бірегей дағдылар"
-      }
+      },
+      "employmentByProgram": "БП бойынша жұмысқа орналасу",
+      "employmentByProgramHint": "Білім беру бағдарламалары бойынша жұмысқа орналасқан түлектердің %",
+      "yearDynamics": "Бітіру жылдары бойынша динамика",
+      "yearDynamicsHint": "Бітіру жылы бойынша студенттер саны мен жұмысқа орналасу %",
+      "gpaDistribution": "GPA таралуы",
+      "gpaDistributionHint": "Үлгерім деңгейлері бойынша студенттер саны",
+      "noStudentData": "Студенттер туралы деректер жоқ. Студенттер тіркелгеннен кейін пайда болады.",
+      "employed": "жұмысқа орналасты",
+      "students": "студент",
+      "paginationNote": "Белгілі шектеу: барлық студенттер бір сұраныспен жүктеледі. 500+ студент болса, сервер жағынан беттеу ұсынылады."
     },
     "status": {
       "applied": "Өтініш берілді",
@@ -882,10 +916,63 @@
       "docRejected": "Құжатқа бас тартылды"
     },
     "autoVerify": {
-      "button": "Дипломды авто-растау",
+      "button": "Анықтаманы авто-растау",
       "success": "{{count}} құжат автоматты расталды",
       "noPending": "Расталатын құжаттар жоқ",
       "error": "Құжаттарды авто-растау мүмкін болмады"
+    },
+    "programs": {
+      "title": "Білім беру бағдарламалары",
+      "searchPlaceholder": "ББ іздеу...",
+      "exportPdf": "PDF есебі",
+      "exportCsv": "CSV",
+      "noData": "Деректер жоқ",
+      "noDataHint": "Студенттер профильде ББ толтырмаған",
+      "donutTotal": "барлығы",
+      "cards": {
+        "totalStudents": "Барлық студент",
+        "activePrograms": "Белсенді ББ",
+        "employed": "Жұмысқа орналасқан",
+        "avgGpa": "Орташа GPA"
+      },
+      "columns": {
+        "students": "студент",
+        "avgGpa": "орт. GPA",
+        "employed": "жұмыс."
+      },
+      "table": {
+        "student": "Студент",
+        "graduation": "Бітіру",
+        "skills": "Дағдылар",
+        "status": "Мәртебе",
+        "graduationYear": "Бітіру жылы"
+      },
+      "employedBadge": "✓ Жұмысқа орналасқан",
+      "seekingBadge": "Жұмыс іздеуде",
+      "unassignedWarning": "ББ жоқ студенттер — {{count}} адам (толтыру керек)",
+      "allPrograms": "Жүйедегі барлық ББ",
+      "popupBlocked": "Браузерде қалқымалы терезелерге рұқсат беріңіз",
+      "studentSearchPlaceholder": "Студент іздеу...",
+      "noStudentsFound": "Студенттер табылмады",
+      "pendingDocsCount": "{{count}} тексеруді күтеді",
+      "pdf": {
+        "title": "Университет студенттері туралы есеп",
+        "generated": "Жасалған күні:",
+        "totalStudents": "Барлық студент",
+        "activePrograms": "Белсенді ББ",
+        "employed": "Жұмысқа орналасқан",
+        "employmentRate": "Жұмысқа орналасу пайызы",
+        "avgGpa": "Орташа GPA",
+        "colStudent": "Студент",
+        "colProgram": "Білім беру бағдарламасы",
+        "colGpa": "GPA",
+        "colGraduation": "Бітіру",
+        "colSkills": "Дағдылар",
+        "colStatus": "Мәртебе",
+        "employedStatus": "✓ Жұмысқа орналасқан",
+        "seekingStatus": "Жұмыс іздеуде",
+        "footer": "Студенттерді жұмысқа орналастыру жүйесі жасады"
+      }
     }
   },
   "interview": {
@@ -999,5 +1086,31 @@
       "yesterday": "кеше",
       "daysAgo": "{{d}} күн бұрын"
     }
+  },
+  "programNames": {
+    "softwareEngineering":         "Бағдарламалық инженерия",
+    "computerScience":             "Информатика",
+    "bigDataAnalysis":             "Үлкен деректерді талдау",
+    "mathComputationalScience":    "Математика және есептеу ғылымдары",
+    "cybersecurity":               "Киберқауіпсіздік",
+    "smartSecurityTechnologies":   "Ақылды қауіпсіздік технологиялары",
+    "industrialIoT":               "Өнеркәсіптік заттар интернеті",
+    "electronicEngineering":       "Электрондық инженерия",
+    "smartTechnologies":           "Ақылды технологиялар",
+    "digitalTechNuclearPower":     "Атом энергетикасындағы цифрлық технологиялар",
+    "itManagement":                "IT-менеджмент",
+    "itEntrepreneurship":          "IT-кәсіпкерлік",
+    "aiBusiness":                  "ЖИ-бизнес",
+    "mediaTechnologies":           "Медиатехнологиялар",
+    "digitalJournalism":           "Цифрлық журналистика",
+    "digitalPublicAdministration": "Цифрлық мемлекеттік басқару"
+  },
+  "programSchools": {
+    "schoolSoftwareEngineering":   "Бағдарламалық инженерия мектебі",
+    "schoolAIDataScience":         "Жасанды интеллект және деректер ғылымы мектебі",
+    "schoolCybersecurity":         "Киберқауіпсіздік мектебі",
+    "schoolIntelligentSystems":    "Интеллектуалды жүйелер мектебі",
+    "schoolCreativeIndustries":    "Шығармашылық индустриялар мектебі",
+    "schoolDigitalGovernance":     "Цифрлық мемлекеттік басқару мектебі"
   }
 }

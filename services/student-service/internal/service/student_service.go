@@ -22,20 +22,6 @@ var (
 	ErrIINTooYoung          = errors.New("по данным ИИН вам меньше 16 лет — регистрация студентов недоступна")
 )
 
-// autoVerifyDiploma автоматически верифицирует диплом студента,
-// если заполнены ключевые академические данные: университет, год выпуска и специализация.
-func autoVerifyDiploma(s *models.Student) {
-	if s.UniversityID != nil && s.GraduationYear > 0 && s.Specialization != "" {
-		if !s.DiplomaVerified {
-			now := time.Now()
-			s.DiplomaVerified = true
-			s.DiplomaVerifiedAt = &now
-		}
-	} else {
-		s.DiplomaVerified = false
-		s.DiplomaVerifiedAt = nil
-	}
-}
 
 // validateIIN проверяет казахстанский ИИН (12 цифр, контрольная сумма, возраст ≥ 16).
 func validateIIN(iin string) error {
@@ -163,9 +149,6 @@ func (s *StudentService) CreateProfile(userID uuid.UUID, req dto.CreateProfileRe
 		}
 	}
 
-	// Автоматически верифицируем диплом если данные полные
-	autoVerifyDiploma(student)
-
 	if err := s.repo.Create(student); err != nil {
 		return nil, err
 	}
@@ -226,9 +209,6 @@ func (s *StudentService) UpdateProfile(userID uuid.UUID, req dto.UpdateProfileRe
 	}
 	// github_url is always updated (allows clearing to empty)
 	student.GithubUrl = req.GithubUrl
-
-	// Автоматически верифицируем/снимаем диплом при изменении академических данных
-	autoVerifyDiploma(student)
 
 	if err := s.repo.Update(student); err != nil {
 		return nil, err

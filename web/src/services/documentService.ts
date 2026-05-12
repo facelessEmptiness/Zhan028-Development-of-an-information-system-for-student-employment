@@ -95,6 +95,14 @@ export const documentService = {
     return res.json();
   },
 
+  /** University: count pending diploma docs for all university students */
+  pendingCount: async (): Promise<number> => {
+    const res = await apiFetch(`${BASE}/pending-count`);
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.count ?? 0;
+  },
+
   /** Student: delete own document */
   delete: async (id: string): Promise<void> => {
     const res = await apiFetch(`${BASE}/${id}`, { method: 'DELETE' });

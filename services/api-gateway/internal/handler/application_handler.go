@@ -263,6 +263,15 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 				jobTitle = vacancyResp.GetTitle()
 			}
 
+			// Fetch student's university_id for scoped university access
+			universityID := ""
+			sCtx, sCancel := context.WithTimeout(context.Background(), 3*time.Second)
+			studentResp, sErr := h.studentClient.GetProfile(sCtx, &studentpb.GetProfileRequest{UserId: resp.GetStudentId()})
+			sCancel()
+			if sErr == nil && studentResp != nil {
+				universityID = studentResp.GetUniversityId()
+			}
+
 			payload := map[string]interface{}{
 				"student_id":     resp.GetStudentId(),
 				"employer_id":    employerID,
@@ -270,6 +279,7 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 				"vacancy_id":     resp.GetVacancyId(),
 				"company_name":   companyName,
 				"job_title":      jobTitle,
+				"university_id":  universityID,
 			}
 			CreateEmploymentRecord(h.appHTTPURL, payload)
 		}()

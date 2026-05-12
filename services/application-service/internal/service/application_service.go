@@ -68,6 +68,10 @@ func (s *applicationService) UpdateStatus(id, employerID uuid.UUID, status strin
 		return nil, ErrApplicationNotFound
 	}
 
+	if app.EmployerID != employerID {
+		return nil, ErrForbidden
+	}
+
 	if err := s.repo.UpdateStatus(id, status); err != nil {
 		return nil, err
 	}

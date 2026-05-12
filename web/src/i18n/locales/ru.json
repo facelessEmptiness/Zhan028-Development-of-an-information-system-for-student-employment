@@ -80,7 +80,7 @@
       "profileCompletion": "Заполненность профиля",
       "fillProfile": "Заполнить профиль →",
       "myApplications": "Мои отклики",
-      "viewAll": "Посмотреть все →",
+      "viewAll": "Посмотреть все",
       "profileCard": "Мой профиль",
       "profileDesc": "Заполните резюме и информацию",
       "jobsCard": "Вакансии",
@@ -268,8 +268,8 @@
       "iin": "ИИН",
       "graduationYear": "Год выпуска",
       "gpa": "GPA",
-      "diplomaVerified": "Диплом подтверждён ✅",
-      "diplomaNotVerified": "Диплом не подтверждён",
+      "diplomaVerified": "Справка подтверждена ✅",
+      "diplomaNotVerified": "Справка не подтверждена",
       "diplomaVerifiedHint": "Автоматически верифицирован {{date}}",
       "diplomaNotVerifiedHint": "Заполните университет, специализацию и год выпуска для автоматической верификации"
     },
@@ -314,7 +314,7 @@
     },
     "stats": {
       "completion": "Заполненность",
-      "diploma": "Диплом"
+      "diploma": "Справка"
     },
     "loading": "Загрузка профиля...",
     "iinError": {
@@ -650,7 +650,7 @@
   },
   "docTypes": {
     "cv": "CV / Резюме",
-    "diploma": "Диплом",
+    "diploma": "Справка",
     "certificate": "Сертификат"
   },
   "industries": {
@@ -824,6 +824,7 @@
     "loading": "Загрузка аналитики...",
     "tabs": {
       "overview": "Обзор",
+      "programs": "ОП",
       "myStudents": "Мои студенты",
       "docReview": "Документы",
       "employment": "Трудоустройство",
@@ -840,10 +841,12 @@
     "overview": {
       "applicationStatuses": "Статусы заявок студентов",
       "noApplicationData": "Данных о заявках пока нет",
-      "conversionRate": "Конверсия в оффер",
+      "conversionRate": "Конверсия заявок в оффер",
       "offersFromApplications": "{{offers}} офферов из {{total}} заявок",
       "vacanciesByLocation": "Вакансии по городам",
-      "noVacancies": "Вакансий пока нет"
+      "noVacancies": "Вакансий пока нет",
+      "realEmploymentRate": "Реально трудоустроено",
+      "employedStudents": "{{employed}} из {{total}} студентов"
     },
     "myStudents": {
       "title": "Студенты вашего университета",
@@ -869,8 +872,19 @@
       "download": "Скачать",
       "verify": "Подтвердить",
       "reject": "Отклонить",
-      "specializationNotSet": "Специализация не указана"
+      "specializationNotSet": "Специализация не указана",
+      "verifiedAt": "Подтверждено {{date}}",
+      "rejectedAt": "Отклонено {{date}}",
+      "comment": "Причина: {{text}}"
     },
+    "rejectModal": {
+      "title": "Причина отклонения справки",
+      "placeholder": "Укажите причину отклонения (необязательно)...",
+      "confirm": "Отклонить",
+      "cancel": "Отмена"
+    },
+    "pendingAlert": "{{count}} студентов ожидают проверки справки",
+    "pendingAlertSingle": "{{count}} студент ожидает проверки справки",
     "students": {
       "bySpecialization": "Студенты по специализации",
       "totalStudents": "({{total}} всего)",
@@ -879,7 +893,17 @@
     },
     "employers": {
       "vacanciesByType": "Распределение вакансий по типу",
-      "percentageOfTotal": "{{percentage}}% от всех вакансий"
+      "percentageOfTotal": "{{percentage}}% от всех вакансий",
+      "companiesTitle": "Компании, нанявшие студентов",
+      "companiesHint": "На основе данных мониторинга трудоустройства",
+      "noHires": "Данные о трудоустройстве отсутствуют",
+      "noHiresHint": "Перейдите в «Трудоустройство» чтобы загрузить данные",
+      "studentsHired": "{{count}} студ.",
+      "active": "работают сейчас",
+      "completed": "завершено",
+      "companyIndustry": "Отрасль",
+      "companyStudents": "Студентов",
+      "companyPositions": "Должности"
     },
     "statistics": {
       "demandedSkills": "Самые востребованные навыки",
@@ -894,7 +918,17 @@
         "offersReceived": "Получили оффер",
         "conversionRate": "Конверсия в оффер",
         "uniqueSkills": "Уникальных навыков в вакансиях"
-      }
+      },
+      "employmentByProgram": "Трудоустройство по ОП",
+      "employmentByProgramHint": "% трудоустроенных выпускников по образовательным программам",
+      "yearDynamics": "Динамика по годам выпуска",
+      "yearDynamicsHint": "Количество студентов и % трудоустроенных по году выпуска",
+      "gpaDistribution": "Распределение GPA",
+      "gpaDistributionHint": "Количество студентов по диапазонам академической успеваемости",
+      "noStudentData": "Нет данных о студентах. Студенты появятся после регистрации.",
+      "employed": "трудоустроено",
+      "students": "студ.",
+      "paginationNote": "Известное ограничение: все студенты загружаются одним запросом. При 500+ студентах рекомендуется пагинация на стороне сервера."
     },
     "status": {
       "applied": "Подана",
@@ -921,10 +955,63 @@
       "docRejected": "Документ отклонён"
     },
     "autoVerify": {
-      "button": "Авто-подтвердить диплом",
+      "button": "Авто-подтвердить справку",
       "success": "{{count}} документ(ов) подтверждено автоматически",
       "noPending": "Нет документов ожидающих подтверждения",
       "error": "Не удалось авто-подтвердить документы"
+    },
+    "programs": {
+      "title": "Образовательные программы",
+      "searchPlaceholder": "Поиск ОП...",
+      "exportPdf": "Отчёт PDF",
+      "exportCsv": "CSV",
+      "noData": "Нет данных",
+      "noDataHint": "Студенты ещё не заполнили ОП в профиле",
+      "donutTotal": "всего",
+      "cards": {
+        "totalStudents": "Всего студентов",
+        "activePrograms": "Активных ОП",
+        "employed": "Трудоустроено",
+        "avgGpa": "Средний GPA"
+      },
+      "columns": {
+        "students": "студентов",
+        "avgGpa": "ср. GPA",
+        "employed": "трудоустр."
+      },
+      "table": {
+        "student": "Студент",
+        "graduation": "Выпуск",
+        "skills": "Навыки",
+        "status": "Статус",
+        "graduationYear": "Год выпуска"
+      },
+      "employedBadge": "✓ Трудоустроен",
+      "seekingBadge": "Ищет работу",
+      "unassignedWarning": "Студенты без ОП — {{count}} чел. (необходимо заполнить)",
+      "allPrograms": "Все доступные ОП в системе",
+      "popupBlocked": "Разрешите всплывающие окна в браузере",
+      "studentSearchPlaceholder": "Поиск студента...",
+      "noStudentsFound": "Студенты не найдены",
+      "pendingDocsCount": "{{count}} ожидают проверки",
+      "pdf": {
+        "title": "Отчёт по студентам университета",
+        "generated": "Дата формирования:",
+        "totalStudents": "Всего студентов",
+        "activePrograms": "Активных ОП",
+        "employed": "Трудоустроено",
+        "employmentRate": "Процент трудоустройства",
+        "avgGpa": "Средний GPA",
+        "colStudent": "Студент",
+        "colProgram": "Образовательная программа",
+        "colGpa": "GPA",
+        "colGraduation": "Выпуск",
+        "colSkills": "Навыки",
+        "colStatus": "Статус",
+        "employedStatus": "✓ Трудоустроен",
+        "seekingStatus": "Ищет работу",
+        "footer": "Сформировано системой трудоустройства студентов"
+      }
     }
   },
   "interview": {
@@ -1038,5 +1125,31 @@
       "yesterday": "вчера",
       "daysAgo": "{{d}} дн назад"
     }
+  },
+  "programNames": {
+    "softwareEngineering":         "Программная инженерия",
+    "computerScience":             "Информатика",
+    "bigDataAnalysis":             "Анализ больших данных",
+    "mathComputationalScience":    "Математика и вычислительные науки",
+    "cybersecurity":               "Кибербезопасность",
+    "smartSecurityTechnologies":   "Интеллектуальные технологии безопасности",
+    "industrialIoT":               "Промышленный интернет вещей",
+    "electronicEngineering":       "Электронная инженерия",
+    "smartTechnologies":           "Интеллектуальные технологии",
+    "digitalTechNuclearPower":     "Цифровые технологии в атомной энергетике",
+    "itManagement":                "IT-менеджмент",
+    "itEntrepreneurship":          "IT-предпринимательство",
+    "aiBusiness":                  "ИИ-бизнес",
+    "mediaTechnologies":           "Медиатехнологии",
+    "digitalJournalism":           "Цифровая журналистика",
+    "digitalPublicAdministration": "Цифровое государственное управление"
+  },
+  "programSchools": {
+    "schoolSoftwareEngineering":   "Школа программной инженерии",
+    "schoolAIDataScience":         "Школа искусственного интеллекта и науки о данных",
+    "schoolCybersecurity":         "Школа кибербезопасности",
+    "schoolIntelligentSystems":    "Школа интеллектуальных систем",
+    "schoolCreativeIndustries":    "Школа креативных индустрий",
+    "schoolDigitalGovernance":     "Школа цифрового государственного управления"
   }
 }

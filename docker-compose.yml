@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # =============== DATABASES ===============
   users-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: users-db
     environment:
       POSTGRES_DB: postgres
@@ -22,7 +22,7 @@ services:
       retries: 5
 
   employer-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: employer-db
     environment:
       POSTGRES_DB: employer_db
@@ -41,7 +41,7 @@ services:
       retries: 5
 
   student-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: student-db
     environment:
       POSTGRES_DB: student_db
@@ -60,7 +60,7 @@ services:
       retries: 5
 
   university-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: university-db
     environment:
       POSTGRES_DB: university_db
@@ -79,7 +79,7 @@ services:
       retries: 5
 
   application-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: application-db
     environment:
       POSTGRES_DB: application_db

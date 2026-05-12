@@ -131,6 +131,7 @@ func (s *authService) sendCode(emailAddr string, codeType models.CodeType) error
 	_ = s.codeRepo.InvalidateAll(emailAddr, codeType)
 
 	code := generateCode()
+	log.Printf("[CODE] %s → %s (type: %s)", emailAddr, code, codeType)
 	vc := &models.VerificationCode{
 		Email:     emailAddr,
 		Code:      code,

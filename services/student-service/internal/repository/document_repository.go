@@ -19,6 +19,7 @@ type DocumentRepository interface {
 	Update(doc *models.Document) error
 	Delete(id uuid.UUID) error
 	VerifyAllPendingByUserID(userID uuid.UUID, verifierID uuid.UUID) ([]*models.Document, error)
+	CountPendingDiplomaByUniversityID(universityID uuid.UUID) (int64, error)
 }
 
 type documentRepository struct {
@@ -67,6 +68,18 @@ func (r *documentRepository) Delete(id uuid.UUID) error {
 		return ErrDocumentNotFound
 	}
 	return result.Error
+}
+
+// CountPendingDiplomaByUniversityID returns the count of pending diploma documents
+// for all students belonging to the given university.
+func (r *documentRepository) CountPendingDiplomaByUniversityID(universityID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Document{}).
+		Joins("JOIN students ON students.user_id = documents.user_id").
+		Where("students.university_id = ? AND documents.status = ? AND documents.type = ?",
+			universityID, models.DocStatusPending, models.DocTypeDiploma).
+		Count(&count).Error
+	return count, err
 }
 
 // VerifyAllPendingByUserID verifies all pending non-CV documents for a student

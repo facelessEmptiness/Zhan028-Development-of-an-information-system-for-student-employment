@@ -106,6 +106,9 @@ func (h *EmploymentHandler) proxy(c *gin.Context, method, path string, extraBody
 	proxyReq.Header.Set("Content-Type", "application/json")
 	proxyReq.Header.Set("X-User-ID", c.GetHeader("X-User-ID"))
 	proxyReq.Header.Set("X-User-Role", c.GetHeader("X-User-Role"))
+	if uid := c.GetHeader("X-University-ID"); uid != "" {
+		proxyReq.Header.Set("X-University-ID", uid)
+	}
 
 	resp, err := h.httpClient.Do(proxyReq)
 	if err != nil {

@@ -29,6 +29,7 @@ func (h *EmploymentHandler) CreateInternal(c *gin.Context) {
 		VacancyID     string `json:"vacancy_id" binding:"required"`
 		CompanyName   string `json:"company_name"`
 		JobTitle      string `json:"job_title"`
+		UniversityID  string `json:"university_id"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -56,6 +57,13 @@ func (h *EmploymentHandler) CreateInternal(c *gin.Context) {
 		return
 	}
 
+	var universityID *uuid.UUID
+	if req.UniversityID != "" {
+		if uid, parseErr := uuid.Parse(req.UniversityID); parseErr == nil {
+			universityID = &uid
+		}
+	}
+
 	// Check if record already exists for this application
 	existing, err := h.repo.GetByApplicationID(appID)
 	if err == nil && existing != nil {
@@ -68,6 +76,7 @@ func (h *EmploymentHandler) CreateInternal(c *gin.Context) {
 		EmployerID:    employerID,
 		ApplicationID: appID,
 		VacancyID:     vacancyID,
+		UniversityID:  universityID,
 		CompanyName:   req.CompanyName,
 		JobTitle:      req.JobTitle,
 		StartedAt:     time.Now(),
@@ -101,8 +110,8 @@ func (h *EmploymentHandler) GetForStudent(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"records": enrichWithDuration(recs)})
 }
 
-// GET /api/employment/university — university views all student employment records
-// Accepts optional query: ?student_ids=uuid1,uuid2,...
+// GET /api/employment/university — university views their students' employment records
+// University role is scoped by X-University-ID header; admin sees all.
 func (h *EmploymentHandler) GetForUniversity(c *gin.Context) {
 	role := c.GetHeader("X-User-Role")
 	if role != "university" && role != "admin" {
@@ -110,11 +119,20 @@ func (h *EmploymentHandler) GetForUniversity(c *gin.Context) {
 		return
 	}
 
-	studentIDsStr := c.Query("student_ids")
 	var recs []models.EmploymentRecord
 	var err error
 
-	if studentIDsStr != "" {
+	universityIDStr := c.GetHeader("X-University-ID")
+	studentIDsStr := c.Query("student_ids")
+
+	if role == "university" && universityIDStr != "" {
+		universityID, parseErr := uuid.Parse(universityIDStr)
+		if parseErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid university_id"})
+			return
+		}
+		recs, err = h.repo.GetByUniversityID(universityID)
+	} else if studentIDsStr != "" {
 		var ids []uuid.UUID
 		for _, s := range splitCSV(studentIDsStr) {
 			if id, e := uuid.Parse(s); e == nil {

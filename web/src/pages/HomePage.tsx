@@ -304,7 +304,7 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
                 {completion < 100 ? '⚠' : '✓'}
               </p>
               <Link to="/profile" className="text-xs text-blue-600 mt-1.5 inline-block hover:underline">
-                {completion < 100 ? t('home.student.fillProfile') : t('home.student.viewAll')} →
+                {completion < 100 ? t('home.student.fillProfile') : `${t('home.student.viewAll')} →`}
               </Link>
             </>
           )}

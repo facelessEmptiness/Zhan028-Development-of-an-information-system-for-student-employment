@@ -703,7 +703,7 @@ const EmployerDashboardPage = () => {
                       })}
                       className="px-2.5 py-1.5 text-xs font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700"
                     >
-                      {t('employerDashboard.applications.viewProfile')} →
+                      {t('employerDashboard.applications.viewProfile')}
                     </button>
                   )}
                 </div>

@@ -16,6 +16,7 @@ type EmploymentRepository interface {
 	GetByEmployerID(employerID uuid.UUID) ([]models.EmploymentRecord, error)
 	GetAll() ([]models.EmploymentRecord, error)
 	GetAllByUniversity(studentIDs []uuid.UUID) ([]models.EmploymentRecord, error)
+	GetByUniversityID(universityID uuid.UUID) ([]models.EmploymentRecord, error)
 	UpdateStatus(id uuid.UUID, status string) error
 	End(id uuid.UUID) error
 }
@@ -71,6 +72,12 @@ func (r *employmentRepository) GetAll() ([]models.EmploymentRecord, error) {
 func (r *employmentRepository) GetAllByUniversity(studentIDs []uuid.UUID) ([]models.EmploymentRecord, error) {
 	var recs []models.EmploymentRecord
 	err := r.db.Where("student_id IN ?", studentIDs).Order("started_at desc").Find(&recs).Error
+	return recs, err
+}
+
+func (r *employmentRepository) GetByUniversityID(universityID uuid.UUID) ([]models.EmploymentRecord, error) {
+	var recs []models.EmploymentRecord
+	err := r.db.Where("university_id = ?", universityID).Order("started_at desc").Find(&recs).Error
 	return recs, err
 }
 

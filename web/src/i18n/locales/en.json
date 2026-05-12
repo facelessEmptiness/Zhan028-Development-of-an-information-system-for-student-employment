@@ -70,7 +70,7 @@
       "profileCompletion": "Profile completion",
       "fillProfile": "Fill in profile →",
       "myApplications": "My Applications",
-      "viewAll": "View all →",
+      "viewAll": "View all",
       "profileCard": "My Profile",
       "profileDesc": "Fill in your resume and info",
       "jobsCard": "Jobs",
@@ -268,8 +268,8 @@
       "iin": "IIN",
       "graduationYear": "Graduation Year",
       "gpa": "GPA",
-      "diplomaVerified": "Diploma Verified ✅",
-      "diplomaNotVerified": "Diploma Not Verified",
+      "diplomaVerified": "Reference Confirmed ✅",
+      "diplomaNotVerified": "Reference Not Confirmed",
       "diplomaVerifiedHint": "Automatically verified on {{date}}",
       "diplomaNotVerifiedHint": "Fill in university, specialization and graduation year for automatic verification"
     },
@@ -314,7 +314,7 @@
     },
     "stats": {
       "completion": "Completion",
-      "diploma": "Diploma"
+      "diploma": "Reference"
     },
     "loading": "Loading profile...",
     "iinError": {
@@ -650,7 +650,7 @@
   },
   "docTypes": {
     "cv": "CV",
-    "diploma": "Diploma",
+    "diploma": "Reference",
     "certificate": "Certificate"
   },
   "industries": {
@@ -824,6 +824,7 @@
     "loading": "Loading analytics...",
     "tabs": {
       "overview": "Overview",
+      "programs": "Programs",
       "myStudents": "My Students",
       "docReview": "Documents",
       "employment": "Employment",
@@ -840,7 +841,9 @@
     "overview": {
       "applicationStatuses": "Student application statuses",
       "noApplicationData": "No application data yet",
-      "conversionRate": "Offer conversion rate",
+      "conversionRate": "Application-to-offer conversion rate",
+      "realEmploymentRate": "Actual employment rate",
+      "employedStudents": "{{employed}} of {{total}} students",
       "offersFromApplications": "{{offers}} offers from {{total}} applications",
       "vacanciesByLocation": "Vacancies by location",
       "noVacancies": "No vacancies yet"
@@ -869,8 +872,19 @@
       "download": "Download",
       "verify": "Verify",
       "reject": "Reject",
-      "specializationNotSet": "Specialization not specified"
+      "specializationNotSet": "Specialization not specified",
+      "verifiedAt": "Confirmed {{date}}",
+      "rejectedAt": "Rejected {{date}}",
+      "comment": "Reason: {{text}}"
     },
+    "rejectModal": {
+      "title": "Reason for rejection",
+      "placeholder": "Specify the reason (optional)...",
+      "confirm": "Reject",
+      "cancel": "Cancel"
+    },
+    "pendingAlert": "{{count}} students are awaiting reference verification",
+    "pendingAlertSingle": "{{count}} student is awaiting reference verification",
     "students": {
       "bySpecialization": "Students by specialization",
       "totalStudents": "({{total}} total)",
@@ -879,7 +893,17 @@
     },
     "employers": {
       "vacanciesByType": "Vacancy distribution by type",
-      "percentageOfTotal": "{{percentage}}% of all vacancies"
+      "percentageOfTotal": "{{percentage}}% of all vacancies",
+      "companiesTitle": "Companies that hired students",
+      "companiesHint": "Based on employment monitoring data",
+      "noHires": "No employment data available",
+      "noHiresHint": "Go to 'Employment' tab to load the data",
+      "studentsHired": "{{count}} students",
+      "active": "currently working",
+      "completed": "completed",
+      "companyIndustry": "Industry",
+      "companyStudents": "Students",
+      "companyPositions": "Positions"
     },
     "statistics": {
       "demandedSkills": "Most demanded skills",
@@ -894,7 +918,17 @@
         "offersReceived": "Received offers",
         "conversionRate": "Offer conversion rate",
         "uniqueSkills": "Unique skills in vacancies"
-      }
+      },
+      "employmentByProgram": "Employment by Program",
+      "employmentByProgramHint": "% of employed graduates per educational program",
+      "yearDynamics": "Dynamics by Graduation Year",
+      "yearDynamicsHint": "Number of students and % employed by graduation year",
+      "gpaDistribution": "GPA Distribution",
+      "gpaDistributionHint": "Number of students by academic performance ranges",
+      "noStudentData": "No student data available. Students will appear after registration.",
+      "employed": "employed",
+      "students": "students",
+      "paginationNote": "Known limitation: all students are loaded in a single request. For 500+ students, server-side pagination is recommended."
     },
     "status": {
       "applied": "Applied",
@@ -921,10 +955,63 @@
       "docRejected": "Document rejected"
     },
     "autoVerify": {
-      "button": "Auto-verify diploma",
+      "button": "Auto-confirm reference",
       "success": "{{count}} document(s) verified automatically",
       "noPending": "No pending documents to verify",
       "error": "Failed to auto-verify documents"
+    },
+    "programs": {
+      "title": "Educational Programs",
+      "searchPlaceholder": "Search programs...",
+      "exportPdf": "PDF Report",
+      "exportCsv": "CSV",
+      "noData": "No data",
+      "noDataHint": "Students have not filled in their program in their profile yet",
+      "donutTotal": "total",
+      "cards": {
+        "totalStudents": "Total students",
+        "activePrograms": "Active programs",
+        "employed": "Employed",
+        "avgGpa": "Average GPA"
+      },
+      "columns": {
+        "students": "students",
+        "avgGpa": "avg. GPA",
+        "employed": "employed"
+      },
+      "table": {
+        "student": "Student",
+        "graduation": "Graduation",
+        "skills": "Skills",
+        "status": "Status",
+        "graduationYear": "Graduation Year"
+      },
+      "employedBadge": "✓ Employed",
+      "seekingBadge": "Job Seeking",
+      "unassignedWarning": "Students without program — {{count}} (needs to be filled)",
+      "allPrograms": "All available programs in the system",
+      "popupBlocked": "Please allow popups in your browser",
+      "studentSearchPlaceholder": "Search student...",
+      "noStudentsFound": "No students found",
+      "pendingDocsCount": "{{count}} pending review",
+      "pdf": {
+        "title": "University Student Report",
+        "generated": "Report generated:",
+        "totalStudents": "Total students",
+        "activePrograms": "Active programs",
+        "employed": "Employed",
+        "employmentRate": "Employment rate",
+        "avgGpa": "Average GPA",
+        "colStudent": "Student",
+        "colProgram": "Educational Program",
+        "colGpa": "GPA",
+        "colGraduation": "Graduation",
+        "colSkills": "Skills",
+        "colStatus": "Status",
+        "employedStatus": "✓ Employed",
+        "seekingStatus": "Job Seeking",
+        "footer": "Generated by student employment system"
+      }
     }
   },
   "interview": {
@@ -1038,5 +1125,31 @@
       "yesterday": "yesterday",
       "daysAgo": "{{d}} days ago"
     }
+  },
+  "programNames": {
+    "softwareEngineering":         "Software Engineering",
+    "computerScience":             "Computer Science",
+    "bigDataAnalysis":             "Big Data Analysis",
+    "mathComputationalScience":    "Mathematical and Computational Science",
+    "cybersecurity":               "Cybersecurity",
+    "smartSecurityTechnologies":   "Smart Security Technologies",
+    "industrialIoT":               "Industrial Internet of Things",
+    "electronicEngineering":       "Electronic Engineering",
+    "smartTechnologies":           "Smart Technologies",
+    "digitalTechNuclearPower":     "Digital Technologies in Nuclear Power Engineering",
+    "itManagement":                "IT Management",
+    "itEntrepreneurship":          "IT Entrepreneurship",
+    "aiBusiness":                  "AI Business",
+    "mediaTechnologies":           "Media Technologies",
+    "digitalJournalism":           "Digital Journalism",
+    "digitalPublicAdministration": "Digital Public Administration"
+  },
+  "programSchools": {
+    "schoolSoftwareEngineering":   "School of Software Engineering",
+    "schoolAIDataScience":         "School of AI and Data Science",
+    "schoolCybersecurity":         "School of Cybersecurity",
+    "schoolIntelligentSystems":    "School of Intelligent Systems",
+    "schoolCreativeIndustries":    "School of Creative Industries",
+    "schoolDigitalGovernance":     "School of Digital Public Administration"
   }
 }

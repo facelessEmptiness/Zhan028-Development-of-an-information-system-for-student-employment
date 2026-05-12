@@ -73,6 +73,7 @@ func seedUniversities(svc service.UniversityService) {
 		{"Университет КИМЭП", "Алматы", "Казахстан", "https://kimep.kz"},
 		{"Университет Туран", "Алматы", "Казахстан", "https://turan-edu.kz"},
 		{"Карагандинский технический университет им. А. Сагинова", "Караганда", "Казахстан", "https://kstu.kz"},
+		{"Astana IT University", "Астана", "Казахстан", "https://astanait.edu.kz"},
 	}
 	for _, u := range unis {
 		_, err := svc.CreateUniversity(u.name, u.city, u.country, u.website)

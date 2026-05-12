@@ -281,6 +281,23 @@ func (h *DocumentHandler) AutoVerify(c *gin.Context) {
 	})
 }
 
+// GET /api/documents/pending-count
+// Returns the count of pending diploma documents for the calling university's students.
+func (h *DocumentHandler) PendingCount(c *gin.Context) {
+	universityIDStr := c.GetHeader("X-University-ID")
+	universityID, err := uuid.Parse(universityIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "university ID required"})
+		return
+	}
+	count, err := h.repo.CountPendingDiplomaByUniversityID(universityID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to count pending documents"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 // DELETE /api/documents/:id
 func (h *DocumentHandler) Delete(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
