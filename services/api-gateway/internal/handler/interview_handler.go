@@ -76,14 +76,11 @@ func (h *InterviewHandler) Schedule(c *gin.Context) {
 		location, _ := reqData["location"].(string)
 
 		if studentID != "" {
-			// Parse scheduled_at to a human-readable format
-			notifBody := "Дата: " + formatScheduledAt(scheduledAt)
-			if location != "" {
-				notifBody += ", Место: " + location
-			}
+			// Store as pipe-separated locale-neutral format: "date|location|notes"
+			notifBody := formatScheduledAt(scheduledAt) + "|" + location
 			notes, _ := reqData["notes"].(string)
 			if notes != "" {
-				notifBody += ". " + notes
+				notifBody += "|" + notes
 			}
 
 			// Parse the created interview ID for related_id

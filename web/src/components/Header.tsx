@@ -372,6 +372,7 @@ export default function Header() {
 const TYPE_CFG: Record<string, { icon: string; bg: string; fg: string }> = {
   application_submitted: { icon: '📄', bg: '#FFFBEB', fg: '#92400E' },
   application_status:    { icon: '💼', bg: '#EFF6FF', fg: '#1D4ED8' },
+  interview_scheduled:   { icon: '📅', bg: '#F0FDF4', fg: '#15803D' },
   document_verified:     { icon: '✅', bg: '#ECFDF5', fg: '#047857' },
   document_rejected:     { icon: '❌', bg: '#FEF2F2', fg: '#B91C1C' },
   chat_message:          { icon: '💬', bg: '#F5F3FF', fg: '#7C3AED' },
@@ -387,6 +388,16 @@ function useNotifTexts(notification: Notification, userRole?: string) {
       const status = related_id?.split('|')[1] ?? '';
       const sub = ['interview','shortlisted','offered','rejected'].includes(status) ? status : 'interview';
       return { title: t(`notifications.application_status.${sub}.title`), body: t(`notifications.application_status.${sub}.body`) };
+    }
+    case 'interview_scheduled': {
+      const parts = notification.body?.split('|') ?? [];
+      const date = parts[0] ?? '';
+      const location = parts[1] ?? '';
+      const notes = parts[2] ?? '';
+      let body = t('notifications.interview_scheduled.date') + ' ' + date;
+      if (location) body += ', ' + t('notifications.interview_scheduled.location') + ' ' + location;
+      if (notes) body += '. ' + t('notifications.interview_scheduled.notes') + ' ' + notes;
+      return { title: t('notifications.interview_scheduled.title'), body };
     }
     case 'chat_message':
       return { title: t('notifications.chat_message.title'), body: userRole === 'employer' ? t('notifications.chat_message.bodyForEmployer') : t('notifications.chat_message.bodyForStudent') };

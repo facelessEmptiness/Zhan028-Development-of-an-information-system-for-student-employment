@@ -5,6 +5,7 @@ import { useAuth } from '../context';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 import { applicationService, type Application } from '../services/applicationService';
 import { type JobPosting } from '../services/employerService';
+import { employmentService, type EmploymentRecord } from '../services/employmentService';
 import { apiFetch } from '../utils/apiClient';
 
 /* ─── Match helpers ─────────────────────────────────────────── */
@@ -180,9 +181,10 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery,  setSearchQuery]  = useState('');
-  const [profile,      setProfile]      = useState<BackendStudentProfile | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [loadingStats, setLoadingStats] = useState(true);
+  const [profile,           setProfile]           = useState<BackendStudentProfile | null>(null);
+  const [applications,      setApplications]      = useState<Application[]>([]);
+  const [employmentRecords, setEmploymentRecords] = useState<EmploymentRecord[]>([]);
+  const [loadingStats,      setLoadingStats]      = useState(true);
   const [recommended,  setRecommended]  = useState<(JobPosting & { score: number })[]>([]);
   const [loadingRec,   setLoadingRec]   = useState(false);
 
@@ -190,9 +192,11 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
     Promise.all([
       studentService.getProfile().catch(() => null),
       applicationService.getMyApplications().catch(() => []),
-    ]).then(([prof, apps]) => {
+      employmentService.getMyRecords().catch(() => [] as EmploymentRecord[]),
+    ]).then(([prof, apps, empRecs]) => {
       setProfile(prof);
       setApplications(apps);
+      setEmploymentRecords(empRecs);
       setLoadingStats(false);
       if (prof && (prof.skills || prof.specialization)) {
         setLoadingRec(true);
@@ -328,6 +332,49 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
           </Link>
         ))}
       </div>
+
+      {/* ── Grant obligation ── */}
+      {employmentRecords.filter(r => r.status === 'active' || r.status === 'completed').length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">{t('home.student.grantTitle')}</h2>
+              <p className="text-sm text-gray-500 mt-0.5">{t('home.student.grantSubtitle')}</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {employmentRecords.filter(r => r.status === 'active' || r.status === 'completed').map(rec => (
+              <div key={rec.id} className="bg-white rounded-xl border border-gray-200 p-5">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{rec.job_title}</h3>
+                    <p className="text-sm text-gray-500">{rec.company_name}</p>
+                  </div>
+                  {rec.grant_fulfilled ? (
+                    <span className="text-green-600 font-semibold text-sm shrink-0">{t('employment.grantFulfilled')}</span>
+                  ) : (
+                    <span className="text-xs px-2.5 py-1 rounded-full font-medium shrink-0 bg-green-50 text-green-700">
+                      {t('employment.status.active')}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${rec.progress}%` }} />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-700 shrink-0">{rec.progress}%</span>
+                </div>
+                <div className="flex justify-between mt-2 text-xs text-gray-400">
+                  <span>{t('employment.table.daysWorked')}: {rec.days_worked}</span>
+                  {!rec.grant_fulfilled && (
+                    <span>{t('employment.remaining', { days: rec.remaining_days })}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Recommended jobs ── */}
       <section>

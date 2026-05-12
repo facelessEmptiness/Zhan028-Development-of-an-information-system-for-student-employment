@@ -181,6 +181,33 @@ func (h *EmploymentHandler) End(c *gin.Context) {
 		return
 	}
 
+	rec, err := h.repo.GetByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "employment record not found"})
+		return
+	}
+
+	role := c.GetHeader("X-User-Role")
+	switch role {
+	case "employer":
+		callerID, parseErr := uuid.Parse(c.GetHeader("X-User-ID"))
+		if parseErr != nil || rec.EmployerID != callerID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+			return
+		}
+	case "university":
+		callerUniID, parseErr := uuid.Parse(c.GetHeader("X-University-ID"))
+		if parseErr != nil || rec.UniversityID == nil || *rec.UniversityID != callerUniID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+			return
+		}
+	case "admin":
+		// admin may end any record
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+		return
+	}
+
 	if err := h.repo.End(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to end employment"})
 		return
@@ -211,14 +238,8 @@ func enrichWithDuration(recs []models.EmploymentRecord) []EmploymentRecordWithDu
 		days := int(end.Sub(r.StartedAt).Hours() / 24)
 		months := int(end.Sub(r.StartedAt).Hours() / 24 / 30)
 		fulfilled := days >= grantDays
-		remaining := grantDays - days
-		if remaining < 0 {
-			remaining = 0
-		}
-		progress := (days * 100) / grantDays
-		if progress > 100 {
-			progress = 100
-		}
+		remaining := max(grantDays-days, 0)
+		progress := min((days*100)/grantDays, 100)
 
 		if fulfilled && r.Status == "active" {
 			r.Status = "completed"

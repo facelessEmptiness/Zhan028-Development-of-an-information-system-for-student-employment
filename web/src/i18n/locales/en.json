@@ -80,7 +80,9 @@
       "recommended": "Recommended Jobs",
       "fillProfileForRec": "Fill in your profile to get personalized recommendations",
       "viewAllJobs": "View all jobs",
-      "match": "match"
+      "match": "match",
+      "grantTitle": "My Employment",
+      "grantSubtitle": "Progress of the 3-year grant obligation"
     },
     "employer": {
       "subtitle": "Manage vacancies and find the best candidates",
@@ -1104,6 +1106,12 @@
         "title": "Application rejected",
         "body": "Unfortunately, your application was rejected."
       }
+    },
+    "interview_scheduled": {
+      "title": "Interview invitation 📅",
+      "date": "Date:",
+      "location": "Location:",
+      "notes": "Notes:"
     },
     "chat_message": {
       "title": "💬 New message",
