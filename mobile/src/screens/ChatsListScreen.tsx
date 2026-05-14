@@ -70,7 +70,7 @@ export default function ChatsListScreen() {
             style={styles.card}
             onPress={() => navigation.navigate('Chat', {
               applicationId: item.id,
-              title: t('chats.withEmployer'),
+              title: item.company_name || item.vacancy_title || t('chats.withEmployer'),
             })}
             activeOpacity={0.75}
           >
@@ -80,7 +80,7 @@ export default function ChatsListScreen() {
             <View style={styles.cardBody}>
               <View style={styles.cardTop}>
                 <Text style={styles.title} numberOfLines={1}>
-                  {t('chats.applicationDate', { date })}
+                  {item.company_name || item.vacancy_title || t('chats.applicationDate', { date })}
                 </Text>
                 <View style={[styles.badge, { backgroundColor: statusColor + '20' }]}>
                   <Text style={[styles.badgeText, { color: statusColor }]}>{statusLabel}</Text>

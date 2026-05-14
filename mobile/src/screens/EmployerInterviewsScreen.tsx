@@ -118,7 +118,7 @@ export default function EmployerInterviewsScreen() {
         <View style={styles.topRow}>
           <Text style={styles.header}>{t('employer.interviews.header')}</Text>
           <TouchableOpacity style={styles.addBtn} onPress={openForm}>
-            <Text style={styles.addBtnText}>+ {t('employer.interviews.schedule')}</Text>
+            <Text style={styles.addBtnText}>{t('employer.interviews.schedule')}</Text>
           </TouchableOpacity>
         </View>
 

@@ -85,7 +85,7 @@ export default function ApplicationsScreen() {
               style={styles.chatBtn}
               onPress={() => navigation.navigate('Chat', {
                 applicationId: item.id,
-                title: t('apps.chatWith'),
+                title: item.company_name || item.vacancy_title || t('apps.chatWith'),
               })}
             >
               <Text style={styles.chatBtnText}>{t('apps.chat')}</Text>

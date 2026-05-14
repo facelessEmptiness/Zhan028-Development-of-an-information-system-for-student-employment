@@ -112,7 +112,7 @@ func (h *ApplicationHandler) Apply(c *gin.Context) {
 	c.JSON(http.StatusCreated, resp)
 }
 
-// GET /api/applications/my - student sees their own applications
+// GET /api/applications/my - student sees their own applications (enriched with vacancy title + company name)
 func (h *ApplicationHandler) GetMyApplications(c *gin.Context) {
 	studentID := c.GetHeader("X-User-ID")
 
@@ -126,7 +126,44 @@ func (h *ApplicationHandler) GetMyApplications(c *gin.Context) {
 		handleGRPCError(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, resp)
+
+	type EnrichedApp struct {
+		ID          string `json:"id"`
+		StudentID   string `json:"student_id"`
+		VacancyID   string `json:"vacancy_id"`
+		EmployerID  string `json:"employer_id"`
+		Status      string `json:"status"`
+		CoverLetter string `json:"cover_letter"`
+		MatchScore  int32  `json:"match_score"`
+		CreatedAt   string `json:"created_at"`
+		UpdatedAt   string `json:"updated_at"`
+		VacancyTitle string `json:"vacancy_title"`
+		CompanyName  string `json:"company_name"`
+	}
+
+	enriched := make([]EnrichedApp, 0, len(resp.Applications))
+	for _, a := range resp.Applications {
+		app := EnrichedApp{
+			ID:          a.GetId(),
+			StudentID:   a.GetStudentId(),
+			VacancyID:   a.GetVacancyId(),
+			EmployerID:  a.GetEmployerId(),
+			Status:      a.GetStatus(),
+			CoverLetter: a.GetCoverLetter(),
+			MatchScore:  a.GetMatchScore(),
+			CreatedAt:   a.GetCreatedAt(),
+			UpdatedAt:   a.GetUpdatedAt(),
+		}
+		vCtx, vCancel := context.WithTimeout(context.Background(), 3*time.Second)
+		if vResp, vErr := h.vacancyClient.GetVacancyByID(vCtx, &vacancypb.GetByIDRequest{Id: a.GetVacancyId()}); vErr == nil && vResp != nil {
+			app.VacancyTitle = vResp.GetTitle()
+			app.CompanyName = vResp.GetCompanyName()
+		}
+		vCancel()
+		enriched = append(enriched, app)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"applications": enriched})
 }
 
 // GET /api/applications/vacancy/:vacancy_id - employer sees applications for their vacancy (enriched with student data)

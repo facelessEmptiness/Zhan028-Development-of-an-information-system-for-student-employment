@@ -10,6 +10,8 @@ export interface Application {
   match_score: number;
   created_at: string;
   updated_at: string;
+  vacancy_title?: string;
+  company_name?: string;
   student?: {
     first_name: string;
     last_name: string;
