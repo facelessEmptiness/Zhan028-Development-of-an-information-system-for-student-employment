@@ -65,7 +65,7 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 
 	// Создание и настройка роутера
-	r := router.SetupRouter(authHandler, jwtManager)
+	r := router.SetupRouter(authHandler, jwtManager, cfg.AllowedOrigins)
 
 	// Запуск HTTP сервера
 	log.Printf("Auth Service запущен на порту %s", cfg.ServerPort)

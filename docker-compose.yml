@@ -97,6 +97,27 @@ services:
       timeout: 5s
       retries: 5
 
+  # =============== OBJECT STORAGE ===============
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # =============== CACHE ===============
   redis:
     image: redis:7-alpine
@@ -133,6 +154,7 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_FROM: ${SMTP_FROM}
       REDIS_URL: redis://redis:6379/0
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
       users-db:
         condition: service_healthy
@@ -159,11 +181,18 @@ services:
       GRPC_PORT: 50051
       SERVER_PORT: 8082
       JWT_SECRET: ${JWT_SECRET}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      MINIO_BUCKET: documents
+      MINIO_USE_SSL: "false"
     depends_on:
       student-db:
         condition: service_healthy
       auth-service:
         condition: service_started
+      minio:
+        condition: service_healthy
     networks:
       - diploma-network
     restart: unless-stopped
@@ -253,6 +282,7 @@ services:
       EMPLOYER_GRPC_URL: employer-service:50052
       UNIVERSITY_GRPC_URL: university-service:50053
       APPLICATION_GRPC_URL: application-service:50054
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
       - auth-service
       - student-service
@@ -287,3 +317,4 @@ volumes:
   employer-db-data:
   university-db-data:
   application-db-data:
+  minio-data:

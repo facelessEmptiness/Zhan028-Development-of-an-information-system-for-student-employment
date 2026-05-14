@@ -25,6 +25,13 @@ type Config struct {
 	// Настройки JWT
 	JWTSecret          string
 	JWTExpirationHours int
+
+	// MinIO
+	MinIOEndpoint  string
+	MinIOAccessKey string
+	MinIOSecretKey string
+	MinIOBucket    string
+	MinIOUseSSL    bool
 }
 
 // LoadConfig загружает конфигурацию из переменных окружения
@@ -33,15 +40,20 @@ func LoadConfig() (*Config, error) {
 	_ = godotenv.Load()
 
 	config := &Config{
-		ServerPort: getEnv("SERVER_PORT", "8082"),
-		GRPCPort:   getEnv("GRPC_PORT", "50051"),
-		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "5433"),
-		DBUser:     getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", "Supoga80"),
-		DBName:     getEnv("DB_NAME", "student_db"),
-		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
-		JWTSecret:  getEnv("JWT_SECRET", "some_jwt_secret"),
+		ServerPort:     getEnv("SERVER_PORT", "8082"),
+		GRPCPort:       getEnv("GRPC_PORT", "50051"),
+		DBHost:         getEnv("DB_HOST", "localhost"),
+		DBPort:         getEnv("DB_PORT", "5433"),
+		DBUser:         getEnv("DB_USER", "postgres"),
+		DBPassword:     getEnv("DB_PASSWORD", "Supoga80"),
+		DBName:         getEnv("DB_NAME", "student_db"),
+		DBSSLMode:      getEnv("DB_SSLMODE", "disable"),
+		JWTSecret:      getEnv("JWT_SECRET", "some_jwt_secret"),
+		MinIOEndpoint:  getEnv("MINIO_ENDPOINT", "localhost:9000"),
+		MinIOAccessKey: getEnv("MINIO_ACCESS_KEY", "minioadmin"),
+		MinIOSecretKey: getEnv("MINIO_SECRET_KEY", "minioadmin123"),
+		MinIOBucket:    getEnv("MINIO_BUCKET", "documents"),
+		MinIOUseSSL:    getEnv("MINIO_USE_SSL", "false") == "true",
 	}
 
 	// Проверка обязательных переменных
@@ -64,6 +76,14 @@ func (c *Config) GetDSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName, c.DBSSLMode,
+	)
+}
+
+// GetMigrateURL возвращает URL для golang-migrate
+func (c *Config) GetMigrateURL() string {
+	return fmt.Sprintf(
+		"pgx5://%s:%s@%s:%s/%s?sslmode=%s",
+		c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName, c.DBSSLMode,
 	)
 }
 

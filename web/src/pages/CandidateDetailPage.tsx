@@ -371,24 +371,30 @@ const CandidateDetailPage = () => {
                     {doc.type === 'cv' ? '📄' : doc.type === 'diploma' ? '🎓' : '📜'}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{doc.file_name}</p>
+                    <p className="text-sm font-medium text-gray-800 truncate">{(() => { try { return decodeURIComponent(doc.file_name); } catch { return doc.file_name; } })()}</p>
                     <p className="text-xs text-gray-500">{t(getTypeKey(doc.type))}</p>
                     <div className="mt-1 flex items-center gap-2">
-                      {doc.status === 'verified' ? (
-                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                          ✅ {t('candidate.docVerifiedByUniversity')}
-                        </span>
-                      ) : doc.status === 'rejected' ? (
-                        <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-                          ❌ {t('candidate.docRejected')}
-                        </span>
+                      {doc.type === 'diploma' ? (
+                        doc.status === 'verified' ? (
+                          <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                            ✅ {t('candidate.docVerifiedByUniversity')}
+                          </span>
+                        ) : doc.status === 'rejected' ? (
+                          <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                            ❌ {t('candidate.docRejected')}
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
+                            {t('candidate.docPending')}
+                          </span>
+                        )
                       ) : (
-                        <span className="text-xs font-semibold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
-                          {t('candidate.docPending')}
+                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                          ✓ {t('candidate.docUploaded')}
                         </span>
                       )}
                     </div>
-                    {doc.type === 'cv' && (
+                    {doc.type !== 'diploma' && (
                       <button
                         onClick={() => documentService.download(doc.id, doc.file_name).catch(() => {})}
                         className="text-xs text-blue-600 hover:underline mt-1 inline-block"

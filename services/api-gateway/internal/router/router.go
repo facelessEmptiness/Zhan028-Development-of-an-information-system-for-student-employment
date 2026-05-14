@@ -9,8 +9,10 @@ import (
 	"api-gateway/internal/handler"
 	"api-gateway/internal/middleware"
 	"api-gateway/internal/proxy"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -55,9 +57,10 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	api := r.Group("/api")
 
 	// ============================================
-	// AUTH SERVICE - REST proxy
+	// AUTH SERVICE - REST proxy (rate-limited: 10 req/min per IP)
 	// ============================================
-	api.Any("/auth/*path", proxy.NewServiceProxy(cfg.AuthServiceUrl))
+	authLimiter := middleware.NewRateLimiter(rate.Every(6*time.Second), 10)
+	api.Any("/auth/*path", authLimiter.Middleware(), proxy.NewServiceProxy(cfg.AuthServiceUrl))
 
 	// ============================================
 	// DOCUMENT SERVICE - REST proxy

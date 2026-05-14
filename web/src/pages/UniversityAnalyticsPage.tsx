@@ -342,7 +342,7 @@ const UniversityAnalyticsPage = () => {
             <span className="text-red-500 font-bold text-[9px]">PDF</span>
           </div>
           <div className="min-w-0">
-            <p className={`font-medium text-gray-900 ${compact ? 'text-xs' : 'text-sm'} truncate`}>{doc.file_name}</p>
+            <p className={`font-medium text-gray-900 ${compact ? 'text-xs' : 'text-sm'} truncate`}>{(() => { try { return decodeURIComponent(doc.file_name); } catch { return doc.file_name; } })()}</p>
             <p className="text-[10px] text-gray-400">{t(getTypeKey(doc.type))} · {(doc.file_size / 1024).toFixed(0)} KB</p>
             {renderAuditLine(doc)}
           </div>

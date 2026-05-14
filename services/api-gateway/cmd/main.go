@@ -2,6 +2,7 @@ package main
 
 import (
 	"api-gateway/internal/config"
+	"api-gateway/internal/middleware"
 	"api-gateway/internal/router"
 	"log"
 
@@ -14,6 +15,7 @@ func main() {
 		panic(err)
 	}
 	r := gin.Default()
+	r.Use(middleware.CORSMiddleware(cfg.AllowedOrigins))
 	router.SetupRoutes(r, cfg)
 
 	address := ":" + cfg.Port // ✅ :8080

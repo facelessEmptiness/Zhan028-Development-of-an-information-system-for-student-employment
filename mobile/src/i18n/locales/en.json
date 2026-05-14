@@ -1,0 +1,603 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "error": "Error",
+    "send": "Send",
+    "search": "Search",
+    "close": "Close",
+    "back": "Back",
+    "ok": "OK",
+    "yes": "Yes",
+    "no": "No",
+    "edit": "Edit",
+    "create": "Create",
+    "download": "Download",
+    "confirm": "Confirm",
+    "success": "Success"
+  },
+  "role": {
+    "student": "Student",
+    "employer": "Employer",
+    "university": "University",
+    "admin": "Administrator"
+  },
+  "nav": {
+    "home": "Home",
+    "jobs": "Jobs",
+    "applications": "Applications",
+    "chats": "Chats",
+    "profile": "Profile",
+    "vacancies": "Vacancies",
+    "interviews": "Interviews",
+    "company": "Company",
+    "account": "Account",
+    "analytics": "Analytics",
+    "students": "Students",
+    "notifications": "Notifications"
+  },
+  "screen": {
+    "home": "Home",
+    "vacancy": "Vacancy",
+    "documents": "Documents",
+    "grant": "Grant",
+    "myApplications": "My Applications",
+    "myInterviews": "My Interviews",
+    "myVacancies": "My Vacancies",
+    "editVacancy": "Edit",
+    "newVacancy": "New Vacancy",
+    "vacancyApplications": "Applications",
+    "candidate": "Candidate",
+    "analytics": "Analytics",
+    "students": "Students",
+    "notifications": "Notifications"
+  },
+  "login": {
+    "appTitle": "Student Employment",
+    "appSub": "Kazakhstan Students",
+    "title": "Sign In",
+    "emailLabel": "Email",
+    "emailPlaceholder": "example@university.kz",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter password",
+    "submitBtn": "Sign In",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Sign Up",
+    "error": {
+      "empty": "Enter email and password",
+      "title": "Login Error",
+      "checkData": "Check your credentials and try again"
+    }
+  },
+  "register": {
+    "title": "Sign Up",
+    "appSub": "Student Employment",
+    "roleLabel": "I am a",
+    "roles": {
+      "student": { "label": "Student", "desc": "Looking for work" },
+      "employer": { "label": "Employer", "desc": "Looking for staff" },
+      "university": { "label": "University", "desc": "Management" }
+    },
+    "firstName": "First Name *",
+    "lastName": "Last Name *",
+    "firstNamePlaceholder": "John",
+    "lastNamePlaceholder": "Smith",
+    "university": "University *",
+    "email": "Email *",
+    "emailPlaceholder": "example@mail.com",
+    "password": "Password *",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmPassword": "Confirm Password *",
+    "confirmPasswordPlaceholder": "Repeat password",
+    "submitBtn": "Sign Up",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign In",
+    "passwordMismatch": "Passwords do not match",
+    "strength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "error": {
+      "name": "Enter first and last name",
+      "email": "Enter email",
+      "passwordLength": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "university": "Select a university",
+      "failed": "Registration failed"
+    },
+    "success": {
+      "title": "Verify your email",
+      "text": "A confirmation email was sent to",
+      "note": "Follow the link in the email, then sign in.",
+      "loginBtn": "Sign In"
+    }
+  },
+  "verify": {
+    "title": "Email Verification",
+    "subtitle": "We sent a 6-digit code to",
+    "codeLabel": "Enter the code from the email",
+    "confirmBtn": "Verify Email",
+    "noCode": "Didn't receive the code?",
+    "resend": "Resend",
+    "resendCooldown": "Resend ({{count}}s)",
+    "backToLogin": "← Back to Login",
+    "error": {
+      "code": "Enter the 6-digit code",
+      "invalid": "Invalid code"
+    },
+    "success": {
+      "title": "Done!",
+      "text": "Email verified. You can now sign in.",
+      "loginBtn": "Sign In"
+    },
+    "resent": "Sent",
+    "resentText": "A new code was sent to your email"
+  },
+  "forgot": {
+    "title": "Forgot Password?",
+    "subtitleEmail": "Enter your email — we'll send a reset code",
+    "subtitleReset": "Code sent to {{email}}",
+    "emailLabel": "Email",
+    "sendBtn": "Send Code",
+    "codeLabel": "Code from email (6 characters)",
+    "codePlaceholder": "Enter 6-digit code",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "repeatPasswordPlaceholder": "Repeat password",
+    "resetBtn": "Reset Password",
+    "anotherEmail": "← Different email",
+    "backToLogin": "← Back to Login",
+    "infoBox": "📧 Open the email at {{email}} and copy the verification code",
+    "passwordMismatch": "Passwords do not match",
+    "error": {
+      "email": "Enter email",
+      "code": "Enter the code from the email",
+      "codeLength": "Code must be exactly 6 characters",
+      "passwordLength": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "sendFailed": "Failed to send email",
+      "resetFailed": "Failed to reset password"
+    },
+    "success": {
+      "title": "Success",
+      "text": "Password changed. Sign in with your new password."
+    }
+  },
+  "home": {
+    "greeting": "Welcome,",
+    "careerSubtitle": "Your career journey starts here",
+    "activeApplications": "Active Applications",
+    "recommended": "Recommended",
+    "profileCompletion": "Profile Completion",
+    "fillProfileLow": "⚠️ Fill in your profile to get relevant vacancies",
+    "fillProfileHigh": "✅ Profile almost complete, just a little more!",
+    "quickActions": "Quick Actions",
+    "findVacancies": "Find Vacancies",
+    "myApplications": "My Applications",
+    "myProfile": "My Profile",
+    "documents": "Documents",
+    "grantObligation": "Grant Obligation",
+    "daysWorked": "days worked",
+    "daysLeft": "days left",
+    "grantFulfilled": "Fulfilled",
+    "grantActive": "Active",
+    "recentApplications": "Recent Applications",
+    "recommendedVacancies": "Recommended Vacancies",
+    "applicationSent": "Application sent"
+  },
+  "jobs": {
+    "searchPlaceholder": "Search vacancies...",
+    "empty": "No vacancies found",
+    "resetFilters": "Reset filters",
+    "filter": {
+      "title": "Filters",
+      "jobType": "Job Type",
+      "city": "City",
+      "anyCity": "Any city",
+      "salary": "Salary (₸)",
+      "from": "From",
+      "to": "To",
+      "sort": "Sort",
+      "reset": "Reset",
+      "apply": "Apply"
+    },
+    "sort": {
+      "relevance": "By relevance",
+      "date": "By date",
+      "salaryAsc": "Salary ↑",
+      "salaryDesc": "Salary ↓"
+    }
+  },
+  "jobDetail": {
+    "description": "Description",
+    "skills": "Required Skills",
+    "applyBtn": "Apply",
+    "monthSalary": "/ mo",
+    "modal": {
+      "title": "Cover Letter",
+      "sub": "For position: {{title}}",
+      "placeholder": "Tell us why you're a good fit for this position...",
+      "submitBtn": "Submit Application",
+      "error": "Write a cover letter",
+      "success": "Application submitted successfully!"
+    }
+  },
+  "status": {
+    "applied": "Applied",
+    "review": "Under Review",
+    "shortlisted": "Shortlisted",
+    "interview": "Interview",
+    "offered": "Offered",
+    "rejected": "Rejected"
+  },
+  "apps": {
+    "header": "My Applications · {{count}}",
+    "interviewsBanner": "📅 My Interviews",
+    "match": "Match: {{score}}%",
+    "withdraw": "Withdraw",
+    "chat": "💬 Chat",
+    "chatWith": "Chat with Employer",
+    "empty": {
+      "title": "No applications",
+      "text": "Apply to a vacancy in the Jobs tab"
+    },
+    "confirm": {
+      "title": "Withdraw application?",
+      "text": "This action cannot be undone",
+      "btn": "Withdraw"
+    }
+  },
+  "interviews": {
+    "header": "My Interviews",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "duration": "{{count}} minutes",
+    "at": "at",
+    "empty": {
+      "title": "No interviews scheduled",
+      "text": "The employer will schedule an interview after reviewing your application"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "employment": {
+    "header": "Grant Obligation (3 years)",
+    "progressLabel": "Grant Progress",
+    "startDate": "Started: {{date}}",
+    "daysWorked": "Days Worked",
+    "months": "Months",
+    "remainingDays": "Days Remaining",
+    "fulfilled": "✓ Grant obligation fulfilled!",
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "terminated": "Terminated"
+    },
+    "empty": {
+      "title": "No employment records",
+      "text": "After accepting an offer, your grant obligation progress will appear here"
+    }
+  },
+  "docs": {
+    "header": "My Documents",
+    "subheader": "Upload your documents. Only the diploma is verified by the university.",
+    "uploadBtn": "+ Upload",
+    "emptyDoc": "No document uploaded",
+    "uploaded": "✓ Uploaded",
+    "rejectReason": "Reason: {{reason}}",
+    "tipTitle": "💡 Document Tips",
+    "tipText": "• CV: PDF or Word, up to 5 MB\n• Diploma: PDF or JPEG, clear photo\n• Certificates: PDF or JPEG",
+    "tipNote": "Only the diploma is reviewed by the university. CV and certificates are accepted automatically.",
+    "deleteBtn": "🗑 Delete",
+    "types": {
+      "cv": "CV / Resume",
+      "diploma": "Diploma",
+      "certificate": "Certificate"
+    },
+    "status": {
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected"
+    },
+    "delete": {
+      "title": "Delete document?",
+      "confirm": "{{type}}: {{name}}",
+      "btn": "Delete"
+    },
+    "empty": "No documents",
+    "uploadError": "Upload error",
+    "deleteError": "Delete error",
+    "uploadSuccess": "{{type}} uploaded",
+    "deleteSuccess": "Document deleted"
+  },
+  "profileEdit": {
+    "personalData": "Personal Data",
+    "education": "Education",
+    "additional": "Additional",
+    "firstName": "First Name *",
+    "lastName": "Last Name *",
+    "iin": "IIN",
+    "phone": "Phone",
+    "city": "City",
+    "specialization": "Specialization",
+    "graduationYear": "Graduation Year",
+    "gpa": "GPA (0.0 – 4.0)",
+    "skills": "Skills (comma-separated)",
+    "github": "GitHub URL",
+    "bio": "About Me",
+    "saveBtn": "Save Changes",
+    "createBtn": "Create Profile",
+    "diplomaVerified": "✓ Diploma verified",
+    "emailVerified": "✓ Email verified",
+    "emailNotVerified": "⚠ Email not verified",
+    "logoutBtn": "Sign Out",
+    "error": {
+      "name": "Enter first and last name",
+      "saveFailed": "Failed to save"
+    },
+    "saved": "Profile saved",
+    "iinError": {
+      "format": "IIN must contain 12 digits",
+      "checksum": "Invalid IIN checksum",
+      "tooYoung": "Minimum age is 16 years"
+    },
+    "tabs": {
+      "profile": "Profile",
+      "applications": "Applications",
+      "documents": "Documents"
+    },
+    "completion": "Profile Completion"
+  },
+  "account": {
+    "title": "Account Information",
+    "email": "Email",
+    "role": "Role",
+    "emailVerified": "Email verified",
+    "yes": "Yes ✓",
+    "no": "No",
+    "notice": "To edit your profile and upload documents, use the web version on a computer.",
+    "logoutBtn": "Sign Out",
+    "logoutConfirm": "Sign out?",
+    "language": "Language"
+  },
+  "auth": {
+    "sessionExpired": "Session expired",
+    "sessionExpiredText": "You have been automatically signed out due to inactivity"
+  },
+  "notifications": {
+    "header": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications",
+    "time": {
+      "justNow": "just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{{count}} d ago"
+    }
+  },
+  "chats": {
+    "header": "Chats",
+    "chatsWithEmployers": "Chats with Employers · {{count}}",
+    "chatsWithCandidates": "Chats with Candidates · {{count}}",
+    "applicationDate": "Application · {{date}}",
+    "openChat": "Tap to open chat",
+    "empty": "No active chats",
+    "emptyText": "Apply to a vacancy to start chatting with an employer",
+    "employerEmptyText": "Chats will appear when students apply to your vacancies",
+    "startChat": "Start a conversation with the employer",
+    "messagePlaceholder": "Type a message...",
+    "sendBtn": "Send",
+    "withEmployer": "Chat with Employer"
+  },
+  "employer": {
+    "overview": "Overview",
+    "vacanciesTab": "Vacancies ({{count}})",
+    "statsVacancies": "Vacancies",
+    "statsApps": "Applications",
+    "statsOffers": "Offers",
+    "hiringFunnel": "Hiring Funnel",
+    "recentApps": "Recent Applications",
+    "topVacancies": "Top Vacancies by Applications",
+    "applications": "applications",
+    "noData": "No data",
+    "salaryNotSet": "Salary not specified",
+    "activeVacancies": "Active Vacancies",
+    "totalApplications": "Total Applications",
+    "addVacancy": "+ New Vacancy",
+    "noVacancies": "No vacancies. Create the first one!",
+    "noApplications": "No applications",
+    "closeVacancy": {
+      "title": "Close vacancy?",
+      "text": "It will no longer be shown to students",
+      "btn": "Close"
+    },
+    "status": {
+      "active": "Active",
+      "closed": "Closed",
+      "draft": "Draft"
+    },
+    "funnel": {
+      "applied": "Applied",
+      "review": "Under Review",
+      "interview": "Interview",
+      "offered": "Offered"
+    },
+    "vacancy": {
+      "mainInfoTitle": "Basic Information",
+      "jobTypeTitle": "Job Type",
+      "salaryTitle": "Salary (₸)",
+      "descriptionTitle": "Description *",
+      "nameLabel": "Title *",
+      "locationLabel": "Location",
+      "skillsLabel": "Skills (comma-separated)",
+      "salaryFrom": "From",
+      "salaryTo": "To",
+      "titlePlaceholder": "Frontend Developer",
+      "locationPlaceholder": "Almaty / Remote",
+      "skillsPlaceholder": "React, TypeScript, Git",
+      "descriptionPlaceholder": "Describe duties and requirements...",
+      "saveBtn": "Save Changes",
+      "createBtn": "Publish Vacancy",
+      "appsBtn": "Applications",
+      "closeBtn": "Close",
+      "error": "Enter title and description",
+      "saveSuccess": "Vacancy updated",
+      "createSuccess": "Vacancy created"
+    },
+    "apps": {
+      "count": "{{count}} applications",
+      "empty": "No applications for this vacancy",
+      "match": "Match:",
+      "profile": "👤 Profile",
+      "chat": "💬 Chat",
+      "statusConfirm": "Set \"{{label}}\"?",
+      "changeStatusTitle": "Change status?",
+      "statusUpdateError": "Failed to update status"
+    },
+    "actions": {
+      "toReview": "To Review",
+      "shortlist": "Shortlist",
+      "interview": "Interview",
+      "offer": "Offer",
+      "reject": "Reject"
+    },
+    "interviews": {
+      "header": "Interviews",
+      "schedule": "+ Schedule",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "duration": "{{count}} min.",
+      "empty": {
+        "title": "No interviews scheduled",
+        "text": "Schedule interviews for candidates with 'Interview' status"
+      },
+      "cancel": "Cancel",
+      "cancelConfirm": {
+        "title": "Cancel interview?",
+        "text": "The student will be notified"
+      },
+      "success": "Interview scheduled",
+      "scheduleError": "Failed to schedule",
+      "cancelError": "Failed to cancel",
+      "modal": {
+        "title": "Schedule Interview",
+        "appLabel": "Application (Interview status)",
+        "noApps": "No applications with Interview status",
+        "dateLabel": "Date (YYYY-MM-DD)",
+        "timeLabel": "Time (HH:MM)",
+        "durationLabel": "Duration (minutes)",
+        "locationLabel": "Location / link",
+        "notesLabel": "Notes",
+        "scheduleBtn": "Schedule Interview",
+        "error": {
+          "app": "Select an application",
+          "datetime": "Enter date and time"
+        }
+      }
+    },
+    "company": {
+      "mainInfo": "Basic Information",
+      "contacts": "Contacts",
+      "about": "About Company",
+      "nameLabel": "Company Name *",
+      "binLabel": "BIN",
+      "industryLabel": "Industry",
+      "sizeLabel": "Company Size",
+      "binVerified": "✓ BIN verified",
+      "saveBtn": "Save Changes",
+      "createBtn": "Create Profile",
+      "saved": "Company profile saved",
+      "error": {
+        "name": "Enter company name",
+        "save": "Failed to save"
+      }
+    },
+    "candidate": {
+      "info": "Information",
+      "bio": "About",
+      "skills": "Skills",
+      "documents": "Documents",
+      "chat": "💬 Send Message",
+      "city": "City",
+      "phone": "Phone",
+      "graduationYear": "Graduation Year",
+      "gpa": "GPA",
+      "github": "GitHub",
+      "docUploaded": "Uploaded",
+      "match": "Match"
+    }
+  },
+  "university": {
+    "overview": "Overview",
+    "programs": "Programs",
+    "employmentTab": "Employment",
+    "stats": "Statistics",
+    "totalStudents": "Students",
+    "totalVacancies": "Vacancies",
+    "totalApps": "Applications",
+    "offeredCount": "Received Offer",
+    "employmentRate": "Employment Rate",
+    "offerOutOf": "{{count}} of {{total}} students received an offer",
+    "employmentRecords": "Employment Records",
+    "active": "Active",
+    "completed": "Completed",
+    "total": "Total",
+    "studentsBySpec": "Students by Specialization",
+    "distribution": "Distribution",
+    "appsByStatus": "Applications by Status",
+    "topSkills": "Top Skills in Vacancies",
+    "vacanciesByType": "Vacancies by Job Type",
+    "noData": "No data",
+    "employers": "Employers",
+    "noEmployers": "No employers",
+    "employerVacancies": "Vacancies: {{count}}",
+    "employerApps": "Applications: {{count}}",
+    "employment": {
+      "active": "Active",
+      "completed": "Completed",
+      "terminated": "Terminated Early",
+      "daysWorked": "days worked",
+      "daysLeft": "days left",
+      "grantFulfilled": "Grant fulfilled",
+      "startDate": "since {{date}}",
+      "noRecords": "No employment records"
+    },
+    "students": {
+      "search": "🔍 Search students...",
+      "noStudents": "No students found",
+      "gpa": "GPA",
+      "graduation": "Graduation",
+      "diplomaVerified": "Diploma verified",
+      "diplomaPending": "Diploma pending",
+      "documents": "Documents",
+      "diploma": "Diploma",
+      "noDiploma": "No diploma uploaded",
+      "verify": "✓ Verify",
+      "reject": "✕ Reject",
+      "close": "Close",
+      "rejectReason": "Reason: {{reason}}",
+      "rejectPromptTitle": "Rejection Reason",
+      "rejectPromptMsg": "Enter the reason for rejecting the document:",
+      "successVerify": "Document verified",
+      "successReject": "Document rejected",
+      "errorVerify": "Failed to verify",
+      "errorReject": "Failed to reject"
+    }
+  },
+  "language": {
+    "label": "Language",
+    "ru": "Русский",
+    "kz": "Қазақша",
+    "en": "English"
+  }
+}

@@ -51,6 +51,13 @@ func ConnectDatabase(cfg *Config) (*gorm.DB, error) {
 	return db, nil
 }
 
+func (c *Config) GetMigrateURL() string {
+	return fmt.Sprintf(
+		"pgx5://%s:%s@%s:%s/%s?sslmode=%s",
+		c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName, c.DBSSLMode,
+	)
+}
+
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value

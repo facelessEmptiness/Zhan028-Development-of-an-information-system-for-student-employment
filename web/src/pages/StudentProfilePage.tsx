@@ -662,7 +662,7 @@ const StudentProfilePage = () => {
             {(['cv', 'diploma', 'certificate'] as DocumentType[]).map(type => (
               <button key={type} onClick={() => handleUploadClick(type)} disabled={uploadingType !== null}
                 className="flex flex-col items-center gap-2 p-5 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50">
-                <span className="text-3xl">{type === 'cv' ? '📄' : '📜'}</span>
+                <span className="text-3xl">{type === 'cv' ? '📄' : type === 'diploma' ? '🎓' : '📜'}</span>
                 <span className="font-medium text-gray-700 text-sm">
                   {uploadingType === type ? t('profile.documents.uploading') : t('profile.documents.upload', { type: t(getTypeKey(type)) })}
                 </span>
@@ -685,8 +685,11 @@ const StudentProfilePage = () => {
                 <div className="w-11 h-11 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0 font-bold text-xs">PDF</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-semibold text-gray-900 text-sm truncate">{doc.file_name}</p>
-                    <StatusBadge status={doc.status} />
+                    <p className="font-semibold text-gray-900 text-sm truncate">{(() => { try { return decodeURIComponent(doc.file_name); } catch { return doc.file_name; } })()}</p>
+                    {doc.type === 'diploma'
+                      ? <StatusBadge status={doc.status} />
+                      : <span className="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700">✓ {t('candidate.docUploaded')}</span>
+                    }
                   </div>
                   <p className="text-xs text-gray-500">{t(getTypeKey(doc.type))} · {(doc.file_size / 1024).toFixed(0)} KB · {new Date(doc.created_at).toLocaleDateString('ru-RU')}</p>
                   {doc.comment && <p className="text-xs text-gray-600 mt-1 italic">{doc.comment}</p>}

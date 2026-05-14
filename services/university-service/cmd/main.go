@@ -7,7 +7,6 @@ import (
 	"university-service/internal/config"
 	grpcserver "university-service/internal/grpc"
 	"university-service/internal/grpc/pb"
-	"university-service/internal/models"
 	"university-service/internal/repository"
 	"university-service/internal/service"
 
@@ -27,8 +26,8 @@ func main() {
 		log.Fatalf("db error: %v", err)
 	}
 
-	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.University{}); err != nil {
+	// 3. Run SQL migrations
+	if err := config.RunMigrations(cfg); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 

@@ -1,0 +1,603 @@
+{
+  "common": {
+    "loading": "Жүктелуде...",
+    "save": "Сақтау",
+    "saving": "Сақталуда...",
+    "cancel": "Бас тарту",
+    "delete": "Жою",
+    "error": "Қате",
+    "send": "Жіберу",
+    "search": "Іздеу",
+    "close": "Жабу",
+    "back": "Артқа",
+    "ok": "OK",
+    "yes": "Иә",
+    "no": "Жоқ",
+    "edit": "Өзгерту",
+    "create": "Жасау",
+    "download": "Жүктеу",
+    "confirm": "Растау",
+    "success": "Сәтті"
+  },
+  "role": {
+    "student": "Студент",
+    "employer": "Жұмыс беруші",
+    "university": "Университет",
+    "admin": "Әкімші"
+  },
+  "nav": {
+    "home": "Басты бет",
+    "jobs": "Вакансиялар",
+    "applications": "Өтінімдер",
+    "chats": "Чаттар",
+    "profile": "Профиль",
+    "vacancies": "Вакансиялар",
+    "interviews": "Сұхбаттар",
+    "company": "Компания",
+    "account": "Аккаунт",
+    "analytics": "Аналитика",
+    "students": "Студенттер",
+    "notifications": "Хабарламалар"
+  },
+  "screen": {
+    "home": "Басты бет",
+    "vacancy": "Вакансия",
+    "documents": "Құжаттар",
+    "grant": "Грант",
+    "myApplications": "Менің өтінімдерім",
+    "myInterviews": "Менің сұхбаттарым",
+    "myVacancies": "Менің вакансияларым",
+    "editVacancy": "Өзгерту",
+    "newVacancy": "Жаңа вакансия",
+    "vacancyApplications": "Өтінімдер",
+    "candidate": "Үміткер",
+    "analytics": "Аналитика",
+    "students": "Студенттер",
+    "notifications": "Хабарламалар"
+  },
+  "login": {
+    "appTitle": "Жұмысқа орналасу",
+    "appSub": "Қазақстан студенттері",
+    "title": "Жүйеге кіру",
+    "emailLabel": "Email",
+    "emailPlaceholder": "example@university.kz",
+    "passwordLabel": "Құпия сөз",
+    "passwordPlaceholder": "Құпия сөзді енгізіңіз",
+    "submitBtn": "Кіру",
+    "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
+    "noAccount": "Аккаунт жоқ па?",
+    "registerLink": "Тіркелу",
+    "error": {
+      "empty": "Email мен құпия сөзді енгізіңіз",
+      "title": "Кіру қатесі",
+      "checkData": "Деректерді тексеріп, қайталап көріңіз"
+    }
+  },
+  "register": {
+    "title": "Тіркелу",
+    "appSub": "Студенттерді жұмысқа орналастыру",
+    "roleLabel": "Мен",
+    "roles": {
+      "student": { "label": "Студент", "desc": "Жұмыс іздеймін" },
+      "employer": { "label": "Жұмыс беруші", "desc": "Қызметкер іздеймін" },
+      "university": { "label": "Университет", "desc": "Басқару" }
+    },
+    "firstName": "Аты *",
+    "lastName": "Тегі *",
+    "firstNamePlaceholder": "Иван",
+    "lastNamePlaceholder": "Иванов",
+    "university": "Университет *",
+    "email": "Email *",
+    "emailPlaceholder": "example@mail.com",
+    "password": "Құпия сөз *",
+    "passwordPlaceholder": "Кемінде 8 таңба",
+    "confirmPassword": "Құпия сөзді растаңыз *",
+    "confirmPasswordPlaceholder": "Құпия сөзді қайталаңыз",
+    "submitBtn": "Тіркелу",
+    "hasAccount": "Аккаунт бар ма?",
+    "loginLink": "Кіру",
+    "passwordMismatch": "Құпия сөздер сәйкес келмейді",
+    "strength": {
+      "weak": "Әлсіз",
+      "medium": "Орташа",
+      "strong": "Күшті"
+    },
+    "error": {
+      "name": "Аты мен тегін енгізіңіз",
+      "email": "Email енгізіңіз",
+      "passwordLength": "Құпия сөз кемінде 8 таңба",
+      "passwordMismatch": "Құпия сөздер сәйкес келмейді",
+      "university": "Университет таңдаңыз",
+      "failed": "Тіркелу сәтсіз аяқталды"
+    },
+    "success": {
+      "title": "Email-ді растаңыз",
+      "text": "Растау хаты жіберілді:",
+      "note": "Хаттағы сілтемені басыңыз, содан кейін жүйеге кіріңіз.",
+      "loginBtn": "Кіру"
+    }
+  },
+  "verify": {
+    "title": "Email растау",
+    "subtitle": "6 таңбалы код жіберілді:",
+    "codeLabel": "Хаттан кодты енгізіңіз",
+    "confirmBtn": "Email-ді растау",
+    "noCode": "Код келмеді ме?",
+    "resend": "Қайта жіберу",
+    "resendCooldown": "Қайта жіберу ({{count}}с)",
+    "backToLogin": "← Кіруге оралу",
+    "error": {
+      "code": "6 таңбалы кодты енгізіңіз",
+      "invalid": "Қате код"
+    },
+    "success": {
+      "title": "Дайын!",
+      "text": "Email расталды. Енді жүйеге кіре аласыз.",
+      "loginBtn": "Кіру"
+    },
+    "resent": "Жіберілді",
+    "resentText": "Жаңа код поштаңызға жіберілді"
+  },
+  "forgot": {
+    "title": "Құпия сөзді ұмыттыңыз ба?",
+    "subtitleEmail": "Email енгізіңіз — сырып алу коды жіберіледі",
+    "subtitleReset": "Код {{email}} адресіне жіберілді",
+    "emailLabel": "Email",
+    "sendBtn": "Код жіберу",
+    "codeLabel": "Хаттан код (6 таңба)",
+    "codePlaceholder": "6 таңбалы кодты енгізіңіз",
+    "newPassword": "Жаңа құпия сөз",
+    "confirmPassword": "Құпия сөзді растаңыз",
+    "passwordPlaceholder": "Кемінде 8 таңба",
+    "repeatPasswordPlaceholder": "Құпия сөзді қайталаңыз",
+    "resetBtn": "Құпия сөзді сырып алу",
+    "anotherEmail": "← Басқа email",
+    "backToLogin": "← Кіруге оралу",
+    "infoBox": "📧 {{email}} адресіндегі хатты ашып, растау кодын көшіріңіз",
+    "passwordMismatch": "Құпия сөздер сәйкес келмейді",
+    "error": {
+      "email": "Email енгізіңіз",
+      "code": "Хаттан кодты енгізіңіз",
+      "codeLength": "Код дәл 6 таңбадан тұруы керек",
+      "passwordLength": "Құпия сөз кемінде 8 таңба",
+      "passwordMismatch": "Құпия сөздер сәйкес келмейді",
+      "sendFailed": "Хат жіберу сәтсіз аяқталды",
+      "resetFailed": "Құпия сөзді сырып алу сәтсіз аяқталды"
+    },
+    "success": {
+      "title": "Сәтті",
+      "text": "Құпия сөз өзгертілді. Жаңа құпия сөзбен кіріңіз."
+    }
+  },
+  "home": {
+    "greeting": "Қош келдіңіз,",
+    "careerSubtitle": "Мансапқа апаратын жолыңыз осында басталады",
+    "activeApplications": "Белсенді өтінімдер",
+    "recommended": "Ұсынылған",
+    "profileCompletion": "Профиль толтырылуы",
+    "fillProfileLow": "⚠️ Өзекті вакансиялар алу үшін профильді толтырыңыз",
+    "fillProfileHigh": "✅ Профиль дайын, азырақ қалды!",
+    "quickActions": "Жылдам әрекеттер",
+    "findVacancies": "Вакансия табу",
+    "myApplications": "Менің өтінімдерім",
+    "myProfile": "Менің профилім",
+    "documents": "Құжаттар",
+    "grantObligation": "Грант міндеттемесі",
+    "daysWorked": "күн жұмыс істелді",
+    "daysLeft": "күн қалды",
+    "grantFulfilled": "Орындалды",
+    "grantActive": "Белсенді",
+    "recentApplications": "Соңғы өтінімдер",
+    "recommendedVacancies": "Ұсынылған вакансиялар",
+    "applicationSent": "Өтінім жіберілді"
+  },
+  "jobs": {
+    "searchPlaceholder": "Вакансия іздеу...",
+    "empty": "Вакансиялар табылмады",
+    "resetFilters": "Сүзгілерді тазалау",
+    "filter": {
+      "title": "Сүзгілер",
+      "jobType": "Жұмыс түрі",
+      "city": "Қала",
+      "anyCity": "Кез келген қала",
+      "salary": "Жалақы (₸)",
+      "from": "Бастап",
+      "to": "Дейін",
+      "sort": "Сұрыптау",
+      "reset": "Тазалау",
+      "apply": "Қолдану"
+    },
+    "sort": {
+      "relevance": "Өзектілігі бойынша",
+      "date": "Күні бойынша",
+      "salaryAsc": "Жалақы ↑",
+      "salaryDesc": "Жалақы ↓"
+    }
+  },
+  "jobDetail": {
+    "description": "Сипаттама",
+    "skills": "Қажетті дағдылар",
+    "applyBtn": "Өтінім беру",
+    "monthSalary": "/ ай",
+    "modal": {
+      "title": "Жапсырма хат",
+      "sub": "Вакансия: {{title}}",
+      "placeholder": "Неліктен осы лауазымға сәйкес екеніңізді айтыңыз...",
+      "submitBtn": "Өтінім жіберу",
+      "error": "Жапсырма хат жазыңыз",
+      "success": "Өтінім сәтті жіберілді!"
+    }
+  },
+  "status": {
+    "applied": "Жіберілді",
+    "review": "Қарастырылуда",
+    "shortlisted": "Шорт-тізім",
+    "interview": "Сұхбат",
+    "offered": "Ұсыныс",
+    "rejected": "Қабылданбады"
+  },
+  "apps": {
+    "header": "Менің өтінімдерім · {{count}}",
+    "interviewsBanner": "📅 Менің сұхбаттарым",
+    "match": "Сәйкестік: {{score}}%",
+    "withdraw": "Кері алу",
+    "chat": "💬 Чат",
+    "chatWith": "Жұмыс берушімен чат",
+    "empty": {
+      "title": "Өтінімдер жоқ",
+      "text": "«Вакансиялар» бөлімінде вакансияға өтінім беріңіз"
+    },
+    "confirm": {
+      "title": "Өтінімді кері алу?",
+      "text": "Бұл әрекетті болдырмауға болмайды",
+      "btn": "Кері алу"
+    }
+  },
+  "interviews": {
+    "header": "Менің сұхбаттарым",
+    "upcoming": "Алдағы",
+    "past": "Өткен",
+    "duration": "{{count}} минут",
+    "at": "сағат",
+    "empty": {
+      "title": "Сұхбат белгіленбеген",
+      "text": "Жұмыс беруші өтінімді қарастырғаннан кейін сұхбат белгілейді"
+    },
+    "status": {
+      "scheduled": "Жоспарланған",
+      "completed": "Өткізілді",
+      "cancelled": "Бас тартылды"
+    }
+  },
+  "employment": {
+    "header": "Грант міндеттемесі (3 жыл)",
+    "progressLabel": "Грант барысы",
+    "startDate": "Басталуы: {{date}}",
+    "daysWorked": "Жұмыс күндері",
+    "months": "Айлар",
+    "remainingDays": "Қалған күндер",
+    "fulfilled": "✓ Грант міндеттемесі орындалды!",
+    "status": {
+      "active": "Белсенді",
+      "completed": "Аяқталды",
+      "terminated": "Үзілді"
+    },
+    "empty": {
+      "title": "Жұмысқа орналасу жазбалары жоқ",
+      "text": "Ұсынысты қабылдағаннан кейін грант міндеттемесінің барысы осында көрсетіледі"
+    }
+  },
+  "docs": {
+    "header": "Менің құжаттарым",
+    "subheader": "Құжаттарыңызды жүктеңіз. Тек анықтама университет тарапынан тексеріледі.",
+    "uploadBtn": "+ Жүктеу",
+    "emptyDoc": "Құжат жүктелмеген",
+    "uploaded": "✓ Жүктелді",
+    "rejectReason": "Себебі: {{reason}}",
+    "tipTitle": "💡 Құжаттар бойынша кеңестер",
+    "tipText": "• CV: PDF немесе Word, 5 МБ дейін\n• Анықтама: PDF немесе JPEG, анық фото\n• Сертификаттар: PDF немесе JPEG",
+    "tipNote": "Тек анықтама университет тарапынан тексеріледі. CV мен сертификаттар автоматты түрде қабылданады.",
+    "deleteBtn": "🗑 Жою",
+    "types": {
+      "cv": "CV / Түйіндеме",
+      "diploma": "Анықтама",
+      "certificate": "Сертификат"
+    },
+    "status": {
+      "pending": "Тексерілуде",
+      "verified": "Расталды",
+      "rejected": "Қабылданбады"
+    },
+    "delete": {
+      "title": "Құжатты жою?",
+      "confirm": "{{type}}: {{name}}",
+      "btn": "Жою"
+    },
+    "empty": "Құжаттар жоқ",
+    "uploadError": "Жүктеу қатесі",
+    "deleteError": "Жою қатесі",
+    "uploadSuccess": "{{type}} жүктелді",
+    "deleteSuccess": "Құжат жойылды"
+  },
+  "profileEdit": {
+    "personalData": "Жеке деректер",
+    "education": "Білім",
+    "additional": "Қосымша",
+    "firstName": "Аты *",
+    "lastName": "Тегі *",
+    "iin": "ЖСН",
+    "phone": "Телефон",
+    "city": "Қала",
+    "specialization": "Мамандық",
+    "graduationYear": "Бітіру жылы",
+    "gpa": "GPA (0.0 – 4.0)",
+    "skills": "Дағдылар (үтір арқылы)",
+    "github": "GitHub URL",
+    "bio": "Өзім туралы",
+    "saveBtn": "Өзгерістерді сақтау",
+    "createBtn": "Профиль жасау",
+    "diplomaVerified": "✓ Анықтама расталды",
+    "emailVerified": "✓ Email расталды",
+    "emailNotVerified": "⚠ Email расталмады",
+    "logoutBtn": "Аккаунттан шығу",
+    "error": {
+      "name": "Аты мен тегін көрсетіңіз",
+      "saveFailed": "Сақтау сәтсіз аяқталды"
+    },
+    "saved": "Профиль сақталды",
+    "iinError": {
+      "format": "ЖСН 12 санды болуы тиіс",
+      "checksum": "ЖСН бақылау сомасы қате",
+      "tooYoung": "Ең аз жас — 16 жыл"
+    },
+    "tabs": {
+      "profile": "Профиль",
+      "applications": "Өтінімдер",
+      "documents": "Құжаттар"
+    },
+    "completion": "Профильдің толықтығы"
+  },
+  "account": {
+    "title": "Аккаунт туралы ақпарат",
+    "email": "Email",
+    "role": "Рөл",
+    "emailVerified": "Email расталды",
+    "yes": "Иә ✓",
+    "no": "Жоқ",
+    "notice": "Профильді өзгерту және құжат жүктеу үшін компьютердегі веб-нұсқаны пайдаланыңыз.",
+    "logoutBtn": "Аккаунттан шығу",
+    "logoutConfirm": "Аккаунттан шығасыз ба?",
+    "language": "Тіл"
+  },
+  "auth": {
+    "sessionExpired": "Сессия аяқталды",
+    "sessionExpiredText": "Белсенді болмағандықтан жүйеден шықтыңыз"
+  },
+  "notifications": {
+    "header": "Хабарламалар",
+    "markAllRead": "Барлығын оқу",
+    "empty": "Хабарламалар жоқ",
+    "time": {
+      "justNow": "дәл қазір",
+      "minutesAgo": "{{count}} мин. бұрын",
+      "hoursAgo": "{{count}} сағ. бұрын",
+      "yesterday": "кеше",
+      "daysAgo": "{{count}} күн бұрын"
+    }
+  },
+  "chats": {
+    "header": "Чаттар",
+    "chatsWithEmployers": "Жұмыс берушілермен чаттар · {{count}}",
+    "chatsWithCandidates": "Үміткерлермен чаттар · {{count}}",
+    "applicationDate": "Өтінім · {{date}}",
+    "openChat": "Чатты ашу үшін басыңыз",
+    "empty": "Белсенді чаттар жоқ",
+    "emptyText": "Жұмыс берушімен байланысу үшін вакансияға өтінім беріңіз",
+    "employerEmptyText": "Студенттер вакансияларыңызға өтінім бергенде чаттар пайда болады",
+    "startChat": "Жұмыс берушімен хат алмасуды бастаңыз",
+    "messagePlaceholder": "Хабарлама енгізіңіз...",
+    "sendBtn": "Жіберу",
+    "withEmployer": "Жұмыс берушімен чат"
+  },
+  "employer": {
+    "overview": "Шолу",
+    "vacanciesTab": "Вакансиялар ({{count}})",
+    "statsVacancies": "Вакансиялар",
+    "statsApps": "Өтінімдер",
+    "statsOffers": "Ұсыныстар",
+    "hiringFunnel": "Жалдау воронкасы",
+    "recentApps": "Соңғы өтінімдер",
+    "topVacancies": "Өтінімдер бойынша үздік вакансиялар",
+    "applications": "өтінім",
+    "noData": "Деректер жоқ",
+    "salaryNotSet": "Жалақы көрсетілмеген",
+    "activeVacancies": "Белсенді вакансиялар",
+    "totalApplications": "Барлық өтінімдер",
+    "addVacancy": "+ Жаңа вакансия",
+    "noVacancies": "Вакансиялар жоқ. Алғашқысын жасаңыз!",
+    "noApplications": "Өтінімдер жоқ",
+    "closeVacancy": {
+      "title": "Вакансияны жабу?",
+      "text": "Ол студенттерге көрсетілмейді",
+      "btn": "Жабу"
+    },
+    "status": {
+      "active": "Белсенді",
+      "closed": "Жабылған",
+      "draft": "Жобалама"
+    },
+    "funnel": {
+      "applied": "Өтінім берді",
+      "review": "Қарастырылуда",
+      "interview": "Сұхбат",
+      "offered": "Ұсыныс"
+    },
+    "vacancy": {
+      "mainInfoTitle": "Негізгі ақпарат",
+      "jobTypeTitle": "Жұмыс түрі",
+      "salaryTitle": "Жалақы (₸)",
+      "descriptionTitle": "Сипаттама *",
+      "nameLabel": "Атауы *",
+      "locationLabel": "Орналасу жері",
+      "skillsLabel": "Дағдылар (үтір арқылы)",
+      "salaryFrom": "Бастап",
+      "salaryTo": "Дейін",
+      "titlePlaceholder": "Frontend әзірлеуші",
+      "locationPlaceholder": "Алматы / Қашықтан",
+      "skillsPlaceholder": "React, TypeScript, Git",
+      "descriptionPlaceholder": "Міндеттер мен талаптарды сипаттаңыз...",
+      "saveBtn": "Өзгерістерді сақтау",
+      "createBtn": "Вакансияны жариялау",
+      "appsBtn": "Өтінімдер",
+      "closeBtn": "Жабу",
+      "error": "Атауы мен сипаттамасын көрсетіңіз",
+      "saveSuccess": "Вакансия жаңартылды",
+      "createSuccess": "Вакансия жасалды"
+    },
+    "apps": {
+      "count": "{{count}} өтінім",
+      "empty": "Бұл вакансияға өтінімдер жоқ",
+      "match": "Сәйкестік:",
+      "profile": "👤 Профиль",
+      "chat": "💬 Чат",
+      "statusConfirm": "\"{{label}}\" орнату?",
+      "changeStatusTitle": "Мәртебені өзгерту?",
+      "statusUpdateError": "Мәртебені жаңарту сәтсіз аяқталды"
+    },
+    "actions": {
+      "toReview": "Қарастыруға",
+      "shortlist": "Шорт-тізім",
+      "interview": "Сұхбат",
+      "offer": "Ұсыныс",
+      "reject": "Қабылдамау"
+    },
+    "interviews": {
+      "header": "Сұхбаттар",
+      "schedule": "+ Белгілеу",
+      "upcoming": "Алдағы",
+      "past": "Өткен",
+      "duration": "{{count}} мин.",
+      "empty": {
+        "title": "Сұхбаттар белгіленбеген",
+        "text": "«Сұхбат» мәртебесіндегі үміткерлерге сұхбат белгілеңіз"
+      },
+      "cancel": "Бас тарту",
+      "cancelConfirm": {
+        "title": "Сұхбаттан бас тарту?",
+        "text": "Студент хабарлама алады"
+      },
+      "success": "Сұхбат белгіленді",
+      "scheduleError": "Белгілеу сәтсіз аяқталды",
+      "cancelError": "Бас тарту сәтсіз аяқталды",
+      "modal": {
+        "title": "Сұхбат белгілеу",
+        "appLabel": "Өтінім («Сұхбат» мәртебесі)",
+        "noApps": "«Сұхбат» мәртебесіндегі өтінімдер жоқ",
+        "dateLabel": "Күні (ЖЖЖЖ-АА-КК)",
+        "timeLabel": "Уақыты (СС:МM)",
+        "durationLabel": "Ұзақтығы (минут)",
+        "locationLabel": "Орын / сілтеме",
+        "notesLabel": "Жазбалар",
+        "scheduleBtn": "Сұхбат белгілеу",
+        "error": {
+          "app": "Өтінімді таңдаңыз",
+          "datetime": "Күн мен уақытты көрсетіңіз"
+        }
+      }
+    },
+    "company": {
+      "mainInfo": "Негізгі ақпарат",
+      "contacts": "Байланыс",
+      "about": "Компания туралы",
+      "nameLabel": "Компания атауы *",
+      "binLabel": "БСН",
+      "industryLabel": "Сала",
+      "sizeLabel": "Компания мөлшері",
+      "binVerified": "✓ БСН расталды",
+      "saveBtn": "Өзгерістерді сақтау",
+      "createBtn": "Профиль жасау",
+      "saved": "Компания профилі сақталды",
+      "error": {
+        "name": "Компания атауын көрсетіңіз",
+        "save": "Сақтау сәтсіз аяқталды"
+      }
+    },
+    "candidate": {
+      "info": "Ақпарат",
+      "bio": "Өзім туралы",
+      "skills": "Дағдылар",
+      "documents": "Құжаттар",
+      "chat": "💬 Хабарлама жазу",
+      "city": "Қала",
+      "phone": "Телефон",
+      "graduationYear": "Бітіру жылы",
+      "gpa": "GPA",
+      "github": "GitHub",
+      "docUploaded": "Жүктелді",
+      "match": "Сәйкестік"
+    }
+  },
+  "university": {
+    "overview": "Шолу",
+    "programs": "Бағдарламалар",
+    "employmentTab": "Жұмыспен қамту",
+    "stats": "Статистика",
+    "totalStudents": "Студенттер",
+    "totalVacancies": "Вакансиялар",
+    "totalApps": "Өтінімдер",
+    "offeredCount": "Ұсыныс алды",
+    "employmentRate": "Жұмыспен қамту пайызы",
+    "offerOutOf": "{{total}} студенттің {{count}}-і ұсыныс алды",
+    "employmentRecords": "Жұмыс жазбалары",
+    "active": "Белсенді",
+    "completed": "Аяқталды",
+    "total": "Барлығы",
+    "studentsBySpec": "Мамандықтар бойынша студенттер",
+    "distribution": "Бөлу",
+    "appsByStatus": "Мәртебе бойынша өтінімдер",
+    "topSkills": "Вакансиялардағы үздік дағдылар",
+    "vacanciesByType": "Жұмыс түрі бойынша вакансиялар",
+    "noData": "Деректер жоқ",
+    "employers": "Жұмыс берушілер",
+    "noEmployers": "Жұмыс берушілер жоқ",
+    "employerVacancies": "Бос орындар: {{count}}",
+    "employerApps": "Өтінімдер: {{count}}",
+    "employment": {
+      "active": "Белсенді",
+      "completed": "Аяқталды",
+      "terminated": "Мерзімінен бұрын тоқтатылды",
+      "daysWorked": "күн жұмыс істелді",
+      "daysLeft": "күн қалды",
+      "grantFulfilled": "Грант орындалды",
+      "startDate": "{{date}} бастап",
+      "noRecords": "Жұмыс жазбалары жоқ"
+    },
+    "students": {
+      "search": "🔍 Студент іздеу...",
+      "noStudents": "Студенттер табылмады",
+      "gpa": "GPA",
+      "graduation": "Бітіру",
+      "diplomaVerified": "Анықтама расталды",
+      "diplomaPending": "Анықтама тексерілуде",
+      "documents": "Құжаттар",
+      "diploma": "Анықтама",
+      "noDiploma": "Анықтама жүктелмеген",
+      "verify": "✓ Растау",
+      "reject": "✕ Қабылдамау",
+      "close": "Жабу",
+      "rejectReason": "Себебі: {{reason}}",
+      "rejectPromptTitle": "Қабылдамау себебі",
+      "rejectPromptMsg": "Құжатты қабылдамау себебін көрсетіңіз:",
+      "successVerify": "Құжат расталды",
+      "successReject": "Құжат қабылданбады",
+      "errorVerify": "Растау сәтсіз аяқталды",
+      "errorReject": "Қабылдамау сәтсіз аяқталды"
+    }
+  },
+  "language": {
+    "label": "Тіл",
+    "ru": "Русский",
+    "kz": "Қазақша",
+    "en": "English"
+  }
+}

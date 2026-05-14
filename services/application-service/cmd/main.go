@@ -9,7 +9,6 @@ import (
 	"application-service/internal/config"
 	httphandler "application-service/internal/http/handler"
 	httprouter "application-service/internal/http/router"
-	"application-service/internal/models"
 	"application-service/internal/repository"
 	"application-service/internal/service"
 
@@ -29,8 +28,8 @@ func main() {
 		log.Fatalf("db error: %v", err)
 	}
 
-	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.Application{}, &models.Interview{}, &models.EmploymentRecord{}, &models.ChatMessage{}); err != nil {
+	// 3. Run SQL migrations
+	if err := config.RunMigrations(cfg); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 

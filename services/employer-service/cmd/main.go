@@ -8,7 +8,6 @@ import (
 	grpcserver "employer-service/internal/grpc"
 	"employer-service/internal/grpc/pb"
 	"employer-service/internal/config"
-	"employer-service/internal/models"
 	"employer-service/internal/repository"
 	"employer-service/internal/service"
 
@@ -29,8 +28,8 @@ func main() {
 		log.Fatalf("db error: %v", err)
 	}
 
-	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.Vacancy{}, &models.EmployerProfile{}); err != nil {
+	// 3. Run SQL migrations
+	if err := config.RunMigrations(cfg); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 

@@ -1,0 +1,603 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "save": "Сохранить",
+    "saving": "Сохранение...",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "error": "Ошибка",
+    "send": "Отправить",
+    "search": "Поиск",
+    "close": "Закрыть",
+    "back": "Назад",
+    "ok": "OK",
+    "yes": "Да",
+    "no": "Нет",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "download": "Скачать",
+    "confirm": "Подтвердить",
+    "success": "Успешно"
+  },
+  "role": {
+    "student": "Студент",
+    "employer": "Работодатель",
+    "university": "Университет",
+    "admin": "Администратор"
+  },
+  "nav": {
+    "home": "Главная",
+    "jobs": "Вакансии",
+    "applications": "Заявки",
+    "chats": "Чаты",
+    "profile": "Профиль",
+    "vacancies": "Вакансии",
+    "interviews": "Интервью",
+    "company": "Компания",
+    "account": "Аккаунт",
+    "analytics": "Аналитика",
+    "students": "Студенты",
+    "notifications": "Уведомления"
+  },
+  "screen": {
+    "home": "Главная",
+    "vacancy": "Вакансия",
+    "documents": "Документы",
+    "grant": "Грант",
+    "myApplications": "Мои заявки",
+    "myInterviews": "Мои интервью",
+    "myVacancies": "Мои вакансии",
+    "editVacancy": "Редактировать",
+    "newVacancy": "Новая вакансия",
+    "vacancyApplications": "Заявки",
+    "candidate": "Кандидат",
+    "analytics": "Аналитика",
+    "students": "Студенты",
+    "notifications": "Уведомления"
+  },
+  "login": {
+    "appTitle": "Трудоустройство",
+    "appSub": "студентов Казахстана",
+    "title": "Вход в систему",
+    "emailLabel": "Email",
+    "emailPlaceholder": "example@university.kz",
+    "passwordLabel": "Пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "submitBtn": "Войти",
+    "forgotPassword": "Забыли пароль?",
+    "noAccount": "Нет аккаунта?",
+    "registerLink": "Зарегистрироваться",
+    "error": {
+      "empty": "Введите email и пароль",
+      "title": "Ошибка входа",
+      "checkData": "Проверьте данные и попробуйте снова"
+    }
+  },
+  "register": {
+    "title": "Регистрация",
+    "appSub": "Трудоустройство студентов",
+    "roleLabel": "Я являюсь",
+    "roles": {
+      "student": { "label": "Студент", "desc": "Ищу работу" },
+      "employer": { "label": "Работодатель", "desc": "Ищу сотрудников" },
+      "university": { "label": "Университет", "desc": "Управление" }
+    },
+    "firstName": "Имя *",
+    "lastName": "Фамилия *",
+    "firstNamePlaceholder": "Иван",
+    "lastNamePlaceholder": "Иванов",
+    "university": "Университет *",
+    "email": "Email *",
+    "emailPlaceholder": "example@mail.com",
+    "password": "Пароль *",
+    "passwordPlaceholder": "Минимум 8 символов",
+    "confirmPassword": "Подтвердите пароль *",
+    "confirmPasswordPlaceholder": "Повторите пароль",
+    "submitBtn": "Зарегистрироваться",
+    "hasAccount": "Уже есть аккаунт?",
+    "loginLink": "Войти",
+    "passwordMismatch": "Пароли не совпадают",
+    "strength": {
+      "weak": "Слабый",
+      "medium": "Средний",
+      "strong": "Надёжный"
+    },
+    "error": {
+      "name": "Введите имя и фамилию",
+      "email": "Введите email",
+      "passwordLength": "Пароль не менее 8 символов",
+      "passwordMismatch": "Пароли не совпадают",
+      "university": "Выберите университет",
+      "failed": "Не удалось зарегистрироваться"
+    },
+    "success": {
+      "title": "Подтвердите email",
+      "text": "Письмо с подтверждением отправлено на",
+      "note": "Перейдите по ссылке в письме, затем войдите в систему.",
+      "loginBtn": "Войти"
+    }
+  },
+  "verify": {
+    "title": "Подтверждение email",
+    "subtitle": "Мы отправили 6-значный код на",
+    "codeLabel": "Введите код из письма",
+    "confirmBtn": "Подтвердить email",
+    "noCode": "Не получили код?",
+    "resend": "Отправить повторно",
+    "resendCooldown": "Отправить повторно ({{count}}с)",
+    "backToLogin": "← Вернуться к входу",
+    "error": {
+      "code": "Введите 6-значный код",
+      "invalid": "Неверный код"
+    },
+    "success": {
+      "title": "Готово!",
+      "text": "Email подтверждён. Теперь вы можете войти.",
+      "loginBtn": "Войти"
+    },
+    "resent": "Отправлено",
+    "resentText": "Новый код отправлен на вашу почту"
+  },
+  "forgot": {
+    "title": "Забыли пароль?",
+    "subtitleEmail": "Введите email — мы отправим код для сброса",
+    "subtitleReset": "Код отправлен на {{email}}",
+    "emailLabel": "Email",
+    "sendBtn": "Отправить код",
+    "codeLabel": "Код из письма (6 символов)",
+    "codePlaceholder": "Введите 6-значный код",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "passwordPlaceholder": "Минимум 8 символов",
+    "repeatPasswordPlaceholder": "Повторите пароль",
+    "resetBtn": "Сбросить пароль",
+    "anotherEmail": "← Другой email",
+    "backToLogin": "← Вернуться к входу",
+    "infoBox": "📧 Откройте письмо на {{email}} и скопируйте код подтверждения",
+    "passwordMismatch": "Пароли не совпадают",
+    "error": {
+      "email": "Введите email",
+      "code": "Введите код из письма",
+      "codeLength": "Код должен быть ровно 6 символов",
+      "passwordLength": "Пароль не менее 8 символов",
+      "passwordMismatch": "Пароли не совпадают",
+      "sendFailed": "Не удалось отправить письмо",
+      "resetFailed": "Не удалось сбросить пароль"
+    },
+    "success": {
+      "title": "Успешно",
+      "text": "Пароль изменён. Войдите с новым паролем."
+    }
+  },
+  "home": {
+    "greeting": "Добро пожаловать,",
+    "careerSubtitle": "Ваш путь к карьере начинается здесь",
+    "activeApplications": "Активные заявки",
+    "recommended": "Рекомендуемых",
+    "profileCompletion": "Заполненность профиля",
+    "fillProfileLow": "⚠️ Заполните профиль чтобы получать релевантные вакансии",
+    "fillProfileHigh": "✅ Профиль почти готов, ещё немного!",
+    "quickActions": "Быстрые действия",
+    "findVacancies": "Найти вакансии",
+    "myApplications": "Мои заявки",
+    "myProfile": "Мой профиль",
+    "documents": "Документы",
+    "grantObligation": "Грант-обязательство",
+    "daysWorked": "дней отработано",
+    "daysLeft": "дней осталось",
+    "grantFulfilled": "Выполнен",
+    "grantActive": "Активен",
+    "recentApplications": "Последние заявки",
+    "recommendedVacancies": "Рекомендуемые вакансии",
+    "applicationSent": "Заявка отправлена"
+  },
+  "jobs": {
+    "searchPlaceholder": "Поиск вакансий...",
+    "empty": "Вакансии не найдены",
+    "resetFilters": "Сбросить фильтры",
+    "filter": {
+      "title": "Фильтры",
+      "jobType": "Тип занятости",
+      "city": "Город",
+      "anyCity": "Любой город",
+      "salary": "Зарплата (₸)",
+      "from": "От",
+      "to": "До",
+      "sort": "Сортировка",
+      "reset": "Сбросить",
+      "apply": "Применить"
+    },
+    "sort": {
+      "relevance": "По релевантности",
+      "date": "По дате",
+      "salaryAsc": "Зарплата ↑",
+      "salaryDesc": "Зарплата ↓"
+    }
+  },
+  "jobDetail": {
+    "description": "Описание",
+    "skills": "Требуемые навыки",
+    "applyBtn": "Откликнуться",
+    "monthSalary": "/ мес",
+    "modal": {
+      "title": "Сопроводительное письмо",
+      "sub": "На вакансию: {{title}}",
+      "placeholder": "Расскажите почему вы подходите на эту позицию...",
+      "submitBtn": "Отправить заявку",
+      "error": "Напишите сопроводительное письмо",
+      "success": "Заявка успешно отправлена!"
+    }
+  },
+  "status": {
+    "applied": "Отправлена",
+    "review": "На рассмотрении",
+    "shortlisted": "Шорт-лист",
+    "interview": "Собеседование",
+    "offered": "Оффер",
+    "rejected": "Отклонена"
+  },
+  "apps": {
+    "header": "Мои заявки · {{count}}",
+    "interviewsBanner": "📅 Мои интервью",
+    "match": "Совпадение: {{score}}%",
+    "withdraw": "Отозвать",
+    "chat": "💬 Чат",
+    "chatWith": "Чат с работодателем",
+    "empty": {
+      "title": "Нет заявок",
+      "text": "Откликнитесь на вакансию во вкладке «Вакансии»"
+    },
+    "confirm": {
+      "title": "Отозвать заявку?",
+      "text": "Это действие нельзя отменить",
+      "btn": "Отозвать"
+    }
+  },
+  "interviews": {
+    "header": "Мои интервью",
+    "upcoming": "Предстоящие",
+    "past": "Прошедшие",
+    "duration": "{{count}} минут",
+    "at": "в",
+    "empty": {
+      "title": "Интервью не назначены",
+      "text": "Работодатель назначит интервью после рассмотрения заявки"
+    },
+    "status": {
+      "scheduled": "Запланировано",
+      "completed": "Завершено",
+      "cancelled": "Отменено"
+    }
+  },
+  "employment": {
+    "header": "Грант-обязательство (3 года)",
+    "progressLabel": "Прогресс гранта",
+    "startDate": "Начало: {{date}}",
+    "daysWorked": "Дней отработано",
+    "months": "Месяцев",
+    "remainingDays": "Осталось дней",
+    "fulfilled": "✓ Грантовое обязательство выполнено!",
+    "status": {
+      "active": "Активно",
+      "completed": "Завершено",
+      "terminated": "Прервано"
+    },
+    "empty": {
+      "title": "Нет записей о трудоустройстве",
+      "text": "После принятия оффера здесь появится прогресс выполнения грантового обязательства"
+    }
+  },
+  "docs": {
+    "header": "Мои документы",
+    "subheader": "Загрузите ваши документы. Только справка проходит верификацию университетом.",
+    "uploadBtn": "+ Загрузить",
+    "emptyDoc": "Документ не загружен",
+    "uploaded": "✓ Загружено",
+    "rejectReason": "Причина: {{reason}}",
+    "tipTitle": "💡 Советы по документам",
+    "tipText": "• CV: PDF или Word, до 5 МБ\n• Справка: PDF или JPEG, чёткое фото\n• Сертификаты: PDF или JPEG",
+    "tipNote": "Только справка проходит проверку университетом. CV и сертификаты принимаются автоматически.",
+    "deleteBtn": "🗑 Удалить",
+    "types": {
+      "cv": "CV / Резюме",
+      "diploma": "Справка",
+      "certificate": "Сертификат"
+    },
+    "status": {
+      "pending": "На проверке",
+      "verified": "Подтверждён",
+      "rejected": "Отклонён"
+    },
+    "delete": {
+      "title": "Удалить документ?",
+      "confirm": "{{type}}: {{name}}",
+      "btn": "Удалить"
+    },
+    "empty": "Нет документов",
+    "uploadError": "Ошибка загрузки",
+    "deleteError": "Ошибка удаления",
+    "uploadSuccess": "{{type}} загружен",
+    "deleteSuccess": "Документ удалён"
+  },
+  "profileEdit": {
+    "personalData": "Личные данные",
+    "education": "Образование",
+    "additional": "Дополнительно",
+    "firstName": "Имя *",
+    "lastName": "Фамилия *",
+    "iin": "ИИН",
+    "phone": "Телефон",
+    "city": "Город",
+    "specialization": "Специальность",
+    "graduationYear": "Год выпуска",
+    "gpa": "GPA (0.0 – 4.0)",
+    "skills": "Навыки (через запятую)",
+    "github": "GitHub URL",
+    "bio": "О себе",
+    "saveBtn": "Сохранить изменения",
+    "createBtn": "Создать профиль",
+    "diplomaVerified": "✓ Справка верифицирована",
+    "emailVerified": "✓ Email подтверждён",
+    "emailNotVerified": "⚠ Email не подтверждён",
+    "logoutBtn": "Выйти из аккаунта",
+    "error": {
+      "name": "Укажите имя и фамилию",
+      "saveFailed": "Не удалось сохранить"
+    },
+    "saved": "Профиль сохранён",
+    "iinError": {
+      "format": "ИИН должен содержать 12 цифр",
+      "checksum": "Неверная контрольная сумма ИИН",
+      "tooYoung": "Минимальный возраст — 16 лет"
+    },
+    "tabs": {
+      "profile": "Профиль",
+      "applications": "Заявки",
+      "documents": "Документы"
+    },
+    "completion": "Заполненность профиля"
+  },
+  "account": {
+    "title": "Информация об аккаунте",
+    "email": "Email",
+    "role": "Роль",
+    "emailVerified": "Email подтверждён",
+    "yes": "Да ✓",
+    "no": "Нет",
+    "notice": "Для редактирования профиля и загрузки документов используйте веб-версию на компьютере.",
+    "logoutBtn": "Выйти из аккаунта",
+    "logoutConfirm": "Выйти из аккаунта?",
+    "language": "Язык"
+  },
+  "auth": {
+    "sessionExpired": "Сессия истекла",
+    "sessionExpiredText": "Выполнен автоматический выход из-за неактивности"
+  },
+  "notifications": {
+    "header": "Уведомления",
+    "markAllRead": "Прочитать все",
+    "empty": "Нет уведомлений",
+    "time": {
+      "justNow": "только что",
+      "minutesAgo": "{{count}} мин. назад",
+      "hoursAgo": "{{count}} ч. назад",
+      "yesterday": "вчера",
+      "daysAgo": "{{count}} дн. назад"
+    }
+  },
+  "chats": {
+    "header": "Чаты",
+    "chatsWithEmployers": "Чаты с работодателями · {{count}}",
+    "chatsWithCandidates": "Чаты с кандидатами · {{count}}",
+    "applicationDate": "Заявка · {{date}}",
+    "openChat": "Нажмите, чтобы открыть чат",
+    "empty": "Нет активных чатов",
+    "emptyText": "Подайте заявку на вакансию, чтобы начать общение с работодателем",
+    "employerEmptyText": "Чаты появятся, когда студенты подадут заявки на ваши вакансии",
+    "startChat": "Начните переписку с работодателем",
+    "messagePlaceholder": "Введите сообщение...",
+    "sendBtn": "Отправить",
+    "withEmployer": "Чат с работодателем"
+  },
+  "employer": {
+    "overview": "Обзор",
+    "vacanciesTab": "Вакансии ({{count}})",
+    "statsVacancies": "Вакансии",
+    "statsApps": "Заявки",
+    "statsOffers": "Предложения",
+    "hiringFunnel": "Воронка найма",
+    "recentApps": "Последние заявки",
+    "topVacancies": "Топ вакансии по заявкам",
+    "applications": "заявок",
+    "noData": "Нет данных",
+    "salaryNotSet": "Зарплата не указана",
+    "activeVacancies": "Активных вакансий",
+    "totalApplications": "Всего заявок",
+    "addVacancy": "+ Новая вакансия",
+    "noVacancies": "Нет вакансий. Создайте первую!",
+    "noApplications": "Нет заявок",
+    "closeVacancy": {
+      "title": "Закрыть вакансию?",
+      "text": "Она больше не будет отображаться для студентов",
+      "btn": "Закрыть"
+    },
+    "status": {
+      "active": "Активна",
+      "closed": "Закрыта",
+      "draft": "Черновик"
+    },
+    "funnel": {
+      "applied": "Откликнулись",
+      "review": "На рассмотрении",
+      "interview": "Собеседование",
+      "offered": "Предложение"
+    },
+    "vacancy": {
+      "mainInfoTitle": "Основная информация",
+      "jobTypeTitle": "Тип занятости",
+      "salaryTitle": "Зарплата (₸)",
+      "descriptionTitle": "Описание *",
+      "nameLabel": "Название *",
+      "locationLabel": "Местоположение",
+      "skillsLabel": "Навыки (через запятую)",
+      "salaryFrom": "От",
+      "salaryTo": "До",
+      "titlePlaceholder": "Frontend разработчик",
+      "locationPlaceholder": "Алматы / Удалённо",
+      "skillsPlaceholder": "React, TypeScript, Git",
+      "descriptionPlaceholder": "Опишите обязанности, требования...",
+      "saveBtn": "Сохранить изменения",
+      "createBtn": "Опубликовать вакансию",
+      "appsBtn": "Заявки",
+      "closeBtn": "Закрыть",
+      "error": "Укажите название и описание",
+      "saveSuccess": "Вакансия обновлена",
+      "createSuccess": "Вакансия создана"
+    },
+    "apps": {
+      "count": "{{count}} заявок",
+      "empty": "Нет заявок на эту вакансию",
+      "match": "Совпадение:",
+      "profile": "👤 Профиль",
+      "chat": "💬 Чат",
+      "statusConfirm": "Установить \"{{label}}\"?",
+      "changeStatusTitle": "Изменить статус?",
+      "statusUpdateError": "Не удалось обновить статус"
+    },
+    "actions": {
+      "toReview": "В рассмотрение",
+      "shortlist": "Шорт-лист",
+      "interview": "Собеседование",
+      "offer": "Оффер",
+      "reject": "Отклонить"
+    },
+    "interviews": {
+      "header": "Интервью",
+      "schedule": "+ Назначить",
+      "upcoming": "Предстоящие",
+      "past": "Прошедшие",
+      "duration": "{{count}} мин.",
+      "empty": {
+        "title": "Интервью не назначены",
+        "text": "Назначьте интервью кандидатам со статусом «Собеседование»"
+      },
+      "cancel": "Отменить",
+      "cancelConfirm": {
+        "title": "Отменить интервью?",
+        "text": "Студент получит уведомление"
+      },
+      "success": "Интервью назначено",
+      "scheduleError": "Не удалось назначить",
+      "cancelError": "Не удалось отменить",
+      "modal": {
+        "title": "Назначить интервью",
+        "appLabel": "Заявка (статус «Собеседование»)",
+        "noApps": "Нет заявок со статусом «Собеседование»",
+        "dateLabel": "Дата (ГГГГ-ММ-ДД)",
+        "timeLabel": "Время (ЧЧ:ММ)",
+        "durationLabel": "Длительность (минуты)",
+        "locationLabel": "Место / ссылка",
+        "notesLabel": "Заметки",
+        "scheduleBtn": "Назначить интервью",
+        "error": {
+          "app": "Выберите заявку",
+          "datetime": "Укажите дату и время"
+        }
+      }
+    },
+    "company": {
+      "mainInfo": "Основная информация",
+      "contacts": "Контакты",
+      "about": "О компании",
+      "nameLabel": "Название компании *",
+      "binLabel": "БИН",
+      "industryLabel": "Отрасль",
+      "sizeLabel": "Размер компании",
+      "binVerified": "✓ БИН верифицирован",
+      "saveBtn": "Сохранить изменения",
+      "createBtn": "Создать профиль",
+      "saved": "Профиль компании сохранён",
+      "error": {
+        "name": "Укажите название компании",
+        "save": "Не удалось сохранить"
+      }
+    },
+    "candidate": {
+      "info": "Информация",
+      "bio": "О себе",
+      "skills": "Навыки",
+      "documents": "Документы",
+      "chat": "💬 Написать сообщение",
+      "city": "Город",
+      "phone": "Телефон",
+      "graduationYear": "Год выпуска",
+      "gpa": "GPA",
+      "github": "GitHub",
+      "docUploaded": "Загружено",
+      "match": "Совпадение"
+    }
+  },
+  "university": {
+    "overview": "Обзор",
+    "programs": "Программы",
+    "employmentTab": "Занятость",
+    "stats": "Статистика",
+    "totalStudents": "Студентов",
+    "totalVacancies": "Вакансий",
+    "totalApps": "Заявок",
+    "offeredCount": "Оффер получили",
+    "employmentRate": "Процент трудоустройства",
+    "offerOutOf": "{{count}} из {{total}} студентов получили оффер",
+    "employmentRecords": "Трудовые записи",
+    "active": "Активных",
+    "completed": "Завершённых",
+    "total": "Всего",
+    "studentsBySpec": "Студенты по специальностям",
+    "distribution": "Распределение",
+    "appsByStatus": "Заявки по статусам",
+    "topSkills": "Топ навыков в вакансиях",
+    "vacanciesByType": "Вакансии по типу занятости",
+    "noData": "Нет данных",
+    "employers": "Работодатели",
+    "noEmployers": "Нет работодателей",
+    "employerVacancies": "Вакансий: {{count}}",
+    "employerApps": "Заявок: {{count}}",
+    "employment": {
+      "active": "Активна",
+      "completed": "Завершена",
+      "terminated": "Досрочно прекращена",
+      "daysWorked": "дн. отработано",
+      "daysLeft": "дн. осталось",
+      "grantFulfilled": "Грант выполнен",
+      "startDate": "с {{date}}",
+      "noRecords": "Нет трудовых записей"
+    },
+    "students": {
+      "search": "🔍 Поиск студентов...",
+      "noStudents": "Студенты не найдены",
+      "gpa": "GPA",
+      "graduation": "Выпуск",
+      "diplomaVerified": "Диплом верифицирован",
+      "diplomaPending": "Диплом на проверке",
+      "documents": "Документы",
+      "diploma": "Справка",
+      "noDiploma": "Справка не загружена",
+      "verify": "✓ Верифицировать",
+      "reject": "✕ Отклонить",
+      "close": "Закрыть",
+      "rejectReason": "Причина: {{reason}}",
+      "rejectPromptTitle": "Причина отклонения",
+      "rejectPromptMsg": "Укажите причину отклонения документа:",
+      "successVerify": "Документ верифицирован",
+      "successReject": "Документ отклонён",
+      "errorVerify": "Не удалось верифицировать",
+      "errorReject": "Не удалось отклонить"
+    }
+  },
+  "language": {
+    "label": "Язык",
+    "ru": "Русский",
+    "kz": "Қазақша",
+    "en": "English"
+  }
+}

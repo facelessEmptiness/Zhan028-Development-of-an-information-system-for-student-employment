@@ -2,10 +2,11 @@ package handler
 
 import (
 	"errors"
-	"io"
+	"fmt"
 	"net/http"
 	"student-service/internal/models"
 	"student-service/internal/repository"
+	"student-service/internal/storage"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,10 +18,11 @@ const maxFileMB = 10
 type DocumentHandler struct {
 	repo      repository.DocumentRepository
 	notifRepo repository.NotificationRepository
+	storage   storage.Storage
 }
 
-func NewDocumentHandler(repo repository.DocumentRepository, notifRepo repository.NotificationRepository) *DocumentHandler {
-	return &DocumentHandler{repo: repo, notifRepo: notifRepo}
+func NewDocumentHandler(repo repository.DocumentRepository, notifRepo repository.NotificationRepository, s storage.Storage) *DocumentHandler {
+	return &DocumentHandler{repo: repo, notifRepo: notifRepo, storage: s}
 }
 
 // POST /api/documents/upload
@@ -56,33 +58,35 @@ func (h *DocumentHandler) Upload(c *gin.Context) {
 	}
 	defer f.Close()
 
-	data, err := io.ReadAll(f)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot read file"})
+	mimeType := fh.Header.Get("Content-Type")
+	if mimeType == "" {
+		mimeType = "application/octet-stream"
+	}
+
+	storageKey := fmt.Sprintf("documents/%s/%s", uid, uuid.New())
+
+	if err := h.storage.Upload(c.Request.Context(), storageKey, mimeType, f, fh.Size); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to upload file"})
 		return
 	}
 
-	mimeType := fh.Header.Get("Content-Type")
-	if mimeType == "" {
-		mimeType = http.DetectContentType(data)
-	}
-
 	doc := &models.Document{
-		UserID:   uid,
-		Type:     docType,
-		FileName: fh.Filename,
-		FileSize: fh.Size,
-		MimeType: mimeType,
-		FileData: data,
-		Status:   models.DocStatusPending,
+		UserID:     uid,
+		Type:       docType,
+		FileName:   fh.Filename,
+		FileSize:   fh.Size,
+		MimeType:   mimeType,
+		StorageKey: storageKey,
+		Status:     models.DocStatusPending,
 	}
 
 	if err := h.repo.Create(doc); err != nil {
+		// Best-effort cleanup of uploaded object on DB failure
+		_ = h.storage.Delete(c.Request.Context(), storageKey)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save document"})
 		return
 	}
 
-	doc.FileData = nil
 	c.JSON(http.StatusCreated, doc)
 }
 
@@ -134,7 +138,7 @@ func (h *DocumentHandler) Download(c *gin.Context) {
 		return
 	}
 
-	doc, err := h.repo.FindByIDWithData(id)
+	doc, err := h.repo.FindByID(id)
 	if errors.Is(err, repository.ErrDocumentNotFound) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "document not found"})
 		return
@@ -144,12 +148,19 @@ func (h *DocumentHandler) Download(c *gin.Context) {
 		return
 	}
 
+	obj, err := h.storage.Download(c.Request.Context(), doc.StorageKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve file"})
+		return
+	}
+	defer obj.Close()
+
 	mime := doc.MimeType
 	if mime == "" {
 		mime = "application/octet-stream"
 	}
 	c.Header("Content-Disposition", `attachment; filename="`+doc.FileName+`"`)
-	c.Data(http.StatusOK, mime, doc.FileData)
+	c.DataFromReader(http.StatusOK, doc.FileSize, mime, obj, nil)
 }
 
 // PUT /api/documents/:id/verify
@@ -201,7 +212,6 @@ func (h *DocumentHandler) setStatus(c *gin.Context, newStatus string) {
 		return
 	}
 
-	// Create notification for the document owner
 	if h.notifRepo != nil {
 		var notifType, title, body string
 		docTypeLabel := map[string]string{
@@ -238,7 +248,6 @@ func (h *DocumentHandler) setStatus(c *gin.Context, newStatus string) {
 }
 
 // PUT /api/documents/auto-verify/:user_id
-// University admin auto-verifies all pending non-CV documents for a student.
 func (h *DocumentHandler) AutoVerify(c *gin.Context) {
 	verifierID, err := uuid.Parse(c.GetHeader("X-User-ID"))
 	if err != nil {
@@ -263,7 +272,6 @@ func (h *DocumentHandler) AutoVerify(c *gin.Context) {
 		return
 	}
 
-	// Send a single notification to the student
 	if h.notifRepo != nil {
 		_ = h.notifRepo.Create(&models.Notification{
 			UserID:    targetUID,
@@ -282,7 +290,6 @@ func (h *DocumentHandler) AutoVerify(c *gin.Context) {
 }
 
 // GET /api/documents/pending-count
-// Returns the count of pending diploma documents for the calling university's students.
 func (h *DocumentHandler) PendingCount(c *gin.Context) {
 	universityIDStr := c.GetHeader("X-University-ID")
 	universityID, err := uuid.Parse(universityIDStr)
@@ -314,6 +321,11 @@ func (h *DocumentHandler) Delete(c *gin.Context) {
 
 	if doc.UserID.String() != c.GetHeader("X-User-ID") {
 		c.JSON(http.StatusForbidden, gin.H{"error": "cannot delete another user's document"})
+		return
+	}
+
+	if err := h.storage.Delete(c.Request.Context(), doc.StorageKey); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete file from storage"})
 		return
 	}
 
