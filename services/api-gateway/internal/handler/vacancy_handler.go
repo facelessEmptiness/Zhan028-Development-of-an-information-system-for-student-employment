@@ -4,11 +4,13 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"api-gateway/internal/grpc/vacancypb"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/metadata"
 )
 
 type VacancyHandler struct {
@@ -19,18 +21,68 @@ func NewVacancyHandler(client vacancypb.VacancyServiceClient) *VacancyHandler {
 	return &VacancyHandler{client: client}
 }
 
+// vacancyResp is the JSON shape returned to the frontend — skills as []string.
+type vacancyResp struct {
+	ID          string   `json:"id"`
+	EmployerID  string   `json:"employer_id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Location    string   `json:"location"`
+	SalaryMin   float64  `json:"salary_min"`
+	SalaryMax   float64  `json:"salary_max"`
+	JobType     string   `json:"job_type"`
+	Skills      []string `json:"skills"`
+	Status      string   `json:"status"`
+	CreatedAt   string   `json:"created_at"`
+	UpdatedAt   string   `json:"updated_at"`
+	CompanyName string   `json:"company_name"`
+}
+
+func toVacancyResp(v *vacancypb.VacancyMessage) vacancyResp {
+	return vacancyResp{
+		ID:          v.GetId(),
+		EmployerID:  v.GetEmployerId(),
+		Title:       v.GetTitle(),
+		Description: v.GetDescription(),
+		Location:    v.GetLocation(),
+		SalaryMin:   v.GetSalaryMin(),
+		SalaryMax:   v.GetSalaryMax(),
+		JobType:     v.GetJobType(),
+		Skills:      splitSkills(v.GetSkills()),
+		Status:      v.GetStatus(),
+		CreatedAt:   v.GetCreatedAt(),
+		UpdatedAt:   v.GetUpdatedAt(),
+		CompanyName: v.GetCompanyName(),
+	}
+}
+
+func splitSkills(s string) []string {
+	if s == "" {
+		return []string{}
+	}
+	parts := strings.Split(s, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			result = append(result, p)
+		}
+	}
+	return result
+}
+
 func (h *VacancyHandler) CreateVacancy(c *gin.Context) {
 	employerID := c.GetHeader("X-User-ID")
 	employerRole := c.GetHeader("X-User-Role")
 
 	var req struct {
-		Title       string  `json:"title"`
-		Description string  `json:"description"`
-		Location    string  `json:"location"`
-		SalaryMin   float64 `json:"salary_min"`
-		SalaryMax   float64 `json:"salary_max"`
-		JobType     string  `json:"job_type"`
-		Skills      string  `json:"skills"`
+		Title       string   `json:"title"`
+		Description string   `json:"description"`
+		Location    string   `json:"location"`
+		SalaryMin   float64  `json:"salary_min"`
+		SalaryMax   float64  `json:"salary_max"`
+		JobType     string   `json:"job_type"`
+		Skills      []string `json:"skills"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -49,14 +101,14 @@ func (h *VacancyHandler) CreateVacancy(c *gin.Context) {
 		SalaryMin:    req.SalaryMin,
 		SalaryMax:    req.SalaryMax,
 		JobType:      req.JobType,
-		Skills:       req.Skills,
+		Skills:       strings.Join(req.Skills, ","),
 	})
 	if err != nil {
 		handleGRPCError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, resp)
+	c.JSON(http.StatusCreated, toVacancyResp(resp))
 }
 
 func (h *VacancyHandler) GetAllVacancies(c *gin.Context) {
@@ -65,73 +117,52 @@ func (h *VacancyHandler) GetAllVacancies(c *gin.Context) {
 	location := c.Query("location")
 	salaryMinStr := c.Query("salary_min")
 	salaryMaxStr := c.Query("salary_max")
+	skillsStr := c.Query("skills") // comma-separated: ?skills=Python,Go
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
 
-	salaryMin, _ := strconv.ParseFloat(salaryMinStr, 64)
-	salaryMax, _ := strconv.ParseFloat(salaryMaxStr, 64)
-	hasSalaryFilter := salaryMin > 0 || salaryMax > 0
+	salaryMin, _ := strconv.Atoi(salaryMinStr)
+	salaryMax, _ := strconv.Atoi(salaryMaxStr)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// When salary filter is active, fetch all matching vacancies then filter+paginate in gateway
-	fetchPage := int32(page)
-	fetchSize := int32(pageSize)
-	if hasSalaryFilter {
-		fetchPage = 1
-		fetchSize = 1000
+	// Pass salary and skills via gRPC metadata so filtering happens at DB level
+	mdPairs := []string{}
+	if salaryMin > 0 {
+		mdPairs = append(mdPairs, "salary-min", strconv.Itoa(salaryMin))
+	}
+	if salaryMax > 0 {
+		mdPairs = append(mdPairs, "salary-max", strconv.Itoa(salaryMax))
+	}
+	if skillsStr != "" {
+		mdPairs = append(mdPairs, "skills", skillsStr)
+	}
+	if len(mdPairs) > 0 {
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(mdPairs...))
 	}
 
 	resp, err := h.client.GetAllVacancies(ctx, &vacancypb.GetAllVacanciesRequest{
 		Search:   search,
 		JobType:  jobType,
 		Location: location,
-		Page:     fetchPage,
-		PageSize: fetchSize,
+		Page:     int32(page),
+		PageSize: int32(pageSize),
 	})
 	if err != nil {
 		handleGRPCError(c, err)
 		return
 	}
 
-	if !hasSalaryFilter {
-		c.JSON(http.StatusOK, gin.H{
-			"vacancies": resp.Vacancies,
-			"total":     resp.Total,
-			"page":      page,
-			"page_size": pageSize,
-		})
-		return
-	}
-
-	// Apply salary filter
-	filtered := resp.Vacancies[:0]
-	for _, v := range resp.Vacancies {
-		if salaryMin > 0 && v.SalaryMax > 0 && v.SalaryMax < salaryMin {
-			continue
-		}
-		if salaryMax > 0 && v.SalaryMin > 0 && v.SalaryMin > salaryMax {
-			continue
-		}
-		filtered = append(filtered, v)
-	}
-
-	// Manual pagination
-	total := len(filtered)
-	start := (page - 1) * pageSize
-	end := start + pageSize
-	if start > total {
-		start = total
-	}
-	if end > total {
-		end = total
+	vacancies := make([]vacancyResp, 0, len(resp.GetVacancies()))
+	for _, v := range resp.GetVacancies() {
+		vacancies = append(vacancies, toVacancyResp(v))
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"vacancies": filtered[start:end],
-		"total":     total,
+		"vacancies": vacancies,
+		"total":     resp.GetTotal(),
 		"page":      page,
 		"page_size": pageSize,
 	})
@@ -149,7 +180,7 @@ func (h *VacancyHandler) GetVacancyByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, toVacancyResp(resp))
 }
 
 func (h *VacancyHandler) GetMyVacancies(c *gin.Context) {
@@ -164,7 +195,11 @@ func (h *VacancyHandler) GetMyVacancies(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	vacancies := make([]vacancyResp, 0, len(resp.GetVacancies()))
+	for _, v := range resp.GetVacancies() {
+		vacancies = append(vacancies, toVacancyResp(v))
+	}
+	c.JSON(http.StatusOK, gin.H{"vacancies": vacancies})
 }
 
 func (h *VacancyHandler) UpdateVacancy(c *gin.Context) {
@@ -172,14 +207,14 @@ func (h *VacancyHandler) UpdateVacancy(c *gin.Context) {
 	employerID := c.GetHeader("X-User-ID")
 
 	var req struct {
-		Title       string  `json:"title"`
-		Description string  `json:"description"`
-		Location    string  `json:"location"`
-		SalaryMin   float64 `json:"salary_min"`
-		SalaryMax   float64 `json:"salary_max"`
-		JobType     string  `json:"job_type"`
-		Skills      string  `json:"skills"`
-		Status      string  `json:"status"`
+		Title       string   `json:"title"`
+		Description string   `json:"description"`
+		Location    string   `json:"location"`
+		SalaryMin   float64  `json:"salary_min"`
+		SalaryMax   float64  `json:"salary_max"`
+		JobType     string   `json:"job_type"`
+		Skills      []string `json:"skills"`
+		Status      string   `json:"status"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -198,7 +233,7 @@ func (h *VacancyHandler) UpdateVacancy(c *gin.Context) {
 		SalaryMin:   req.SalaryMin,
 		SalaryMax:   req.SalaryMax,
 		JobType:     req.JobType,
-		Skills:      req.Skills,
+		Skills:      strings.Join(req.Skills, ","),
 		Status:      req.Status,
 	})
 	if err != nil {
@@ -206,7 +241,7 @@ func (h *VacancyHandler) UpdateVacancy(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, toVacancyResp(resp))
 }
 
 func (h *VacancyHandler) DeleteVacancy(c *gin.Context) {

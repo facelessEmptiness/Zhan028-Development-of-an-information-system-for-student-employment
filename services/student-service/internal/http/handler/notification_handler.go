@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"student-service/internal/models"
 	"student-service/internal/repository"
+	"student-service/internal/sse"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -11,10 +13,11 @@ import (
 
 type NotificationHandler struct {
 	repo repository.NotificationRepository
+	hub  *sse.Hub
 }
 
-func NewNotificationHandler(repo repository.NotificationRepository) *NotificationHandler {
-	return &NotificationHandler{repo: repo}
+func NewNotificationHandler(repo repository.NotificationRepository, hub *sse.Hub) *NotificationHandler {
+	return &NotificationHandler{repo: repo, hub: hub}
 }
 
 // GET /api/notifications
@@ -87,7 +90,7 @@ func (h *NotificationHandler) MarkRead(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "notification marked as read"})
 }
 
-// POST /api/notifications/internal  — called by API Gateway (no JWT check)
+// POST /api/notifications/internal — called by API Gateway (no JWT check)
 func (h *NotificationHandler) CreateInternal(c *gin.Context) {
 	var req struct {
 		UserID    string `json:"user_id" binding:"required"`
@@ -118,5 +121,48 @@ func (h *NotificationHandler) CreateInternal(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create notification"})
 		return
 	}
+
+	// Push to any active SSE subscribers for this user
+	h.hub.Push(uid, req.Type, n)
+
 	c.JSON(http.StatusCreated, n)
+}
+
+// GET /api/notifications/stream — Server-Sent Events endpoint
+func (h *NotificationHandler) Stream(c *gin.Context) {
+	uid, err := uuid.Parse(c.GetHeader("X-User-ID"))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid X-User-ID"})
+		return
+	}
+
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
+
+	ch, unsub := h.hub.Subscribe(uid)
+	defer unsub()
+
+	// Send a keep-alive comment immediately so the browser knows the stream started
+	fmt.Fprint(c.Writer, ": connected\n\n")
+	c.Writer.Flush()
+
+	clientGone := c.Request.Context().Done()
+	for {
+		select {
+		case <-clientGone:
+			return
+		case ev, ok := <-ch:
+			if !ok {
+				return
+			}
+			data, err := ev.Marshal()
+			if err != nil {
+				continue
+			}
+			c.Writer.Write(data)
+			c.Writer.Flush()
+		}
+	}
 }

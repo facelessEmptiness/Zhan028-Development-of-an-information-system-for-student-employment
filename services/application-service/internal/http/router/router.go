@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch *handler.ChatHandler) *gin.Engine {
+func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch *handler.ChatHandler, wsh *handler.WSChatHandler) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
@@ -39,6 +39,9 @@ func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch
 		chat.GET("/:application_id", ch.GetMessages)
 		chat.POST("/:application_id", ch.SendMessage)
 	}
+
+	// WebSocket chat endpoint
+	r.GET("/ws/chat/:application_id", wsh.ServeWS)
 
 	return r
 }

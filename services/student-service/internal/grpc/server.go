@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 	"errors"
+	"strings"
+
 	"student-service/internal/dto"
 	"student-service/internal/grpc/pb"
 	"student-service/internal/models"
@@ -207,7 +209,7 @@ func toProtoStudent(s *models.Student) *pb.StudentResponse {
 		LastName:       s.LastName,
 		Iin:            s.IIN,
 		UniversityId:   uniID,
-		Skills:         s.Skills,
+		Skills:         strings.Join([]string(s.Skills), ","),
 		CreatedAt:      s.CreatedAt.String(),
 		UpdatedAt:      s.UpdatedAt.String(),
 		Gpa:            s.GPA,

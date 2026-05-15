@@ -11,6 +11,7 @@ import (
 	"student-service/internal/http/router"
 	"student-service/internal/repository"
 	"student-service/internal/service"
+	"student-service/internal/sse"
 	"student-service/internal/storage"
 
 	"google.golang.org/grpc"
@@ -66,9 +67,10 @@ func main() {
 
 	// HTTP server in background
 	go func() {
+		sseHub := sse.NewHub()
 		studentHandler := handler.NewStudentHandler(studentSvc)
 		docHandler := handler.NewDocumentHandler(docRepo, notifRepo, minioStorage)
-		notifHandler := handler.NewNotificationHandler(notifRepo)
+		notifHandler := handler.NewNotificationHandler(notifRepo, sseHub)
 		r := router.SetupRouter(studentHandler, docHandler, notifHandler)
 
 		httpPort := cfg.ServerPort

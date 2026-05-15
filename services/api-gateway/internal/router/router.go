@@ -53,6 +53,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	interviewHandler := handler.NewInterviewHandler(cfg.ApplicationServiceHttpUrl, notifClient)
 	employmentHandler := handler.NewEmploymentHandler(cfg.ApplicationServiceHttpUrl)
 	chatHandler := handler.NewChatHandler(cfg.ApplicationServiceHttpUrl, notifClient, vacancyClient)
+	wsChatProxy := handler.NewWSChatProxy(cfg)
 
 	api := r.Group("/api")
 
@@ -74,8 +75,10 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	// ============================================
 	notifAuth := middleware.AuthMiddleware(cfg.JWTSecret)
 	notifProxy := proxy.NewServiceProxy(cfg.DocumentServiceUrl)
+	notifStreamProxy := proxy.NewStreamingProxy(cfg.DocumentServiceUrl)
 	api.GET("/notifications", notifAuth, notifProxy)
 	api.GET("/notifications/unread-count", notifAuth, notifProxy)
+	api.GET("/notifications/stream", notifAuth, notifStreamProxy)
 	api.PUT("/notifications/read-all", notifAuth, notifProxy)
 	api.PUT("/notifications/:id/read", notifAuth, notifProxy)
 
@@ -183,6 +186,11 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	{
 		analytics.GET("/summary", analyticsHandler.GetSummary)
 	}
+
+	// ============================================
+	// WebSocket chat (auth via ?token=<jwt> query param)
+	// ============================================
+	r.GET("/ws/chat/:application_id", wsChatProxy.ProxyChat)
 
 	// ============================================
 	// Health check

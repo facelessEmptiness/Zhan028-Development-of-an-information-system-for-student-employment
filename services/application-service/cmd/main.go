@@ -11,42 +11,40 @@ import (
 	httprouter "application-service/internal/http/router"
 	"application-service/internal/repository"
 	"application-service/internal/service"
+	"application-service/internal/ws"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
-	// 1. Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("config error: %v", err)
 	}
 
-	// 2. Connect to database
 	db, err := config.ConnectDatabase(cfg)
 	if err != nil {
 		log.Fatalf("db error: %v", err)
 	}
 
-	// 3. Run SQL migrations
 	if err := config.RunMigrations(cfg); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 
-	// 4. Initialize layers
 	appRepo := repository.NewApplicationRepository(db)
 	interviewRepo := repository.NewInterviewRepository(db)
 	employmentRepo := repository.NewEmploymentRepository(db)
 	appSvc := service.NewApplicationService(appRepo)
 	grpcSrv := grpcserver.NewApplicationGRPCServer(appSvc, appRepo)
 
-	// 5. Start HTTP server for interviews and employment in background
 	go func() {
 		chatRepo := repository.NewChatRepository(db)
+		hub := ws.NewHub()
 		interviewHandler := httphandler.NewInterviewHandler(interviewRepo, appRepo)
 		employmentHandler := httphandler.NewEmploymentHandler(employmentRepo)
 		chatHandler := httphandler.NewChatHandler(chatRepo, appRepo)
-		r := httprouter.SetupRouter(interviewHandler, employmentHandler, chatHandler)
+		wsHandler := httphandler.NewWSChatHandler(hub, chatRepo, appRepo)
+		r := httprouter.SetupRouter(interviewHandler, employmentHandler, chatHandler, wsHandler)
 
 		httpPort := cfg.HTTPPort
 		if httpPort == "" {
@@ -58,13 +56,11 @@ func main() {
 		}
 	}()
 
-	// 6. Determine gRPC port
 	grpcPort := cfg.GRPCPort
 	if grpcPort == "" {
 		grpcPort = "50054"
 	}
 
-	// 7. Start gRPC server
 	lis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

@@ -3,6 +3,9 @@ package grpc
 import (
 	"context"
 	"errors"
+	"strconv"
+	"strings"
+
 	"employer-service/internal/dto"
 	"employer-service/internal/grpc/pb"
 	"employer-service/internal/models"
@@ -11,6 +14,7 @@ import (
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -41,7 +45,7 @@ func (s *VacancyGRPCServer) CreateVacancy(ctx context.Context, req *pb.CreateVac
 		SalaryMin:   int(req.SalaryMin),
 		SalaryMax:   int(req.SalaryMax),
 		JobType:     req.JobType,
-		Skills:      req.Skills,
+		Skills:      parseSkills(req.Skills),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create vacancy: %v", err)
@@ -51,13 +55,32 @@ func (s *VacancyGRPCServer) CreateVacancy(ctx context.Context, req *pb.CreateVac
 }
 
 func (s *VacancyGRPCServer) GetAllVacancies(ctx context.Context, req *pb.GetAllVacanciesRequest) (*pb.VacanciesResponse, error) {
-	vacancies, total, err := s.service.GetAllVacancies(service.SearchParams{
+	params := service.SearchParams{
 		Search:   req.Search,
 		JobType:  req.JobType,
 		Location: req.Location,
 		Page:     int(req.Page),
 		PageSize: int(req.PageSize),
-	})
+	}
+
+	// Read salary and skills from gRPC incoming metadata
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if vals := md.Get("salary-min"); len(vals) > 0 {
+			if v, err := strconv.Atoi(vals[0]); err == nil {
+				params.SalaryMin = v
+			}
+		}
+		if vals := md.Get("salary-max"); len(vals) > 0 {
+			if v, err := strconv.Atoi(vals[0]); err == nil {
+				params.SalaryMax = v
+			}
+		}
+		if vals := md.Get("skills"); len(vals) > 0 && vals[0] != "" {
+			params.Skills = parseSkills(vals[0])
+		}
+	}
+
+	vacancies, total, err := s.service.GetAllVacancies(params)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get vacancies: %v", err)
 	}
@@ -121,7 +144,7 @@ func (s *VacancyGRPCServer) UpdateVacancy(ctx context.Context, req *pb.UpdateVac
 		SalaryMin:   int(req.SalaryMin),
 		SalaryMax:   int(req.SalaryMax),
 		JobType:     req.JobType,
-		Skills:      req.Skills,
+		Skills:      parseSkills(req.Skills),
 		Status:      req.Status,
 	})
 	if err != nil {
@@ -260,7 +283,7 @@ func (s *VacancyGRPCServer) toProtoVacancy(v *models.Vacancy) *pb.VacancyMessage
 		SalaryMin:   float64(v.SalaryMin),
 		SalaryMax:   float64(v.SalaryMax),
 		JobType:     v.JobType,
-		Skills:      v.Skills,
+		Skills:      strings.Join([]string(v.Skills), ","),
 		Status:      v.Status,
 		CreatedAt:   v.CreatedAt.String(),
 		UpdatedAt:   v.UpdatedAt.String(),
@@ -285,3 +308,20 @@ func toProtoProfile(p *models.EmployerProfile) *pb.EmployerProfileMessage {
 		UpdatedAt:          p.UpdatedAt.String(),
 	}
 }
+
+// parseSkills splits a comma-separated skills string into a slice, trimming spaces and dropping empties.
+func parseSkills(s string) []string {
+	if s == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			result = append(result, p)
+		}
+	}
+	return result
+}
+

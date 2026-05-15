@@ -7,16 +7,20 @@ import (
 	"employer-service/internal/repository"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 var ErrAccessDenied = errors.New("доступ запрещён")
 
 type SearchParams struct {
-	Search   string
-	JobType  string
-	Location string
-	Page     int
-	PageSize int
+	Search    string
+	JobType   string
+	Location  string
+	Skills    []string
+	SalaryMin int
+	SalaryMax int
+	Page      int
+	PageSize  int
 }
 
 type VacancyService interface {
@@ -45,7 +49,7 @@ func (s *vacancyService) CreateVacancy(employerID uuid.UUID, req *dto.CreateVaca
 		SalaryMin:   req.SalaryMin,
 		SalaryMax:   req.SalaryMax,
 		JobType:     req.JobType,
-		Skills:      req.Skills,
+		Skills:      pq.StringArray(req.Skills),
 		Status:      "active",
 	}
 
@@ -57,11 +61,14 @@ func (s *vacancyService) CreateVacancy(employerID uuid.UUID, req *dto.CreateVaca
 
 func (s *vacancyService) GetAllVacancies(params SearchParams) ([]models.Vacancy, int64, error) {
 	return s.repo.Search(repository.SearchParams{
-		Search:   params.Search,
-		JobType:  params.JobType,
-		Location: params.Location,
-		Page:     params.Page,
-		PageSize: params.PageSize,
+		Search:    params.Search,
+		JobType:   params.JobType,
+		Location:  params.Location,
+		Skills:    params.Skills,
+		SalaryMin: params.SalaryMin,
+		SalaryMax: params.SalaryMax,
+		Page:      params.Page,
+		PageSize:  params.PageSize,
 	})
 }
 
@@ -101,8 +108,8 @@ func (s *vacancyService) UpdateVacancy(id uuid.UUID, employerID uuid.UUID, req *
 	if req.JobType != "" {
 		vacancy.JobType = req.JobType
 	}
-	if req.Skills != "" {
-		vacancy.Skills = req.Skills
+	if len(req.Skills) > 0 {
+		vacancy.Skills = pq.StringArray(req.Skills)
 	}
 	if req.Status != "" {
 		vacancy.Status = req.Status

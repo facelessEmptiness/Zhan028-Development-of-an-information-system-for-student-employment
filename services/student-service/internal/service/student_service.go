@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 	"student-service/internal/dto"
 	"student-service/internal/models"
 	"student-service/internal/repository"
@@ -9,6 +10,7 @@ import (
 	"unicode"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 const minStudentAge = 16
@@ -131,7 +133,7 @@ func (s *StudentService) CreateProfile(userID uuid.UUID, req dto.CreateProfileRe
 		FirstName:      req.FirstName,
 		LastName:       req.LastName,
 		IIN:            req.IIN,
-		Skills:         req.Skills,
+		Skills:         parseSkills(req.Skills),
 		GPA:            req.GPA,
 		Specialization: req.Specialization,
 		GraduationYear: req.GraduationYear,
@@ -187,7 +189,7 @@ func (s *StudentService) UpdateProfile(userID uuid.UUID, req dto.UpdateProfileRe
 		}
 	}
 	if req.Skills != "" {
-		student.Skills = req.Skills
+		student.Skills = parseSkills(req.Skills)
 	}
 	if req.GPA > 0 {
 		student.GPA = req.GPA
@@ -215,4 +217,19 @@ func (s *StudentService) UpdateProfile(userID uuid.UUID, req dto.UpdateProfileRe
 	}
 
 	return student, nil
+}
+
+func parseSkills(s string) pq.StringArray {
+	if s == "" {
+		return pq.StringArray{}
+	}
+	parts := strings.Split(s, ",")
+	result := make(pq.StringArray, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			result = append(result, p)
+		}
+	}
+	return result
 }

@@ -41,6 +41,7 @@ func SetupRouter(sh *handler.StudentHandler, dh *handler.DocumentHandler, nh *ha
 	{
 		notifs.GET("", nh.ListMy)
 		notifs.GET("/unread-count", nh.UnreadCount)
+		notifs.GET("/stream", nh.Stream)
 		notifs.PUT("/read-all", nh.MarkAllRead)
 		notifs.PUT("/:id/read", nh.MarkRead)
 		// Internal endpoint called by API Gateway — no JWT check here (gateway already validated)
