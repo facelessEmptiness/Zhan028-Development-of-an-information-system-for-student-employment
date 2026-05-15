@@ -3,6 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   FlatList, ActivityIndicator, KeyboardAvoidingView, Platform,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { chatService, type ChatMessage } from '../services/chatService';
@@ -71,7 +72,7 @@ export default function ChatScreen() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>💬</Text>
+            <View style={styles.emptyIcon}><Icon name="chat" size={48} color="#D1D5DB" /></View>
             <Text style={styles.emptyText}>{t('chats.startChat')}</Text>
           </View>
         }
@@ -110,7 +111,7 @@ export default function ChatScreen() {
         >
           {sending
             ? <ActivityIndicator size="small" color="#fff" />
-            : <Text style={styles.sendIcon}>➤</Text>
+            : <Icon name="send" size={16} color="#fff" />
           }
         </TouchableOpacity>
       </View>
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
   loader:            { marginTop: 60 },
   list:              { padding: 12, paddingBottom: 8, flexGrow: 1 },
   empty:             { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
-  emptyIcon:         { fontSize: 48, marginBottom: 10 },
+  emptyIcon:         { marginBottom: 10 },
   emptyText:         { fontSize: 14, color: '#9CA3AF', textAlign: 'center' },
   bubble:            { maxWidth: '78%', borderRadius: 16, padding: 10, marginBottom: 8 },
   bubbleMine:        { alignSelf: 'flex-end', backgroundColor: '#2563EB', borderBottomRightRadius: 4 },
@@ -138,5 +139,4 @@ const styles = StyleSheet.create({
   input:             { flex: 1, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10, fontSize: 14, color: '#111827', backgroundColor: '#F9FAFB', maxHeight: 100 },
   sendBtn:           { width: 44, height: 44, borderRadius: 22, backgroundColor: '#2563EB', alignItems: 'center', justifyContent: 'center' },
   sendBtnDisabled:   { backgroundColor: '#93C5FD' },
-  sendIcon:          { fontSize: 16, color: '#fff' },
 });

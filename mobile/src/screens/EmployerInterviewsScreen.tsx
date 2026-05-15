@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, StyleSheet, ActivityIndicator,
   RefreshControl, TouchableOpacity, Alert, Modal, TextInput,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { interviewService, type Interview } from '../services/interviewService';
 import { applicationService, type Application } from '../services/applicationService';
@@ -124,7 +125,7 @@ export default function EmployerInterviewsScreen() {
 
         {interviews.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>📅</Text>
+            <View style={styles.emptyIcon}><Icon name="calendar" size={52} color="#D1D5DB" /></View>
             <Text style={styles.emptyTitle}>{t('employer.interviews.empty.title')}</Text>
             <Text style={styles.emptyText}>{t('employer.interviews.empty.text')}</Text>
           </View>
@@ -171,7 +172,7 @@ export default function EmployerInterviewsScreen() {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t('employer.interviews.modal.title')}</Text>
             <TouchableOpacity onPress={() => setShowForm(false)}>
-              <Text style={styles.closeBtnText}>✕</Text>
+              <Icon name="x" size={20} color="#6B7280" />
             </TouchableOpacity>
           </View>
 
@@ -282,9 +283,9 @@ function InterviewCard({ interview: i, statusConfig, atLabel, durationLabel, can
           <Text style={[styles.badgeText, { color: cfg.color }]}>{cfg.label}</Text>
         </View>
       </View>
-      <View style={styles.metaRow}><Text style={styles.metaIcon}>📅</Text><Text style={styles.metaText}>{formatDate(i.scheduled_at, atLabel)}</Text></View>
-      <View style={styles.metaRow}><Text style={styles.metaIcon}>⏱</Text><Text style={styles.metaText}>{durationLabel}</Text></View>
-      {i.location ? <View style={styles.metaRow}><Text style={styles.metaIcon}>📍</Text><Text style={styles.metaText}>{i.location}</Text></View> : null}
+      <View style={styles.metaRow}><View style={styles.metaIcon}><Icon name="calendar" size={13} color="#6B7280" /></View><Text style={styles.metaText}>{formatDate(i.scheduled_at, atLabel)}</Text></View>
+      <View style={styles.metaRow}><View style={styles.metaIcon}><Icon name="hourglass" size={13} color="#6B7280" /></View><Text style={styles.metaText}>{durationLabel}</Text></View>
+      {i.location ? <View style={styles.metaRow}><View style={styles.metaIcon}><Icon name="pin" size={13} color="#6B7280" /></View><Text style={styles.metaText}>{i.location}</Text></View> : null}
       {onCancel && i.status === 'scheduled' && cancelLabel && (
         <TouchableOpacity style={styles.cancelBtn} onPress={onCancel}>
           <Text style={styles.cancelBtnText}>{cancelLabel}</Text>
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
   addBtnText:      { color: '#fff', fontWeight: '700', fontSize: 13 },
   sectionTitle:    { fontSize: 13, fontWeight: '700', color: '#6B7280', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 },
   empty:           { alignItems: 'center', paddingTop: 80 },
-  emptyIcon:       { fontSize: 52, marginBottom: 12 },
+  emptyIcon:       { marginBottom: 12 },
   emptyTitle:      { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 6 },
   emptyText:       { fontSize: 14, color: '#9CA3AF', textAlign: 'center' },
   card:            { backgroundColor: '#fff', borderRadius: 16, padding: 14, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   badge:           { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
   badgeText:       { fontSize: 11, fontWeight: '700' },
   metaRow:         { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 5 },
-  metaIcon:        { fontSize: 13, width: 20 },
+  metaIcon:        { width: 20, alignItems: 'center' as const },
   metaText:        { fontSize: 13, color: '#374151' },
   cancelBtn:       { marginTop: 10, alignSelf: 'flex-start', borderWidth: 1, borderColor: '#EF4444', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 5 },
   cancelBtnText:   { fontSize: 12, color: '#EF4444', fontWeight: '600' },
@@ -322,7 +323,6 @@ const styles = StyleSheet.create({
   modalContent:    { padding: 20, paddingBottom: 40 },
   modalHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   modalTitle:      { fontSize: 20, fontWeight: '800', color: '#111827' },
-  closeBtnText:    { fontSize: 20, color: '#6B7280' },
   fieldLabel:      { fontSize: 12, fontWeight: '600', color: '#374151', marginBottom: 5 },
   input:           { borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 11, fontSize: 14, color: '#111827', backgroundColor: '#F9FAFB', marginBottom: 14 },
   inputMulti:      { height: 80, textAlignVertical: 'top' },

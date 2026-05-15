@@ -194,6 +194,7 @@
   "jobs": {
     "searchPlaceholder": "Поиск вакансий...",
     "empty": "Вакансии не найдены",
+    "notFound": "Вакансия не найдена",
     "resetFilters": "Сбросить фильтры",
     "filter": {
       "title": "Фильтры",
@@ -331,7 +332,7 @@
     "specialization": "Специальность",
     "graduationYear": "Год выпуска",
     "gpa": "GPA (0.0 – 4.0)",
-    "skills": "Навыки (через запятую)",
+    "skills": "Навыки",
     "github": "GitHub URL",
     "bio": "О себе",
     "saveBtn": "Сохранить изменения",
@@ -439,7 +440,7 @@
       "descriptionTitle": "Описание *",
       "nameLabel": "Название *",
       "locationLabel": "Местоположение",
-      "skillsLabel": "Навыки (через запятую)",
+      "skillsLabel": "Навыки",
       "salaryFrom": "От",
       "salaryTo": "До",
       "titlePlaceholder": "Frontend разработчик",

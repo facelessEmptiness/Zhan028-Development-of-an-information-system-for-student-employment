@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import FlagIcon from './FlagIcon';
 
 const LanguageSelector = () => {
   const { i18n } = useTranslation();
@@ -42,18 +43,19 @@ const LanguageSelector = () => {
       {open && (
         <div className="absolute right-0 mt-2 min-w-[160px] rounded-xl border border-gray-200 bg-white shadow-lg z-50">
           {[
-            { code: 'ru', label: '🇷🇺 Русский' },
-            { code: 'en', label: 'EN English' },
-            { code: 'kz', label: '🇰🇿 Қазақша' },
-          ].map(({ code, label }) => (
+            { code: 'ru', flag: 'ru' as const, label: 'Русский' },
+            { code: 'en', flag: null,          label: 'EN English' },
+            { code: 'kz', flag: 'kz' as const, label: 'Қазақша' },
+          ].map(({ code, flag, label }) => (
             <button
               key={code}
               type="button"
               onClick={() => handleLanguageChange(code)}
-              className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+              className={`w-full text-left flex items-center gap-2 px-4 py-3 text-sm transition-colors ${
                 i18n.language === code ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
+              {flag ? <FlagIcon name={flag} size={20} /> : <span className="w-5 text-center font-bold">EN</span>}
               {label}
             </button>
           ))}

@@ -6,6 +6,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { notificationService, type Notification } from '../services/notificationService';
 import { formatDate } from '../utils/dateUtils';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 
 function relativeTime(dateStr: string, t: (k: string, opts?: any) => string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -20,12 +22,12 @@ function relativeTime(dateStr: string, t: (k: string, opts?: any) => string): st
   return formatDate(dateStr, 'ru-RU', { day: 'numeric', month: 'short' });
 }
 
-const TYPE_CFG: Record<string, { icon: string; color: string }> = {
-  application_submitted: { icon: '✅', color: '#10B981' },
-  application_status:    { icon: '📋', color: '#3B82F6' },
-  interview_scheduled:   { icon: '📅', color: '#8B5CF6' },
-  document_verified:     { icon: '✔️', color: '#10B981' },
-  document_rejected:     { icon: '❌', color: '#EF4444' },
+const TYPE_CFG: Record<string, { icon: IconName; color: string }> = {
+  application_submitted: { icon: 'check-circle', color: '#10B981' },
+  application_status:    { icon: 'clipboard-list', color: '#3B82F6' },
+  interview_scheduled:   { icon: 'calendar', color: '#8B5CF6' },
+  document_verified:     { icon: 'check-circle', color: '#10B981' },
+  document_rejected:     { icon: 'x-circle', color: '#EF4444' },
 };
 
 export default function NotificationsScreen() {
@@ -59,7 +61,7 @@ export default function NotificationsScreen() {
   };
 
   const renderItem = ({ item }: { item: Notification }) => {
-    const cfg   = TYPE_CFG[item.type] ?? { icon: '🔔', color: '#6B7280' };
+    const cfg   = TYPE_CFG[item.type] ?? { icon: 'bell' as IconName, color: '#6B7280' };
     const unread = !item.is_read;
     const date  = relativeTime(item.created_at, t);
 
@@ -70,7 +72,7 @@ export default function NotificationsScreen() {
         activeOpacity={unread ? 0.7 : 1}
       >
         <View style={[styles.iconBox, { backgroundColor: cfg.color + '20' }]}>
-          <Text style={styles.icon}>{cfg.icon}</Text>
+          <Icon name={cfg.icon} size={18} color={cfg.color} />
         </View>
         <View style={styles.cardBody}>
           {item.title ? (
@@ -117,7 +119,7 @@ export default function NotificationsScreen() {
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>🔔</Text>
+          <View style={styles.emptyIcon}><Icon name="bell" size={48} color="#D1D5DB" /></View>
           <Text style={styles.emptyText}>{t('notifications.empty')}</Text>
         </View>
       }
@@ -134,7 +136,6 @@ const styles = StyleSheet.create({
   card:          { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, alignItems: 'flex-start', gap: 12, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
   cardUnread:    { backgroundColor: '#EFF6FF', borderWidth: 1, borderColor: '#BFDBFE' },
   iconBox:       { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  icon:          { fontSize: 18 },
   cardBody:      { flex: 1 },
   title:         { fontSize: 14, fontWeight: '600', color: '#111827', marginBottom: 2 },
   titleUnread:   { color: '#1D4ED8' },
@@ -142,6 +143,6 @@ const styles = StyleSheet.create({
   date:          { fontSize: 11, color: '#9CA3AF' },
   unreadDot:     { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2563EB', marginTop: 4, flexShrink: 0 },
   empty:         { alignItems: 'center', paddingTop: 80 },
-  emptyIcon:     { fontSize: 48, marginBottom: 12 },
+  emptyIcon:     { marginBottom: 12 },
   emptyText:     { fontSize: 16, color: '#9CA3AF' },
 });

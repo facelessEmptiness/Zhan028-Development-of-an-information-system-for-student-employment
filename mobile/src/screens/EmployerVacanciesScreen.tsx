@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
   ActivityIndicator, RefreshControl, Alert, ScrollView,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -218,7 +219,7 @@ export default function EmployerVacanciesScreen() {
           }
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>💼</Text>
+              <View style={styles.emptyIcon}><Icon name="briefcase" size={48} color="#D1D5DB" /></View>
               <Text style={styles.emptyText}>{t('employer.noVacancies')}</Text>
             </View>
           }
@@ -351,7 +352,7 @@ const styles = StyleSheet.create({
   closeBtn:         { backgroundColor: '#FEF2F2' },
   actionBtnText:    { fontSize: 12, fontWeight: '700', color: '#fff' },
   empty:            { alignItems: 'center', paddingTop: 80 },
-  emptyIcon:        { fontSize: 48, marginBottom: 12 },
+  emptyIcon:        { marginBottom: 12 },
   emptyText:        { fontSize: 16, color: '#9CA3AF' },
 
   fab:              { position: 'absolute', right: 20, bottom: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: '#7C3AED', alignItems: 'center', justifyContent: 'center', shadowColor: '#7C3AED', shadowOpacity: 0.4, shadowRadius: 8, elevation: 6 },

@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../services/authService';
+import Icon from '../components/Icon';
 
 export default function ForgotPasswordScreen({ onGoLogin }: { onGoLogin: () => void }) {
   const { t } = useTranslation();
@@ -53,7 +54,7 @@ export default function ForgotPasswordScreen({ onGoLogin }: { onGoLogin: () => v
       <ScrollView style={styles.bg} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
         <View style={styles.iconBox}>
-          <Text style={styles.icon}>🔑</Text>
+          <Icon name="key" size={52} color="#2563EB" />
         </View>
         <Text style={styles.title}>{t('forgot.title')}</Text>
         <Text style={styles.subtitle}>
@@ -104,7 +105,7 @@ export default function ForgotPasswordScreen({ onGoLogin }: { onGoLogin: () => v
                   secureTextEntry={!showPass}
                 />
                 <TouchableOpacity style={styles.eyeBtn} onPress={() => setShowPass(!showPass)}>
-                  <Text>{showPass ? '🙈' : '👁'}</Text>
+                  <Icon name={showPass ? 'eye-off' : 'eye'} size={18} color="#9CA3AF" />
                 </TouchableOpacity>
               </View>
 
@@ -144,7 +145,6 @@ const styles = StyleSheet.create({
   bg:         { flex: 1, backgroundColor: '#F8FAFC' },
   container:  { flexGrow: 1, padding: 24, paddingBottom: 40, justifyContent: 'center' },
   iconBox:    { alignItems: 'center', marginBottom: 12 },
-  icon:       { fontSize: 52 },
   title:      { fontSize: 22, fontWeight: '800', color: '#111827', textAlign: 'center', marginBottom: 6 },
   subtitle:   { fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 24 },
   card:       { backgroundColor: '#fff', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 12, elevation: 3 },

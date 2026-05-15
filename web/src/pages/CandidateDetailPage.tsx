@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import MatchIndex from '../components/MatchIndex';
+import Icon from '../components/Icon';
 import { apiFetch } from '../utils/apiClient';
 import { applicationService } from '../services/applicationService';
 import { type BackendStudentProfile } from '../services/studentService';
@@ -180,13 +181,13 @@ const CandidateDetailPage = () => {
                 <div className="min-w-0">
                   <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 break-words">{fullName}</h1>
                   {student.specialization && (
-                    <p className="text-lg text-gray-600 mb-3">🎓 {student.specialization}</p>
+                    <p className="text-lg text-gray-600 mb-3 flex items-center gap-1.5"><Icon name="graduation-cap" size={18} className="shrink-0" />{student.specialization}</p>
                   )}
                   <div className="flex flex-wrap gap-4 text-gray-600 text-sm">
-                    {student.location_city && <span>📍 {student.location_city}</span>}
-                    {student.phone && <span>📱 {student.phone}</span>}
+                    {student.location_city && <span className="flex items-center gap-1"><Icon name="pin" size={13} className="shrink-0" />{student.location_city}</span>}
+                    {student.phone && <span className="flex items-center gap-1"><Icon name="phone" size={13} className="shrink-0" />{student.phone}</span>}
                     {student.graduation_year > 0 && (
-                      <span>🎓 {t('candidate.graduation', { year: student.graduation_year })}</span>
+                      <span className="flex items-center gap-1"><Icon name="graduation-cap" size={13} className="shrink-0" />{t('candidate.graduation', { year: student.graduation_year })}</span>
                     )}
                     {student.gpa > 0 && (
                       <span className="font-semibold text-green-700">GPA: {student.gpa.toFixed(2)}</span>
@@ -311,7 +312,7 @@ const CandidateDetailPage = () => {
               {interview && interview.status === 'scheduled' ? (
                 <div className="space-y-2">
                   <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 space-y-1">
-                    <p className="text-sm font-semibold text-purple-800">📅 {t('interview.scheduled')}</p>
+                    <p className="text-sm font-semibold text-purple-800 flex items-center gap-1.5"><Icon name="calendar" size={14} />{t('interview.scheduled')}</p>
                     <p className="text-sm text-gray-700">
                       <span className="font-medium">{t('interview.datetime')}:</span>{' '}
                       {new Date(interview.scheduled_at).toLocaleString()}
@@ -368,7 +369,7 @@ const CandidateDetailPage = () => {
               {documents.map(doc => (
                 <div key={doc.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
                   <span className="text-xl mt-0.5">
-                    {doc.type === 'cv' ? '📄' : doc.type === 'diploma' ? '🎓' : '📜'}
+                    {doc.type === 'cv' ? <Icon name="document" size={20} /> : doc.type === 'diploma' ? <Icon name="graduation-cap" size={20} /> : <Icon name="certificate" size={20} />}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{(() => { try { return decodeURIComponent(doc.file_name); } catch { return doc.file_name; } })()}</p>
@@ -377,11 +378,11 @@ const CandidateDetailPage = () => {
                       {doc.type === 'diploma' ? (
                         doc.status === 'verified' ? (
                           <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                            ✅ {t('candidate.docVerifiedByUniversity')}
+                            <Icon name="check-circle" size={11} className="inline mr-0.5" />{t('candidate.docVerifiedByUniversity')}
                           </span>
                         ) : doc.status === 'rejected' ? (
                           <span className="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-                            ❌ {t('candidate.docRejected')}
+                            <Icon name="x-circle" size={11} className="inline mr-0.5" />{t('candidate.docRejected')}
                           </span>
                         ) : (
                           <span className="text-xs font-semibold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
@@ -390,7 +391,7 @@ const CandidateDetailPage = () => {
                         )
                       ) : (
                         <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                          ✓ {t('candidate.docUploaded')}
+                          <Icon name="check" size={11} className="inline mr-0.5" />{t('candidate.docUploaded')}
                         </span>
                       )}
                     </div>

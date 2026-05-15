@@ -3,6 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context';
 import { notificationService, type Notification } from '../services/notificationService';
+import Icon from './Icon';
+import FlagIcon from './FlagIcon';
+import type { IconName } from './icons';
+import type { FlagIconName } from './icons';
 
 /* ─── Role meta ─────────────────────────────────────────────── */
 const ROLE_PILL: Record<string, string> = {
@@ -173,15 +177,16 @@ export default function Header() {
               </button>
               {langDropdownOpen && (
                 <div className="absolute right-0 top-[calc(100%+4px)] min-w-[148px] bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-[9999]">
-                  {[
-                    { code: 'ru', label: '🇷🇺 Русский' },
-                    { code: 'en', label: '🇺🇸 English' },
-                    { code: 'kz', label: '🇰🇿 Қазақша' },
-                  ].map(({ code, label }) => (
+                  {([
+                    { code: 'ru', flag: 'ru' as FlagIconName, label: 'Русский' },
+                    { code: 'en', flag: null,                 label: 'English' },
+                    { code: 'kz', flag: 'kz' as FlagIconName, label: 'Қазақша' },
+                  ] as const).map(({ code, flag, label }) => (
                     <button key={code} onClick={() => handleLanguageChange(code)}
-                      className={`block w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50 ${
+                      className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50 ${
                         i18n.language === code ? 'text-blue-600 font-semibold bg-blue-50' : 'text-gray-700'
                       }`}>
+                      {flag ? <FlagIcon name={flag} size={18} /> : <span className="w-[18px] text-center text-xs font-bold">EN</span>}
                       {label}
                     </button>
                   ))}
@@ -223,7 +228,7 @@ export default function Header() {
                       <div className="divide-y divide-gray-50 max-h-[calc(50dvh-80px)] sm:max-h-[380px] overflow-y-auto">
                         {notifications.length === 0 ? (
                           <div className="flex flex-col items-center justify-center py-12">
-                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-xl mb-3">🔔</div>
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-3"><Icon name="bell" size={24} /></div>
                             <p className="text-sm text-gray-500">{t('nav.noNotifications')}</p>
                           </div>
                         ) : notifications.map(n => (
@@ -369,13 +374,13 @@ export default function Header() {
 }
 
 /* ─── Notification helpers ──────────────────────────────────── */
-const TYPE_CFG: Record<string, { icon: string; bg: string; fg: string }> = {
-  application_submitted: { icon: '📄', bg: '#FFFBEB', fg: '#92400E' },
-  application_status:    { icon: '💼', bg: '#EFF6FF', fg: '#1D4ED8' },
-  interview_scheduled:   { icon: '📅', bg: '#F0FDF4', fg: '#15803D' },
-  document_verified:     { icon: '✅', bg: '#ECFDF5', fg: '#047857' },
-  document_rejected:     { icon: '❌', bg: '#FEF2F2', fg: '#B91C1C' },
-  chat_message:          { icon: '💬', bg: '#F5F3FF', fg: '#7C3AED' },
+const TYPE_CFG: Record<string, { icon: IconName; bg: string; fg: string }> = {
+  application_submitted: { icon: 'document',      bg: '#FFFBEB', fg: '#92400E' },
+  application_status:    { icon: 'briefcase',     bg: '#EFF6FF', fg: '#1D4ED8' },
+  interview_scheduled:   { icon: 'calendar',      bg: '#F0FDF4', fg: '#15803D' },
+  document_verified:     { icon: 'check-circle',  bg: '#ECFDF5', fg: '#047857' },
+  document_rejected:     { icon: 'x-circle',      bg: '#FEF2F2', fg: '#B91C1C' },
+  chat_message:          { icon: 'chat',          bg: '#F5F3FF', fg: '#7C3AED' },
 };
 
 function useNotifTexts(notification: Notification, userRole?: string) {
@@ -429,7 +434,7 @@ function NotifItem({ notification, onMarkRead, userRole, navigate }: {
   userRole?: string;
   navigate: (path: string) => void;
 }) {
-  const cfg     = TYPE_CFG[notification.type] ?? { icon: '🔔', bg: '#F3F4F6', fg: '#374151' };
+  const cfg     = TYPE_CFG[notification.type] ?? { icon: 'bell' as IconName, bg: '#F3F4F6', fg: '#374151' };
   const { title, body } = useNotifTexts(notification, userRole);
   const timeAgo = useRelativeTime(notification.created_at);
 
@@ -447,9 +452,9 @@ function NotifItem({ notification, onMarkRead, userRole, navigate }: {
   return (
     <div onClick={handleClick}
       className={`relative flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors ${!notification.is_read ? 'bg-blue-50/40 dot-unread' : ''}`}>
-      <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[17px]"
+      <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
         style={{ background: cfg.bg, color: cfg.fg }}>
-        {cfg.icon}
+        <Icon name={cfg.icon} size={17} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">

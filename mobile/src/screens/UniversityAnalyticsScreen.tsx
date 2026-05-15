@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { universityService, type AnalyticsSummary } from '../services/universityService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
 import { formatDate } from '../utils/dateUtils';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 
 type Tab = 'overview' | 'programs' | 'employment' | 'stats' | 'employers';
 
@@ -132,10 +134,10 @@ export default function UniversityAnalyticsScreen() {
         {tab === 'overview' && (
           <>
             <View style={styles.kpiGrid}>
-              <KpiCard label={t('university.totalStudents')}  value={totalStudents}  color="#2563EB" icon="🎓" />
-              <KpiCard label={t('university.totalVacancies')} value={totalVacancies} color="#7C3AED" icon="💼" />
-              <KpiCard label={t('university.totalApps')}      value={totalApps}      color="#F59E0B" icon="📋" />
-              <KpiCard label={t('university.offeredCount')}   value={offeredCount}   color="#10B981" icon="✅" />
+              <KpiCard label={t('university.totalStudents')}  value={totalStudents}  color="#2563EB" icon="graduation-cap" />
+              <KpiCard label={t('university.totalVacancies')} value={totalVacancies} color="#7C3AED" icon="briefcase" />
+              <KpiCard label={t('university.totalApps')}      value={totalApps}      color="#F59E0B" icon="clipboard-list" />
+              <KpiCard label={t('university.offeredCount')}   value={offeredCount}   color="#10B981" icon="check-circle" />
             </View>
 
             <View style={styles.card}>
@@ -269,12 +271,21 @@ export default function UniversityAnalyticsScreen() {
                     <Text style={styles.empProgressPct}>{Math.round(r.progress)}%</Text>
                   </View>
                   <View style={styles.empStats}>
-                    <Text style={styles.empStat}>📅 {r.days_worked} {t('university.employment.daysWorked')}</Text>
+                    <View style={styles.empStatItem}>
+                      <Icon name="calendar" size={11} color="#6B7280" />
+                      <Text style={styles.empStat}>{r.days_worked} {t('university.employment.daysWorked')}</Text>
+                    </View>
                     {r.status === 'active' && (
-                      <Text style={styles.empStat}>⏳ {r.remaining_days} {t('university.employment.daysLeft')}</Text>
+                      <View style={styles.empStatItem}>
+                        <Icon name="in-progress" size={11} color="#6B7280" />
+                        <Text style={styles.empStat}>{r.remaining_days} {t('university.employment.daysLeft')}</Text>
+                      </View>
                     )}
                     {r.grant_fulfilled && (
-                      <Text style={[styles.empStat, { color: '#059669' }]}>✅ {t('university.employment.grantFulfilled')}</Text>
+                      <View style={styles.empStatItem}>
+                        <Icon name="check-circle" size={11} color="#059669" />
+                        <Text style={[styles.empStat, { color: '#059669' }]}>{t('university.employment.grantFulfilled')}</Text>
+                      </View>
                     )}
                   </View>
                 </View>
@@ -391,10 +402,10 @@ export default function UniversityAnalyticsScreen() {
   );
 }
 
-function KpiCard({ label, value, color, icon }: { label: string; value: number; color: string; icon: string }) {
+function KpiCard({ label, value, color, icon }: { label: string; value: number; color: string; icon: IconName }) {
   return (
     <View style={[styles.kpiCard, { borderTopColor: color }]}>
-      <Text style={styles.kpiIcon}>{icon}</Text>
+      <View style={styles.kpiIcon}><Icon name={icon} size={22} color={color} /></View>
       <Text style={[styles.kpiValue, { color }]}>{value.toLocaleString()}</Text>
       <Text style={styles.kpiLabel}>{label}</Text>
     </View>
@@ -417,7 +428,7 @@ const styles = StyleSheet.create({
 
   kpiGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 14 },
   kpiCard:         { flex: 1, minWidth: '45%', backgroundColor: '#fff', borderRadius: 14, padding: 14, borderTopWidth: 3, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
-  kpiIcon:         { fontSize: 22, marginBottom: 6 },
+  kpiIcon:         { marginBottom: 6 },
   kpiValue:        { fontSize: 22, fontWeight: '800' },
   kpiLabel:        { fontSize: 11, color: '#6B7280', marginTop: 2 },
 
@@ -466,6 +477,7 @@ const styles = StyleSheet.create({
   empProgressFill: { height: 6, borderRadius: 3 },
   empProgressPct:  { fontSize: 12, fontWeight: '700', color: '#374151', width: 36 },
   empStats:        { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  empStatItem:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
   empStat:         { fontSize: 11, color: '#6B7280' },
 
   emptySmall:      { fontSize: 13, color: '#9CA3AF', textAlign: 'center', paddingVertical: 12 },

@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity,
   StyleSheet, Modal, TextInput, Alert, ActivityIndicator,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { type NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { type StudentStackParamList } from '../navigation/MainNavigator';
@@ -41,8 +42,16 @@ export default function JobDetailScreen({ route }: Props) {
           <Text style={styles.title}>{vacancy.title}</Text>
           {vacancy.company_name ? <Text style={styles.company}>{vacancy.company_name}</Text> : null}
           <View style={styles.metaRow}>
-            {vacancy.location ? <Text style={styles.metaText}>📍 {vacancy.location}</Text> : null}
-            <Text style={styles.metaText}>💼 {vacancy.job_type}</Text>
+            {vacancy.location ? (
+              <View style={styles.metaItem}>
+                <Icon name="pin" size={13} color="#6B7280" />
+                <Text style={styles.metaText}>{vacancy.location}</Text>
+              </View>
+            ) : null}
+            <View style={styles.metaItem}>
+              <Icon name="briefcase" size={13} color="#6B7280" />
+              <Text style={styles.metaText}>{vacancy.job_type}</Text>
+            </View>
           </View>
           {vacancy.salary_min > 0 && (
             <View style={styles.salaryBox}>
@@ -85,7 +94,7 @@ export default function JobDetailScreen({ route }: Props) {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t('jobDetail.modal.title')}</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.modalClose}>✕</Text>
+              <Icon name="x" size={20} color="#6B7280" />
             </TouchableOpacity>
           </View>
           <Text style={styles.modalSub}>{t('jobDetail.modal.sub', { title: vacancy.title })}</Text>
@@ -127,6 +136,7 @@ const styles = StyleSheet.create({
   title:           { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 6 },
   company:         { fontSize: 15, color: '#6B7280', marginBottom: 10 },
   metaRow:         { flexDirection: 'row', gap: 16, marginBottom: 12 },
+  metaItem:        { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaText:        { fontSize: 13, color: '#6B7280' },
   salaryBox:       { backgroundColor: '#EFF6FF', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, alignSelf: 'flex-start' },
   salaryText:      { color: '#1D4ED8', fontWeight: '700', fontSize: 15 },
@@ -142,7 +152,7 @@ const styles = StyleSheet.create({
   modal:           { flex: 1, padding: 24, backgroundColor: '#fff' },
   modalHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   modalTitle:      { fontSize: 20, fontWeight: '700', color: '#111827' },
-  modalClose:      { fontSize: 20, color: '#6B7280', padding: 4 },
+  modalClose:      { padding: 4 },
   modalSub:        { fontSize: 13, color: '#6B7280', marginBottom: 16 },
   textarea:        { flex: 1, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12, padding: 14, fontSize: 15, color: '#111827', backgroundColor: '#F9FAFB', marginBottom: 16 },
   charCount:       { fontSize: 11, color: '#9CA3AF', textAlign: 'right', marginTop: -10, marginBottom: 12 },

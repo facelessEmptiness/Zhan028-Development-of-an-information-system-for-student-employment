@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../services/authService';
+import Icon from '../components/Icon';
 
 interface Props {
   email: string;
@@ -86,7 +87,7 @@ export default function VerifyEmailScreen({ email, onSuccess, onGoLogin }: Props
       <ScrollView style={styles.bg} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
         <View style={styles.iconBox}>
-          <Text style={styles.icon}>📧</Text>
+          <Icon name="mail" size={56} color="#2563EB" />
         </View>
 
         <Text style={styles.title}>{t('verify.title')}</Text>
@@ -150,7 +151,6 @@ const styles = StyleSheet.create({
   bg:            { flex: 1, backgroundColor: '#F8FAFC' },
   container:     { flexGrow: 1, padding: 24, paddingBottom: 40, justifyContent: 'center' },
   iconBox:       { alignItems: 'center', marginBottom: 12 },
-  icon:          { fontSize: 56 },
   title:         { fontSize: 22, fontWeight: '800', color: '#111827', textAlign: 'center', marginBottom: 8 },
   subtitle:      { fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 28, lineHeight: 22 },
   email:         { fontWeight: '700', color: '#2563EB' },

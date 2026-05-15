@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { applicationService, type Application } from '../services/applicationService';
 import { formatDate } from '../utils/dateUtils';
 import type { ChatsStackParamList } from '../navigation/MainNavigator';
+import Icon from '../components/Icon';
 
 const STATUS_COLORS: Record<string, string> = {
   applied: '#3B82F6', review: '#8B5CF6', shortlisted: '#F59E0B',
@@ -55,7 +56,7 @@ export default function ChatsListScreen() {
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>💬</Text>
+          <View style={styles.emptyIcon}><Icon name="chat" size={52} color="#D1D5DB" /></View>
           <Text style={styles.emptyTitle}>{t('chats.empty')}</Text>
           <Text style={styles.emptyText}>{t('chats.emptyText')}</Text>
         </View>
@@ -75,7 +76,7 @@ export default function ChatsListScreen() {
             activeOpacity={0.75}
           >
             <View style={styles.avatarBox}>
-              <Text style={styles.avatarIcon}>💼</Text>
+              <Icon name="briefcase" size={20} color="#2563EB" />
             </View>
             <View style={styles.cardBody}>
               <View style={styles.cardTop}>
@@ -104,7 +105,6 @@ const styles = StyleSheet.create({
   header:       { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 14 },
   card:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, gap: 12, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
   avatarBox:    { width: 44, height: 44, borderRadius: 22, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  avatarIcon:   { fontSize: 20 },
   cardBody:     { flex: 1 },
   cardTop:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
   title:        { fontSize: 14, fontWeight: '700', color: '#111827', flex: 1, marginRight: 8 },
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   snippet:      { fontSize: 12, color: '#6B7280' },
   arrow:        { fontSize: 22, color: '#D1D5DB' },
   empty:        { alignItems: 'center', paddingTop: 80, paddingHorizontal: 40 },
-  emptyIcon:    { fontSize: 52, marginBottom: 16 },
+  emptyIcon:    { marginBottom: 16 },
   emptyTitle:   { fontSize: 17, fontWeight: '700', color: '#374151', marginBottom: 8, textAlign: 'center' },
   emptyText:    { fontSize: 13, color: '#9CA3AF', textAlign: 'center', lineHeight: 20 },
 });

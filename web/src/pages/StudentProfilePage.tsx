@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import Icon from '../components/Icon';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 import { ChatModal } from '../components';
 import { useAuth } from '../context';
@@ -342,8 +343,8 @@ const StudentProfilePage = () => {
             )}
 
             <div className="flex items-center gap-3 text-xs sm:text-sm text-gray-500 mt-2 flex-wrap">
-              {profile?.location_city && <span>📍 {profile.location_city}</span>}
-              {profile?.phone && <span>📱 {profile.phone}</span>}
+              {profile?.location_city && <span className="flex items-center gap-1"><Icon name="pin" size={13} className="shrink-0" />{profile.location_city}</span>}
+              {profile?.phone && <span className="flex items-center gap-1"><Icon name="phone" size={13} className="shrink-0" />{profile.phone}</span>}
               {profile?.github_url && (
                 <a href={profile.github_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-gray-900">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -374,7 +375,7 @@ const StudentProfilePage = () => {
             </div>
             <div className="p-3 bg-amber-50 rounded-lg">
               <p className="text-[11px] text-gray-600 mb-0.5">{t('profile.stats.diploma')}</p>
-              <p className="text-xl font-bold text-amber-700">{profile?.diploma_verified ? '✓' : '—'}</p>
+              <div className="mt-1 text-amber-700">{profile?.diploma_verified ? <Icon name="check" size={22} /> : <span className="text-xl font-bold">—</span>}</div>
             </div>
           </div>
         )}
@@ -456,7 +457,7 @@ const StudentProfilePage = () => {
                   <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-bold text-gray-900 mb-3">{t('profile.view.education', { defaultValue: 'Образование' })}</h3>
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">🎓</div>
+                      <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0"><Icon name="graduation-cap" size={20} /></div>
                       <div>
                         {profile?.university_id && <p className="font-semibold text-gray-900">{universityName(profile.university_id)}</p>}
                         {profile?.specialization && <p className="text-sm text-gray-500">{profile.specialization}</p>}
@@ -475,7 +476,7 @@ const StudentProfilePage = () => {
                 {/* Diploma status */}
                 <div className={`rounded-xl border p-5 ${profile?.diploma_verified ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl">{profile?.diploma_verified ? '🎓' : '📋'}</span>
+                    <span className={profile?.diploma_verified ? 'text-green-600' : 'text-yellow-600'}>{profile?.diploma_verified ? <Icon name="graduation-cap" size={22} /> : <Icon name="clipboard-list" size={22} />}</span>
                     <div>
                       <p className="font-semibold text-sm text-gray-900">
                         {profile?.diploma_verified ? t('profile.view.diplomaVerified') : t('profile.view.diplomaNotVerified')}
@@ -662,7 +663,7 @@ const StudentProfilePage = () => {
             {(['cv', 'diploma', 'certificate'] as DocumentType[]).map(type => (
               <button key={type} onClick={() => handleUploadClick(type)} disabled={uploadingType !== null}
                 className="flex flex-col items-center gap-2 p-5 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50">
-                <span className="text-3xl">{type === 'cv' ? '📄' : type === 'diploma' ? '🎓' : '📜'}</span>
+                <span className="text-gray-500">{type === 'cv' ? <Icon name="document" size={28} /> : type === 'diploma' ? <Icon name="graduation-cap" size={28} /> : <Icon name="certificate" size={28} />}</span>
                 <span className="font-medium text-gray-700 text-sm">
                   {uploadingType === type ? t('profile.documents.uploading') : t('profile.documents.upload', { type: t(getTypeKey(type)) })}
                 </span>
@@ -688,7 +689,7 @@ const StudentProfilePage = () => {
                     <p className="font-semibold text-gray-900 text-sm truncate">{(() => { try { return decodeURIComponent(doc.file_name); } catch { return doc.file_name; } })()}</p>
                     {doc.type === 'diploma'
                       ? <StatusBadge status={doc.status} />
-                      : <span className="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700">✓ {t('candidate.docUploaded')}</span>
+                      : <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700"><Icon name="check" size={11} />{t('candidate.docUploaded')}</span>
                     }
                   </div>
                   <p className="text-xs text-gray-500">{t(getTypeKey(doc.type))} · {(doc.file_size / 1024).toFixed(0)} KB · {new Date(doc.created_at).toLocaleDateString('ru-RU')}</p>

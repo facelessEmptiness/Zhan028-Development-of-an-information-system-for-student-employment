@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 import { applicationService, type Application } from '../services/applicationService';
 import { type JobPosting } from '../services/employerService';
@@ -67,15 +69,15 @@ function SkillChip({ children, variant = 'blue' }: { children: React.ReactNode; 
 }
 
 /* ─── Data ──────────────────────────────────────────────────── */
-const jobCategories = [
-  { id: 1, labelKey: 'home.categories_list.it',           count: '2 340', icon: '💻' },
-  { id: 2, labelKey: 'home.categories_list.sales',        count: '1 850', icon: '📊' },
-  { id: 3, labelKey: 'home.categories_list.finance',      count: '1 250', icon: '₸'  },
-  { id: 4, labelKey: 'home.categories_list.hr',           count: '890',   icon: '👥' },
-  { id: 5, labelKey: 'home.categories_list.engineering',  count: '1 560', icon: '⚙️' },
-  { id: 6, labelKey: 'home.categories_list.medicine',     count: '940',   icon: '⚕️' },
-  { id: 7, labelKey: 'home.categories_list.education',    count: '720',   icon: '🎓' },
-  { id: 8, labelKey: 'home.categories_list.construction', count: '1 100', icon: '🏗️' },
+const jobCategories: { id: number; labelKey: string; count: string; icon: IconName }[] = [
+  { id: 1, labelKey: 'home.categories_list.it',           count: '2 340', icon: 'code'           },
+  { id: 2, labelKey: 'home.categories_list.sales',        count: '1 850', icon: 'chart-bar'      },
+  { id: 3, labelKey: 'home.categories_list.finance',      count: '1 250', icon: 'chart-line'     },
+  { id: 4, labelKey: 'home.categories_list.hr',           count: '890',   icon: 'user-circle'    },
+  { id: 5, labelKey: 'home.categories_list.engineering',  count: '1 560', icon: 'briefcase'      },
+  { id: 6, labelKey: 'home.categories_list.medicine',     count: '940',   icon: 'certificate'    },
+  { id: 7, labelKey: 'home.categories_list.education',    count: '720',   icon: 'graduation-cap' },
+  { id: 8, labelKey: 'home.categories_list.construction', count: '1 100', icon: 'building-2'     },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
@@ -162,7 +164,7 @@ const LandingPage = () => {
           {jobCategories.map(cat => (
             <button key={cat.id} onClick={() => navigate('/jobs')}
               className="text-left bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-blue-200 transition-all category-card">
-              <div className="text-3xl mb-3">{cat.icon}</div>
+              <div className="mb-3 text-blue-500"><Icon name={cat.icon} size={28} /></div>
               <h3 className="font-semibold text-gray-900 mb-1 text-sm">{t(cat.labelKey)}</h3>
               <p className="font-bold text-blue-600">{cat.count}</p>
               <p className="text-gray-500 text-xs">{t('home.categories.openPositions')}</p>
@@ -304,9 +306,9 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
           <p className="text-xs text-gray-500 mb-1">{t('home.student.profileCard')}</p>
           {loadingStats ? <div className="skeleton h-7 w-16 mt-1" /> : (
             <>
-              <p className="text-2xl font-bold" style={{ color: completion < 100 ? '#F59E0B' : '#10B981' }}>
-                {completion < 100 ? '⚠' : '✓'}
-              </p>
+              <div className="mt-1" style={{ color: completion < 100 ? '#F59E0B' : '#10B981' }}>
+                {completion < 100 ? <Icon name="alert-triangle" size={24} /> : <Icon name="check" size={24} />}
+              </div>
               <Link to="/profile" className="text-xs text-blue-600 mt-1.5 inline-block hover:underline">
                 {completion < 100 ? t('home.student.fillProfile') : `${t('home.student.viewAll')} →`}
               </Link>
@@ -318,14 +320,14 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
       {/* ── Quick actions ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { titleKey: 'home.student.profileCard',      descKey: 'home.student.profileDesc',      link: '/profile',         bg: 'bg-blue-50',   iconBg: 'bg-blue-100',   icon: '👤' },
-          { titleKey: 'home.student.jobsCard',         descKey: 'home.student.jobsDesc',         link: '/jobs',            bg: 'bg-indigo-50', iconBg: 'bg-indigo-100', icon: '🔍' },
-          { titleKey: 'home.student.applicationsCard', descKey: 'home.student.applicationsDesc', link: '/my-applications', bg: 'bg-purple-50', iconBg: 'bg-purple-100', icon: '📋' },
+          { titleKey: 'home.student.profileCard',      descKey: 'home.student.profileDesc',      link: '/profile',         bg: 'bg-blue-50',   iconBg: 'bg-blue-100',   icon: 'user'           as IconName },
+          { titleKey: 'home.student.jobsCard',         descKey: 'home.student.jobsDesc',         link: '/jobs',            bg: 'bg-indigo-50', iconBg: 'bg-indigo-100', icon: 'search'         as IconName },
+          { titleKey: 'home.student.applicationsCard', descKey: 'home.student.applicationsDesc', link: '/my-applications', bg: 'bg-purple-50', iconBg: 'bg-purple-100', icon: 'clipboard-list' as IconName },
         ].map(item => (
           <Link key={item.link} to={item.link}
             className={`${item.bg} rounded-xl border border-transparent p-5 hover:shadow-md hover:border-blue-200 transition-all`}>
-            <div className={`${item.iconBg} w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-3`}>
-              {item.icon}
+            <div className={`${item.iconBg} w-10 h-10 rounded-xl flex items-center justify-center text-blue-600 mb-3`}>
+              <Icon name={item.icon} size={20} />
             </div>
             <h3 className="font-semibold text-gray-900 mb-1">{t(item.titleKey)}</h3>
             <p className="text-gray-500 text-sm">{t(item.descKey)}</p>
@@ -431,7 +433,7 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
 
         {!loadingRec && recommended.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
-            <div className="text-4xl mb-3">🔍</div>
+            <div className="mb-3 text-gray-300 flex justify-center"><Icon name="search" size={40} /></div>
             <p className="text-gray-600 mb-4">{t('home.student.fillProfileForRec')}</p>
             <Link to="/profile"
               className="inline-block px-6 py-2 text-white rounded-lg font-medium transition-colors"
@@ -464,7 +466,7 @@ const EmployerHome = ({ email }: { email?: string }) => {
         </div>
       </section>
       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">💼</div>
+        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mx-auto mb-4"><Icon name="briefcase" size={32} /></div>
         <h2 className="text-2xl font-bold text-gray-900 mb-3">{t('home.employer.title')}</h2>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">{t('home.employer.description')}</p>
         <Link to="/employer-dashboard"
@@ -496,7 +498,7 @@ const UniversityHome = ({ email }: { email?: string }) => {
         </div>
       </section>
       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-        <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🎓</div>
+        <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mx-auto mb-4"><Icon name="graduation-cap" size={32} /></div>
         <h2 className="text-2xl font-bold text-gray-900 mb-3">{t('home.university.title')}</h2>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">{t('home.university.description')}</p>
         <Link to="/analytics"

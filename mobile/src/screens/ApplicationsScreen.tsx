@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, TouchableOpacity,
   StyleSheet, ActivityIndicator, RefreshControl, Alert,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -127,7 +128,7 @@ export default function ApplicationsScreen() {
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <View style={styles.emptyIcon}><Icon name="clipboard-list" size={48} color="#D1D5DB" /></View>
           <Text style={styles.emptyTitle}>{t('apps.empty.title')}</Text>
           <Text style={styles.emptyText}>{t('apps.empty.text')}</Text>
         </View>
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
   interviewBannerText: { fontSize: 14, fontWeight: '700', color: '#7C3AED' },
   interviewBannerArrow:{ fontSize: 16, color: '#7C3AED', fontWeight: '700' },
   empty:        { alignItems: 'center', paddingTop: 80, paddingHorizontal: 32 },
-  emptyIcon:    { fontSize: 48, marginBottom: 12 },
+  emptyIcon:    { marginBottom: 12 },
   emptyTitle:   { fontSize: 18, fontWeight: '700', color: '#374151', marginBottom: 6 },
   emptyText:    { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 20 },
 });

@@ -1,4 +1,6 @@
 // Reusable UI components
+export { default as Icon } from './Icon';
+export { default as FlagIcon } from './FlagIcon';
 export { default as Header } from './Header';
 export { Button } from './Button';
 export { ProtectedRoute } from './ProtectedRoute';

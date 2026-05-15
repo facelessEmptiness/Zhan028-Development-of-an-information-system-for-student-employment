@@ -3,6 +3,7 @@ import { useState, useEffect, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import Icon from '../components/Icon';
 import { apiFetch } from '../utils/apiClient';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 import { EDUCATIONAL_PROGRAMS, PROGRAM_I18N_KEY, type EducationalProgram } from '../constants/programs';
@@ -547,7 +548,7 @@ const UniversityAnalyticsPage = () => {
                     return (
                       <div key={item.name}>
                         <div className="flex justify-between text-sm mb-1.5">
-                          <span className="text-gray-700 font-medium">📍 {item.name}</span>
+                          <span className="text-gray-700 font-medium flex items-center gap-1"><Icon name="pin" size={13} className="text-gray-400 shrink-0" />{item.name}</span>
                           <span className="text-gray-900 font-semibold">{item.count}</span>
                         </div>
                         <div className="w-full bg-gray-100 rounded-full h-2">

@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
   ActivityIndicator, RefreshControl,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -82,7 +83,7 @@ export default function EmployerChatsListScreen() {
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>💬</Text>
+          <View style={styles.emptyIcon}><Icon name="chat" size={52} color="#D1D5DB" /></View>
           <Text style={styles.emptyTitle}>{t('chats.empty')}</Text>
           <Text style={styles.emptyText}>{t('chats.employerEmptyText')}</Text>
         </View>
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
   vacancy:      { fontSize: 12, color: '#6B7280' },
   arrow:        { fontSize: 22, color: '#D1D5DB' },
   empty:        { alignItems: 'center', paddingTop: 80, paddingHorizontal: 40 },
-  emptyIcon:    { fontSize: 52, marginBottom: 16 },
+  emptyIcon:    { marginBottom: 16 },
   emptyTitle:   { fontSize: 17, fontWeight: '700', color: '#374151', marginBottom: 8, textAlign: 'center' },
   emptyText:    { fontSize: 13, color: '#9CA3AF', textAlign: 'center', lineHeight: 20 },
 });

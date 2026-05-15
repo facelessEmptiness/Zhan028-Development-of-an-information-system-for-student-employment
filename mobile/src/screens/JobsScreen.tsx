@@ -8,6 +8,7 @@ import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { jobService, type Vacancy } from '../services/jobService';
 import { type StudentStackParamList } from '../navigation/MainNavigator';
+import Icon from '../components/Icon';
 
 type Nav = NativeStackNavigationProp<StudentStackParamList, 'JobsMain'>;
 
@@ -104,7 +105,12 @@ export default function JobsScreen() {
       </View>
       {item.company_name ? <Text style={styles.company}>{item.company_name}</Text> : null}
       <View style={styles.meta}>
-        {item.location ? <Text style={styles.metaText}>📍 {item.location}</Text> : null}
+        {item.location ? (
+          <View style={styles.metaItem}>
+            <Icon name="pin" size={12} color="#6B7280" />
+            <Text style={styles.metaText}>{item.location}</Text>
+          </View>
+        ) : null}
         {item.salary_min > 0 ? (
           <Text style={styles.metaText}>₸ {item.salary_min.toLocaleString()} – {item.salary_max.toLocaleString()}</Text>
         ) : null}
@@ -138,7 +144,7 @@ export default function JobsScreen() {
           style={[styles.filterBtn, fc > 0 && styles.filterBtnActive]}
           onPress={() => { setDraft(filters); setShowFilter(true); }}
         >
-          <Text style={styles.filterBtnIcon}>⚙️</Text>
+          <Icon name="sliders" size={18} color={fc > 0 ? '#fff' : '#374151'} />
           {fc > 0 && <View style={styles.filterBadge}><Text style={styles.filterBadgeText}>{fc}</Text></View>}
         </TouchableOpacity>
       </View>
@@ -155,7 +161,10 @@ export default function JobsScreen() {
           ))}
           {filters.city ? (
             <TouchableOpacity style={styles.chip} onPress={() => { setFilters(f => ({ ...f, city: '' })); setPage(1); setVacancies([]); }}>
-              <Text style={styles.chipText}>📍 {filters.city} ×</Text>
+              <View style={styles.chipContent}>
+                <Icon name="pin" size={11} color="#4F46E5" />
+                <Text style={styles.chipText}>{filters.city} ×</Text>
+              </View>
             </TouchableOpacity>
           ) : null}
           {(filters.salaryMin || filters.salaryMax) ? (
@@ -180,7 +189,7 @@ export default function JobsScreen() {
           ListFooterComponent={loadingMore ? <ActivityIndicator color="#2563EB" style={{ marginVertical: 16 }} /> : null}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>🔍</Text>
+              <View style={styles.emptyIcon}><Icon name="search" size={40} color="#D1D5DB" /></View>
               <Text style={styles.emptyText}>{t('jobs.empty')}</Text>
               {fc > 0 && (
                 <TouchableOpacity style={styles.resetBtn} onPress={resetFilters}>
@@ -258,13 +267,14 @@ const styles = StyleSheet.create({
   searchBtnText:   { fontSize: 18 },
   filterBtn:       { width: 44, height: 44, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#E5E7EB', alignItems: 'center', justifyContent: 'center' },
   filterBtnActive: { borderColor: '#2563EB', backgroundColor: '#EFF6FF' },
-  filterBtnIcon:   { fontSize: 18 },
   filterBadge:     { position: 'absolute', top: -4, right: -4, backgroundColor: '#2563EB', borderRadius: 8, width: 16, height: 16, alignItems: 'center', justifyContent: 'center' },
   filterBadgeText: { fontSize: 9, color: '#fff', fontWeight: '800' },
   chipsScroll:     { maxHeight: 44 },
   chips:           { paddingHorizontal: 12, paddingBottom: 8, gap: 8, flexDirection: 'row' },
   chip:            { backgroundColor: '#EFF6FF', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
+  chipContent:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
   chipText:        { fontSize: 12, color: '#2563EB', fontWeight: '600' },
+  metaItem:        { flexDirection: 'row', alignItems: 'center', gap: 4 },
   list:            { paddingHorizontal: 12, paddingBottom: 24 },
   loader:          { marginTop: 60 },
   card:            { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
@@ -279,7 +289,7 @@ const styles = StyleSheet.create({
   skill:           { backgroundColor: '#EFF6FF', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
   skillText:       { fontSize: 11, color: '#1D4ED8', fontWeight: '500' },
   empty:           { alignItems: 'center', paddingTop: 80 },
-  emptyIcon:       { fontSize: 40, marginBottom: 12 },
+  emptyIcon:       { marginBottom: 12 },
   emptyText:       { fontSize: 16, color: '#9CA3AF', marginBottom: 16 },
   resetBtn:        { backgroundColor: '#EFF6FF', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 20 },
   resetBtnText:    { color: '#2563EB', fontWeight: '700', fontSize: 14 },

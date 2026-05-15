@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { chatService, type ChatMessage } from '../services/chatService';
 import { useAuth } from '../context';
+import Icon from './Icon';
 
 interface Props {
   applicationId: string;
@@ -96,9 +97,9 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            ✕
+            <Icon name="x" size={18} />
           </button>
         </div>
 

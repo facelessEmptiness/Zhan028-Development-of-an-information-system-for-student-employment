@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 import { getUniversities, type University } from '../services/universityService';
 import LanguageSelector from '../components/LanguageSelector';
 
@@ -158,12 +160,12 @@ const RegisterPage = () => {
 
           <div className="space-y-3">
             {[
-              { icon: '🎓', text: t('auth.register.feature1') },
-              { icon: '💼', text: t('auth.register.feature2') },
-              { icon: '🏛️', text: t('auth.register.feature3') },
+              { icon: 'graduation-cap' as IconName, text: t('auth.register.feature1') },
+              { icon: 'briefcase'      as IconName, text: t('auth.register.feature2') },
+              { icon: 'building'       as IconName, text: t('auth.register.feature3') },
             ].map((item) => (
               <div key={item.text} className="flex items-start space-x-3 bg-white/20 rounded-xl p-4">
-                <span className="text-xl">{item.icon}</span>
+                <Icon name={item.icon} size={20} className="shrink-0 text-white" />
                 <p className="text-white text-sm leading-relaxed">{item.text}</p>
               </div>
             ))}
@@ -269,7 +271,7 @@ const RegisterPage = () => {
                     >
                       <option value="">{t('auth.register.selectUniversity')}</option>
                       {Object.entries(groupedByCity).map(([city, unis]) => (
-                        <optgroup key={city} label={`📍 ${city}`}>
+                        <optgroup key={city} label={city}>
                           {unis
                             .sort((a, b) => a.name.localeCompare(b.name, 'ru'))
                             .map((uni) => (

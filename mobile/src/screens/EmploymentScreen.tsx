@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, StyleSheet, ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
 import { formatDate } from '../utils/dateUtils';
@@ -42,7 +43,7 @@ export default function EmploymentScreen() {
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <View style={styles.emptyIcon}><Icon name="clipboard-list" size={48} color="#D1D5DB" /></View>
           <Text style={styles.emptyTitle}>{t('employment.empty.title')}</Text>
           <Text style={styles.emptyText}>{t('employment.empty.text')}</Text>
         </View>
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
   fulfilledBanner: { backgroundColor: '#ECFDF5', borderRadius: 8, padding: 10, marginTop: 12, borderWidth: 1, borderColor: '#A7F3D0' },
   fulfilledText:   { color: '#047857', fontWeight: '700', textAlign: 'center', fontSize: 13 },
   empty:           { alignItems: 'center', paddingTop: 80, paddingHorizontal: 32 },
-  emptyIcon:       { fontSize: 48, marginBottom: 12 },
+  emptyIcon:       { marginBottom: 12 },
   emptyTitle:      { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' },
   emptyText:       { fontSize: 13, color: '#9CA3AF', textAlign: 'center', lineHeight: 18 },
 });

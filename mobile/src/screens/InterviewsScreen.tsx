@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { interviewService, type Interview } from '../services/interviewService';
+import Icon from '../components/Icon';
 
 function formatDate(iso: string, t: (k: string, opts?: any) => string) {
   if (!iso) return '';
@@ -54,7 +55,7 @@ export default function InterviewsScreen() {
 
       {interviews.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>📅</Text>
+          <View style={styles.emptyIcon}><Icon name="calendar" size={52} color="#D1D5DB" /></View>
           <Text style={styles.emptyTitle}>{t('interviews.empty.title')}</Text>
           <Text style={styles.emptyText}>{t('interviews.empty.text')}</Text>
         </View>
@@ -100,16 +101,16 @@ function InterviewCard({ interview: i, statusConfig, t }: {
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.metaIcon}>📅</Text>
+        <View style={styles.metaIcon}><Icon name="calendar" size={14} color="#6B7280" /></View>
         <Text style={styles.metaText}>{formatDate(i.scheduled_at, t)}</Text>
       </View>
       <View style={styles.row}>
-        <Text style={styles.metaIcon}>⏱</Text>
+        <View style={styles.metaIcon}><Icon name="hourglass" size={14} color="#6B7280" /></View>
         <Text style={styles.metaText}>{t('interviews.duration', { count: i.duration_minutes })}</Text>
       </View>
       {i.location ? (
         <View style={styles.row}>
-          <Text style={styles.metaIcon}>📍</Text>
+          <View style={styles.metaIcon}><Icon name="pin" size={14} color="#6B7280" /></View>
           <Text style={styles.metaText}>{i.location}</Text>
         </View>
       ) : null}
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
   header:       { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 16 },
   sectionTitle: { fontSize: 14, fontWeight: '700', color: '#6B7280', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 },
   empty:        { alignItems: 'center', paddingTop: 80 },
-  emptyIcon:    { fontSize: 52, marginBottom: 12 },
+  emptyIcon:    { marginBottom: 12 },
   emptyTitle:   { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 6 },
   emptyText:    { fontSize: 14, color: '#9CA3AF', textAlign: 'center' },
   card:         { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   badge:        { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, flexShrink: 0 },
   badgeText:    { fontSize: 11, fontWeight: '700' },
   row:          { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
-  metaIcon:     { fontSize: 14, width: 20 },
+  metaIcon:     { width: 20, alignItems: 'center' },
   metaText:     { fontSize: 13, color: '#374151' },
   notesBox:     { marginTop: 8, backgroundColor: '#F8FAFC', borderRadius: 8, padding: 10 },
   notesText:    { fontSize: 12, color: '#6B7280', lineHeight: 18 },

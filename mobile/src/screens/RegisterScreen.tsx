@@ -6,6 +6,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE } from '../services/api';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 
 type Role = 'student' | 'employer' | 'university';
 interface University { id: string; name: string; city: string; }
@@ -89,7 +91,7 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
   if (success) {
     return (
       <View style={styles.successContainer}>
-        <Text style={styles.successIcon}>✉️</Text>
+        <View style={styles.successIcon}><Icon name="mail" size={56} color="#2563EB" /></View>
         <Text style={styles.successTitle}>{t('register.success.title')}</Text>
         <Text style={styles.successText}>
           {t('register.success.text')}{'\n'}
@@ -104,10 +106,10 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
   }
 
   const str = passStrength();
-  const ROLES: { value: Role; icon: string }[] = [
-    { value: 'student',    icon: '🎓' },
-    { value: 'employer',   icon: '🏢' },
-    { value: 'university', icon: '🏛️' },
+  const ROLES: { value: Role; icon: IconName }[] = [
+    { value: 'student',    icon: 'graduation-cap' },
+    { value: 'employer',   icon: 'building' },
+    { value: 'university', icon: 'building-2' },
   ];
 
   return (
@@ -115,7 +117,7 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
       <ScrollView style={styles.bg} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
         <View style={styles.logoBox}>
-          <Text style={styles.logoIcon}>🎓</Text>
+          <View style={styles.logoIcon}><Icon name="graduation-cap" size={44} color="#1E3A8A" /></View>
           <Text style={styles.logoTitle}>{t('register.title')}</Text>
           <Text style={styles.logoSub}>{t('register.appSub')}</Text>
         </View>
@@ -129,7 +131,7 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
                 style={[styles.roleChip, role === r.value && styles.roleChipActive]}
                 onPress={() => setRole(r.value)}
               >
-                <Text style={styles.roleIcon}>{r.icon}</Text>
+                <View style={styles.roleIcon}><Icon name={r.icon} size={20} color={role === r.value ? '#2563EB' : '#6B7280'} /></View>
                 <Text style={[styles.roleLabel, role === r.value && styles.roleLabelActive]}>
                   {t(`register.roles.${r.value}.label`)}
                 </Text>
@@ -166,7 +168,10 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
                 ))}
               </ScrollView>
               {univId ? (
-                <Text style={styles.selectedUniv}>✓ {universities.find(u => u.id === univId)?.name ?? ''}</Text>
+                <View style={styles.selectedUnivRow}>
+                  <Icon name="check" size={12} color="#059669" />
+                  <Text style={styles.selectedUniv}>{universities.find(u => u.id === univId)?.name ?? ''}</Text>
+                </View>
               ) : null}
             </View>
           )}
@@ -196,7 +201,7 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
                 secureTextEntry={!showPass}
               />
               <TouchableOpacity style={styles.eyeBtn} onPress={() => setShowPass(!showPass)}>
-                <Text style={styles.eyeIcon}>{showPass ? '🙈' : '👁'}</Text>
+                <Icon name={showPass ? 'eye-off' : 'eye'} size={18} color="#9CA3AF" />
               </TouchableOpacity>
             </View>
             {password.length > 0 && (
@@ -245,7 +250,7 @@ const styles = StyleSheet.create({
   bg:               { flex: 1, backgroundColor: '#F8FAFC' },
   container:        { flexGrow: 1, padding: 20, paddingBottom: 40 },
   logoBox:          { alignItems: 'center', marginBottom: 24, marginTop: 20 },
-  logoIcon:         { fontSize: 44, marginBottom: 6 },
+  logoIcon:         { marginBottom: 6 },
   logoTitle:        { fontSize: 22, fontWeight: '700', color: '#1E3A8A' },
   logoSub:          { fontSize: 13, color: '#6B7280', marginTop: 2 },
   card:             { backgroundColor: '#fff', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 12, elevation: 3 },
@@ -253,7 +258,7 @@ const styles = StyleSheet.create({
   roleRow:          { flexDirection: 'row', gap: 8, marginBottom: 18 },
   roleChip:         { flex: 1, alignItems: 'center', padding: 10, borderRadius: 12, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#F9FAFB' },
   roleChipActive:   { borderColor: '#2563EB', backgroundColor: '#EFF6FF' },
-  roleIcon:         { fontSize: 20, marginBottom: 4 },
+  roleIcon:         { marginBottom: 4 },
   roleLabel:        { fontSize: 11, fontWeight: '700', color: '#6B7280' },
   roleLabelActive:  { color: '#2563EB' },
   roleDesc:         { fontSize: 10, color: '#9CA3AF', marginTop: 2, textAlign: 'center' },
@@ -263,7 +268,6 @@ const styles = StyleSheet.create({
   input:            { borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 11, fontSize: 14, color: '#111827', backgroundColor: '#F9FAFB' },
   inputError:       { borderColor: '#EF4444' },
   eyeBtn:           { position: 'absolute', right: 12, top: 10 },
-  eyeIcon:          { fontSize: 18 },
   strengthRow:      { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
   strengthTrack:    { flex: 1, height: 4, backgroundColor: '#E5E7EB', borderRadius: 2, overflow: 'hidden' },
   strengthFill:     { height: 4, borderRadius: 2 },
@@ -273,14 +277,15 @@ const styles = StyleSheet.create({
   univChipActive:   { backgroundColor: '#2563EB', borderColor: '#2563EB' },
   univChipText:     { fontSize: 12, color: '#374151', maxWidth: 140 },
   univChipTextActive:{ color: '#fff' },
-  selectedUniv:     { fontSize: 11, color: '#059669', marginTop: 6 },
+  selectedUnivRow:  { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
+  selectedUniv:     { fontSize: 11, color: '#059669' },
   btn:              { backgroundColor: '#2563EB', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 6 },
   btnText:          { color: '#fff', fontSize: 16, fontWeight: '700' },
   loginLink:        { alignItems: 'center', marginTop: 20 },
   loginLinkText:    { fontSize: 13, color: '#9CA3AF' },
   loginLinkBold:    { fontWeight: '700', color: '#2563EB' },
   successContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32, backgroundColor: '#F8FAFC' },
-  successIcon:      { fontSize: 56, marginBottom: 16 },
+  successIcon:      { marginBottom: 16 },
   successTitle:     { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 10 },
   successText:      { fontSize: 14, color: '#6B7280', textAlign: 'center', lineHeight: 22, marginBottom: 8 },
   successEmail:     { fontWeight: '700', color: '#2563EB' },

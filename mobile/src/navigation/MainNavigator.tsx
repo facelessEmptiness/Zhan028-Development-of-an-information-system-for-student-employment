@@ -1,8 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 import { useAuth } from '../context/AuthContext';
 import NotificationBell from '../components/NotificationBell';
 
@@ -13,7 +14,6 @@ import NotificationsScreen      from '../screens/NotificationsScreen';
 import ProfileScreen            from '../screens/ProfileScreen';
 import EmploymentScreen         from '../screens/EmploymentScreen';
 import StudentProfileEditScreen from '../screens/StudentProfileEditScreen';
-import DocumentsScreen          from '../screens/DocumentsScreen';
 import InterviewsScreen         from '../screens/InterviewsScreen';
 import ChatScreen               from '../screens/ChatScreen';
 import ChatsListScreen          from '../screens/ChatsListScreen';
@@ -36,7 +36,6 @@ import type { Vacancy } from '../services/jobService';
 export type HomeStackParamList = {
   HomeMain:   undefined;
   JobDetail:  { vacancy: Vacancy };
-  Documents:  undefined;
   Employment: undefined;
 };
 
@@ -110,7 +109,6 @@ function HomeStackNav() {
     <HomeStack.Navigator screenOptions={HEADER_OPTS}>
       <HomeStack.Screen name="HomeMain"   component={StudentHomeScreen} options={{ title: t('screen.home'),      ...HEADER_BELL }} />
       <HomeStack.Screen name="JobDetail"  component={JobDetailScreen}   options={{ title: t('screen.vacancy') }} />
-      <HomeStack.Screen name="Documents"  component={DocumentsScreen}   options={{ title: t('screen.documents') }} />
       <HomeStack.Screen name="Employment" component={EmploymentScreen}  options={{ title: t('screen.grant') }} />
     </HomeStack.Navigator>
   );
@@ -184,8 +182,8 @@ function UniversityStackNav() {
 }
 
 // ─── Tab icon helper ──────────────────────────────────────────────
-function Icon({ name, focused }: { name: string; focused: boolean }) {
-  return <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.45 }}>{name}</Text>;
+function TabIcon({ name, color }: { name: IconName; color: string }) {
+  return <Icon name={name} size={22} color={color} />;
 }
 
 const TAB_OPTS = {
@@ -205,27 +203,27 @@ function StudentTabs() {
       <Tab.Screen
         name="Home"
         component={HomeStackNav}
-        options={{ title: t('nav.home'), headerShown: false, tabBarIcon: ({ focused }) => <Icon name="🏠" focused={focused} /> }}
+        options={{ title: t('nav.home'), headerShown: false, tabBarIcon: ({ color }) => <TabIcon name="home" color={color} /> }}
       />
       <Tab.Screen
         name="Jobs"
         component={JobsStackNav}
-        options={{ title: t('nav.vacancies'), headerShown: false, tabBarIcon: ({ focused }) => <Icon name="💼" focused={focused} /> }}
+        options={{ title: t('nav.vacancies'), headerShown: false, tabBarIcon: ({ color }) => <TabIcon name="briefcase" color={color} /> }}
       />
       <Tab.Screen
         name="Applications"
         component={AppsStackNav}
-        options={{ title: t('nav.applications'), headerShown: false, tabBarIcon: ({ focused }) => <Icon name="📋" focused={focused} /> }}
+        options={{ title: t('nav.applications'), headerShown: false, tabBarIcon: ({ color }) => <TabIcon name="clipboard-list" color={color} /> }}
       />
       <Tab.Screen
         name="Chats"
         component={ChatsStackNav}
-        options={{ title: t('nav.chats'), headerShown: false, tabBarIcon: ({ focused }) => <Icon name="💬" focused={focused} /> }}
+        options={{ title: t('nav.chats'), headerShown: false, tabBarIcon: ({ color }) => <TabIcon name="chat" color={color} /> }}
       />
       <Tab.Screen
         name="Profile"
         component={StudentProfileEditScreen}
-        options={{ title: t('nav.profile'), headerRight: () => <NotificationBell />, tabBarIcon: ({ focused }) => <Icon name="👤" focused={focused} /> }}
+        options={{ title: t('nav.profile'), headerRight: () => <NotificationBell />, tabBarIcon: ({ color }) => <TabIcon name="user" color={color} /> }}
       />
     </Tab.Navigator>
   );
@@ -238,27 +236,27 @@ function EmployerTabs() {
       <Tab.Screen
         name="Vacancies"
         component={EmployerStackNav}
-        options={{ title: t('nav.vacancies'), headerShown: false, tabBarIcon: ({ focused }) => <Icon name="💼" focused={focused} /> }}
+        options={{ title: t('nav.vacancies'), headerShown: false, tabBarIcon: ({ color }) => <TabIcon name="briefcase" color={color} /> }}
       />
       <Tab.Screen
         name="EmployerChats"
         component={EmployerChatsStackNav}
-        options={{ title: t('nav.chats'), headerShown: false, tabBarIcon: ({ focused }) => <Icon name="💬" focused={focused} /> }}
+        options={{ title: t('nav.chats'), headerShown: false, tabBarIcon: ({ color }) => <TabIcon name="chat" color={color} /> }}
       />
       <Tab.Screen
         name="Interviews"
         component={EmployerInterviewsScreen}
-        options={{ title: t('nav.interviews'), headerRight: () => <NotificationBell />, tabBarIcon: ({ focused }) => <Icon name="📅" focused={focused} /> }}
+        options={{ title: t('nav.interviews'), headerRight: () => <NotificationBell />, tabBarIcon: ({ color }) => <TabIcon name="calendar" color={color} /> }}
       />
       <Tab.Screen
         name="CompanyProfile"
         component={EmployerCompanyProfileScreen}
-        options={{ title: t('nav.company'), headerRight: () => <NotificationBell />, tabBarIcon: ({ focused }) => <Icon name="🏢" focused={focused} /> }}
+        options={{ title: t('nav.company'), headerRight: () => <NotificationBell />, tabBarIcon: ({ color }) => <TabIcon name="building" color={color} /> }}
       />
       <Tab.Screen
         name="Account"
         component={ProfileScreen}
-        options={{ title: t('nav.account'), headerRight: () => <NotificationBell />, tabBarIcon: ({ focused }) => <Icon name="👤" focused={focused} /> }}
+        options={{ title: t('nav.account'), headerRight: () => <NotificationBell />, tabBarIcon: ({ color }) => <TabIcon name="user" color={color} /> }}
       />
     </Tab.Navigator>
   );
@@ -271,17 +269,17 @@ function UniversityTabs() {
       <Tab.Screen
         name="Analytics"
         component={UniversityStackNav}
-        options={{ title: t('nav.analytics'), headerShown: false, tabBarIcon: ({ focused }) => <Icon name="📊" focused={focused} /> }}
+        options={{ title: t('nav.analytics'), headerShown: false, tabBarIcon: ({ color }) => <TabIcon name="chart-bar" color={color} /> }}
       />
       <Tab.Screen
         name="Students"
         component={UniversityStudentsScreen}
-        options={{ title: t('nav.students'), headerRight: () => <NotificationBell />, tabBarIcon: ({ focused }) => <Icon name="🎓" focused={focused} /> }}
+        options={{ title: t('nav.students'), headerRight: () => <NotificationBell />, tabBarIcon: ({ color }) => <TabIcon name="graduation-cap" color={color} /> }}
       />
       <Tab.Screen
         name="Account"
         component={ProfileScreen}
-        options={{ title: t('nav.account'), headerRight: () => <NotificationBell />, tabBarIcon: ({ focused }) => <Icon name="👤" focused={focused} /> }}
+        options={{ title: t('nav.account'), headerRight: () => <NotificationBell />, tabBarIcon: ({ color }) => <TabIcon name="user" color={color} /> }}
       />
     </Tab.Navigator>
   );

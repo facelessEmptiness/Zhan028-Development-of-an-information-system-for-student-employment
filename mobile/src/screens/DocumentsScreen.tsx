@@ -11,11 +11,13 @@ import {
   type Document,
   type DocumentType,
 } from '../services/documentService';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 
-const DOC_ICONS: Record<DocumentType, string> = {
-  cv:          '📄',
-  diploma:     '🎓',
-  certificate: '📜',
+const DOC_ICONS: Record<DocumentType, IconName> = {
+  cv:          'document',
+  diploma:     'graduation-cap',
+  certificate: 'certificate',
 };
 
 const DOC_TYPES: DocumentType[] = ['cv', 'diploma', 'certificate'];
@@ -113,7 +115,7 @@ export default function DocumentsScreen() {
         return (
           <View key={type} style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionIcon}>{DOC_ICONS[type]}</Text>
+              <View style={styles.sectionIcon}><Icon name={DOC_ICONS[type]} size={20} color="#6B7280" /></View>
               <Text style={styles.sectionTitle}>{t(`docs.types.${type}`)}</Text>
               <TouchableOpacity
                 style={[styles.uploadBtn, isUploading && styles.uploadBtnDisabled]}
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
   subheader:     { fontSize: 13, color: '#6B7280', marginBottom: 20 },
   section:       { backgroundColor: '#fff', borderRadius: 16, padding: 14, marginBottom: 14, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  sectionIcon:   { fontSize: 20, marginRight: 8 },
+  sectionIcon:   { marginRight: 8, alignItems: 'center' as const, justifyContent: 'center' as const },
   sectionTitle:  { fontSize: 15, fontWeight: '700', color: '#111827', flex: 1 },
   uploadBtn:     { borderWidth: 1.5, borderColor: '#2563EB', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 },
   uploadBtnDisabled: { borderColor: '#93C5FD' },

@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import MatchIndex from '../components/MatchIndex';
 import { ChatModal } from '../components';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 import { employerService, type JobPosting } from '../services/employerService';
 import { applicationService, type Application } from '../services/applicationService';
 import { employerProfileService, type EmployerProfile } from '../services/employerProfileService';
@@ -382,10 +384,10 @@ const EmployerDashboardPage = () => {
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: t('employerDashboard.stats.activeJobs'),        val: String(activeJobsCount),                                              delta: null, tone: 'blue',   icon: '📋' },
-          { label: t('employerDashboard.stats.totalApplications'), val: String(applications.length),                                         delta: null, tone: 'indigo', icon: '📨' },
-          { label: t('employerDashboard.stats.interviews'),        val: String(applications.filter(a => a.status === 'interview').length),    delta: null, tone: 'purple', icon: '📅' },
-          { label: t('employerDashboard.stats.offers'),            val: String(applications.filter(a => a.status === 'offered').length),      delta: null, tone: 'green',  icon: '✅' },
+          { label: t('employerDashboard.stats.activeJobs'),        val: String(activeJobsCount),                                              delta: null, tone: 'blue',   icon: 'clipboard-list' as IconName },
+          { label: t('employerDashboard.stats.totalApplications'), val: String(applications.length),                                         delta: null, tone: 'indigo', icon: 'send'           as IconName },
+          { label: t('employerDashboard.stats.interviews'),        val: String(applications.filter(a => a.status === 'interview').length),    delta: null, tone: 'purple', icon: 'calendar'       as IconName },
+          { label: t('employerDashboard.stats.offers'),            val: String(applications.filter(a => a.status === 'offered').length),      delta: null, tone: 'green',  icon: 'check-circle'   as IconName },
         ].map((s, i) => {
           const toneMap: Record<string, { bg: string; fg: string }> = {
             blue:   { bg: '#EFF6FF', fg: '#2563EB' },
@@ -397,8 +399,8 @@ const EmployerDashboardPage = () => {
           return (
             <div key={i} className="bg-white rounded-xl border border-gray-200 p-5">
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl" style={{ background: tone.bg }}>
-                  {s.icon}
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: tone.bg, color: tone.fg }}>
+                  <Icon name={s.icon} size={20} />
                 </div>
               </div>
               <p className="text-2xl font-bold text-gray-900">{s.val}</p>
@@ -554,7 +556,7 @@ const EmployerDashboardPage = () => {
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h3 className="font-semibold text-gray-900 truncate">{job.title}</h3>
                       <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold ${job.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                        {job.status === 'active' ? `✓ ${t('employerDashboard.jobs.statusActive')}` : t('employerDashboard.jobs.statusClosed')}
+                        {job.status === 'active' ? <><Icon name="check" size={10} className="inline mr-0.5" />{t('employerDashboard.jobs.statusActive')}</> : t('employerDashboard.jobs.statusClosed')}
                       </span>
                     </div>
                     <p className="text-sm text-gray-500">
@@ -564,7 +566,7 @@ const EmployerDashboardPage = () => {
                   </div>
                   <div className="flex items-center gap-1">
                     {job.status === 'active' && (
-                      <button onClick={() => handleCloseJob(job.id)} className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100">✕</button>
+                      <button onClick={() => handleCloseJob(job.id)} className="text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100"><Icon name="x" size={14} /></button>
                     )}
                   </div>
                 </div>
@@ -667,7 +669,7 @@ const EmployerDashboardPage = () => {
                     className="px-2.5 py-1.5 text-xs font-semibold rounded-lg disabled:opacity-50"
                     style={{ background: '#F5F3FF', color: '#6D28D9' }}
                   >
-                    📅 {t('employerDashboard.applications.toInterview')}
+                    <Icon name="calendar" size={12} className="inline mr-1" />{t('employerDashboard.applications.toInterview')}
                   </button>
                   <button
                     onClick={() => handleUpdateStatus(app.id, 'offered')}
@@ -675,7 +677,7 @@ const EmployerDashboardPage = () => {
                     className="px-2.5 py-1.5 text-xs font-semibold rounded-lg disabled:opacity-50"
                     style={{ background: '#ECFDF5', color: '#047857' }}
                   >
-                    ✓ {t('employerDashboard.applications.accept')}
+                    <Icon name="check" size={12} className="inline mr-1" />{t('employerDashboard.applications.accept')}
                   </button>
                   <button
                     onClick={() => handleUpdateStatus(app.id, 'rejected')}
@@ -683,7 +685,7 @@ const EmployerDashboardPage = () => {
                     className="px-2.5 py-1.5 text-xs font-semibold rounded-lg disabled:opacity-50"
                     style={{ background: '#FEF2F2', color: '#B91C1C' }}
                   >
-                    ✕ {t('employerDashboard.applications.reject')}
+                    <Icon name="x" size={12} className="inline mr-1" />{t('employerDashboard.applications.reject')}
                   </button>
                   <button
                     onClick={() => setChatApp({
@@ -694,7 +696,7 @@ const EmployerDashboardPage = () => {
                     })}
                     className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700"
                   >
-                    💬 {t('chat.open')}
+                    <Icon name="chat" size={12} className="inline mr-1" />{t('chat.open')}
                   </button>
                   {app.student_id && (
                     <button
@@ -918,7 +920,7 @@ const EmployerDashboardPage = () => {
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900">{t('employerDashboard.jobModal.title')}</h2>
               <button onClick={() => { setShowJobForm(false); setFormData(emptyForm); setFormError(''); setFormSuccess(''); }}
-                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500">✕</button>
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500"><Icon name="x" size={16} /></button>
             </div>
             <div className="p-4 sm:p-6 overflow-y-auto max-h-[80dvh] sm:max-h-[70vh] space-y-4">
               {formError && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{formError}</div>}

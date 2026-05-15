@@ -3,6 +3,8 @@ import {
   View, Text, ScrollView, StyleSheet, ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { EmployerStackParamList } from '../navigation/MainNavigator';
@@ -107,11 +109,11 @@ export default function CandidateDetailScreen() {
       {/* Info */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{t('employer.candidate.info')}</Text>
-        {profile?.location_city   ? <InfoRow icon="📍" label={t('employer.candidate.city')}           value={profile.location_city} /> : null}
-        {profile?.phone           ? <InfoRow icon="📞" label={t('employer.candidate.phone')}          value={profile.phone} /> : null}
-        {profile?.graduation_year ? <InfoRow icon="🎓" label={t('employer.candidate.graduationYear')} value={String(profile.graduation_year)} /> : null}
-        {profile?.gpa             ? <InfoRow icon="📊" label={t('employer.candidate.gpa')}            value={String(profile.gpa)} /> : null}
-        {profile?.github_url      ? <InfoRow icon="💻" label={t('employer.candidate.github')}         value={profile.github_url} /> : null}
+        {profile?.location_city   ? <InfoRow icon="pin"            label={t('employer.candidate.city')}           value={profile.location_city} /> : null}
+        {profile?.phone           ? <InfoRow icon="phone"          label={t('employer.candidate.phone')}          value={profile.phone} /> : null}
+        {profile?.graduation_year ? <InfoRow icon="graduation-cap" label={t('employer.candidate.graduationYear')} value={String(profile.graduation_year)} /> : null}
+        {profile?.gpa             ? <InfoRow icon="chart-bar"      label={t('employer.candidate.gpa')}            value={String(profile.gpa)} /> : null}
+        {profile?.github_url      ? <InfoRow icon="code"           label={t('employer.candidate.github')}         value={profile.github_url} /> : null}
       </View>
 
       {/* Bio */}
@@ -180,10 +182,10 @@ export default function CandidateDetailScreen() {
   );
 }
 
-function InfoRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+function InfoRow({ icon, label, value }: { icon: IconName; label: string; value: string }) {
   return (
     <View style={styles.infoRow}>
-      <Text style={styles.infoIcon}>{icon}</Text>
+      <View style={styles.infoIcon}><Icon name={icon} size={14} color="#6B7280" /></View>
       <Text style={styles.infoLabel}>{label}:</Text>
       <Text style={styles.infoValue}>{value}</Text>
     </View>
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
   cardTitle:     { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 12 },
   bio:           { fontSize: 13, color: '#374151', lineHeight: 20 },
   infoRow:       { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  infoIcon:      { fontSize: 14, width: 20 },
+  infoIcon:      { width: 20, alignItems: 'center' as const },
   infoLabel:     { fontSize: 13, color: '#6B7280', width: 90 },
   infoValue:     { fontSize: 13, color: '#111827', flex: 1, fontWeight: '500' },
   skillsWrap:    { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

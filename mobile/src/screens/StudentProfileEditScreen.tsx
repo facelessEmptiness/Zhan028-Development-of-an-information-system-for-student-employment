@@ -8,10 +8,20 @@ import { useTranslation } from 'react-i18next';
 import { studentService, type StudentProfile } from '../services/studentService';
 import { applicationService, type Application } from '../services/applicationService';
 import { documentService, type Document } from '../services/documentService';
+import { jobService } from '../services/jobService';
 import * as DocumentPicker from 'expo-document-picker';
 import { useAuth } from '../context/AuthContext';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import LanguageSelector from '../components/LanguageSelector';
 import { formatDate } from '../utils/dateUtils';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
+
+const DOC_TYPE_ICONS: Record<'cv' | 'diploma' | 'certificate', IconName> = {
+  cv:          'document',
+  diploma:     'graduation-cap',
+  certificate: 'certificate',
+};
 
 const MIN_STUDENT_AGE = 16;
 
@@ -81,6 +91,8 @@ type TabType = 'profile' | 'applications' | 'documents';
 export default function StudentProfileEditScreen() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
+  const route      = useRoute<any>();
+  const navigation = useNavigation<any>();
 
   const [tab,      setTab]      = useState<TabType>('profile');
   const [form,     setForm]     = useState<FormData>(emptyForm);
@@ -140,6 +152,13 @@ export default function StudentProfileEditScreen() {
     if (next === 'applications' && apps.length === 0) loadApps();
     if (next === 'documents'    && docs.length === 0) loadDocs();
   };
+
+  useEffect(() => {
+    const initialTab = route.params?.initialTab as TabType | undefined;
+    if (initialTab && (initialTab === 'profile' || initialTab === 'applications' || initialTab === 'documents')) {
+      handleTabChange(initialTab);
+    }
+  }, [route.params?.initialTab]);
 
   const set = (key: keyof FormData) => (val: string) =>
     setForm(prev => ({ ...prev, [key]: val }));
@@ -217,6 +236,18 @@ export default function StudentProfileEditScreen() {
         }},
       ],
     );
+  };
+
+  const handleOpenVacancy = async (vacancyId: string) => {
+    try {
+      const vacancy = await jobService.getById(vacancyId);
+      navigation.navigate('Home', {
+        screen: 'JobDetail',
+        params: { vacancy },
+      });
+    } catch {
+      Alert.alert(t('common.error'), t('jobs.notFound'));
+    }
   };
 
   if (loading) return <ActivityIndicator style={styles.loader} size="large" color="#2563EB" />;
@@ -329,7 +360,7 @@ export default function StudentProfileEditScreen() {
               contentContainerStyle={styles.content}
               ListEmptyComponent={
                 <View style={styles.empty}>
-                  <Text style={styles.emptyIcon}>📋</Text>
+                  <View style={styles.emptyIcon}><Icon name="clipboard-list" size={40} color="#D1D5DB" /></View>
                   <Text style={styles.emptyText}>{t('apps.empty')}</Text>
                 </View>
               }
@@ -337,7 +368,7 @@ export default function StudentProfileEditScreen() {
                 const color = STATUS_COLORS[item.status] ?? '#6B7280';
                 const date  = formatDate(item.created_at, 'ru-RU', { day: '2-digit', month: 'short' });
                 return (
-                  <View style={styles.appCard}>
+                  <TouchableOpacity style={styles.appCard} activeOpacity={0.7} onPress={() => handleOpenVacancy(item.vacancy_id)}>
                     <View style={styles.appTop}>
                       <Text style={styles.appDate}>{date}</Text>
                       <View style={[styles.appBadge, { backgroundColor: color + '20' }]}>
@@ -346,13 +377,16 @@ export default function StudentProfileEditScreen() {
                         </Text>
                       </View>
                     </View>
-                    {item.cover_letter ? (
-                      <Text style={styles.appLetter} numberOfLines={2}>{item.cover_letter}</Text>
+                    {item.vacancy_title ? (
+                      <Text style={styles.appVacancyTitle} numberOfLines={1}>{item.vacancy_title}</Text>
+                    ) : null}
+                    {item.company_name ? (
+                      <Text style={styles.appCompany} numberOfLines={1}>{item.company_name}</Text>
                     ) : null}
                     {item.match_score > 0 && (
                       <Text style={styles.appMatch}>{t('employer.apps.match')} {item.match_score}%</Text>
                     )}
-                  </View>
+                  </TouchableOpacity>
                 );
               }}
             />
@@ -378,9 +412,7 @@ export default function StudentProfileEditScreen() {
                   <View key={docType} style={styles.docCard}>
                     <View style={styles.docCardHeader}>
                       <View style={[styles.docTypeIcon, { backgroundColor: color + '20' }]}>
-                        <Text style={[styles.docTypeEmoji]}>
-                          {docType === 'cv' ? '📄' : docType === 'diploma' ? '🎓' : '📜'}
-                        </Text>
+                        <Icon name={DOC_TYPE_ICONS[docType]} size={20} color={color} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.docTypeName, { color }]}>{t(`docs.types.${docType}`)}</Text>
@@ -392,7 +424,7 @@ export default function StudentProfileEditScreen() {
                           <Text style={styles.docEmpty}>{t('docs.emptyDoc')}</Text>
                         )}
                       </View>
-                      {existing && (
+                      {existing && docType === 'diploma' && (
                         <View style={[styles.docStatus, { backgroundColor: (statusConfig[existing.status] ?? statusConfig.pending).bg }]}>
                           <Text style={[styles.docStatusText, { color: (statusConfig[existing.status] ?? statusConfig.pending).fg }]}>
                             {(statusConfig[existing.status] ?? statusConfig.pending).label}
@@ -486,20 +518,21 @@ const styles = StyleSheet.create({
   logoutText:      { color: '#DC2626', fontSize: 14, fontWeight: '700' },
   // Applications tab
   empty:           { alignItems: 'center', paddingTop: 60 },
-  emptyIcon:       { fontSize: 40, marginBottom: 10 },
+  emptyIcon:       { marginBottom: 10 },
   emptyText:       { fontSize: 15, color: '#9CA3AF' },
   appCard:         { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
   appTop:          { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   appDate:         { fontSize: 12, color: '#9CA3AF' },
   appBadge:        { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   appBadgeText:    { fontSize: 11, fontWeight: '700' },
-  appLetter:       { fontSize: 13, color: '#374151', lineHeight: 18 },
-  appMatch:        { fontSize: 11, color: '#6B7280', marginTop: 6 },
+  appLetter:        { fontSize: 13, color: '#374151', lineHeight: 18 },
+  appVacancyTitle:  { fontSize: 14, fontWeight: '700', color: '#111827', marginTop: 6 },
+  appCompany:       { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  appMatch:         { fontSize: 11, color: '#6B7280', marginTop: 6 },
   // Documents tab
   docCard:         { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
   docCardHeader:   { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 10 },
   docTypeIcon:     { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  docTypeEmoji:    { fontSize: 20 },
   docTypeName:     { fontSize: 14, fontWeight: '700', marginBottom: 2 },
   docFileName:     { fontSize: 11, color: '#6B7280' },
   docEmpty:        { fontSize: 11, color: '#9CA3AF' },

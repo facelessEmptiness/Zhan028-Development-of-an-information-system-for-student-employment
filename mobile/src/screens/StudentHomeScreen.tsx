@@ -13,6 +13,8 @@ import { employmentService, type EmploymentRecord } from '../services/employment
 import { jobService, type Vacancy } from '../services/jobService';
 import { formatDate } from '../utils/dateUtils';
 import type { HomeStackParamList } from '../navigation/MainNavigator';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>;
 
@@ -95,8 +97,8 @@ export default function StudentHomeScreen() {
       </View>
 
       <View style={styles.statsGrid}>
-        <StatCard icon="📋" label={t('home.activeApplications')} value={activeApps} color="#2563EB" onPress={() => navigation.getParent()?.navigate('Applications')} />
-        <StatCard icon="💼" label={t('home.recommended')} value={recommended.length} color="#7C3AED" onPress={() => navigation.getParent()?.navigate('Jobs')} />
+        <StatCard icon="clipboard-list" label={t('home.activeApplications')} value={activeApps} color="#2563EB" onPress={() => navigation.getParent()?.navigate('Applications')} />
+        <StatCard icon="briefcase" label={t('home.recommended')} value={recommended.length} color="#7C3AED" onPress={() => navigation.getParent()?.navigate('Jobs')} />
       </View>
 
       <View style={styles.card}>
@@ -121,10 +123,10 @@ export default function StudentHomeScreen() {
 
       <Text style={styles.sectionTitle}>{t('home.quickActions')}</Text>
       <View style={styles.actionsGrid}>
-        <QuickAction icon="🔍" label={t('home.findVacancies')} color="#EFF6FF" textColor="#2563EB" onPress={() => navigation.getParent()?.navigate('Jobs')} />
-        <QuickAction icon="📋" label={t('home.myApplications')} color="#F5F3FF" textColor="#7C3AED" onPress={() => navigation.getParent()?.navigate('Applications')} />
-        <QuickAction icon="👤" label={t('home.myProfile')} color="#ECFDF5" textColor="#059669" onPress={() => navigation.getParent()?.navigate('Profile')} />
-        <QuickAction icon="📁" label={t('home.documents')} color="#FFF7ED" textColor="#C2410C" onPress={() => navigation.navigate('Documents')} />
+        <QuickAction icon="search"         label={t('home.findVacancies')} color="#EFF6FF" textColor="#2563EB" onPress={() => navigation.getParent()?.navigate('Jobs')} />
+        <QuickAction icon="clipboard-list" label={t('home.myApplications')} color="#F5F3FF" textColor="#7C3AED" onPress={() => navigation.getParent()?.navigate('Applications')} />
+        <QuickAction icon="user"           label={t('home.myProfile')} color="#ECFDF5" textColor="#059669" onPress={() => navigation.getParent()?.navigate('Profile')} />
+        <QuickAction icon="document"       label={t('home.documents')} color="#FFF7ED" textColor="#C2410C" onPress={() => navigation.getParent()?.navigate('Profile', { initialTab: 'documents' })} />
       </View>
 
       {grant && (
@@ -148,9 +150,11 @@ export default function StudentHomeScreen() {
               <Text style={styles.grantStatLbl}>{t('home.daysLeft')}</Text>
             </View>
             <View style={styles.grantStat}>
-              <Text style={[styles.grantStatVal, { color: grant.grant_fulfilled ? '#10B981' : '#F59E0B' }]}>
-                {grant.grant_fulfilled ? '✓' : '⏳'}
-              </Text>
+              <Icon
+                name={grant.grant_fulfilled ? 'check-circle' : 'in-progress'}
+                size={24}
+                color={grant.grant_fulfilled ? '#10B981' : '#F59E0B'}
+              />
               <Text style={styles.grantStatLbl}>{grant.grant_fulfilled ? t('home.grantFulfilled') : t('home.grantActive')}</Text>
             </View>
           </View>
@@ -195,8 +199,16 @@ export default function StudentHomeScreen() {
               </View>
               {v.company_name && <Text style={styles.vacCompany}>{v.company_name}</Text>}
               <View style={styles.vacMeta}>
-                {v.location ? <Text style={styles.vacMetaText}>📍 {v.location}</Text> : null}
-                <Text style={styles.vacMetaText}>💼 {v.job_type}</Text>
+                {v.location ? (
+                  <View style={styles.vacMetaItem}>
+                    <Icon name="pin" size={11} color="#9CA3AF" />
+                    <Text style={styles.vacMetaText}>{v.location}</Text>
+                  </View>
+                ) : null}
+                <View style={styles.vacMetaItem}>
+                  <Icon name="briefcase" size={11} color="#9CA3AF" />
+                  <Text style={styles.vacMetaText}>{v.job_type}</Text>
+                </View>
               </View>
               {v.skills ? (
                 <View style={styles.vacSkills}>
@@ -215,20 +227,20 @@ export default function StudentHomeScreen() {
   );
 }
 
-function StatCard({ icon, label, value, color, onPress }: { icon: string; label: string; value: number; color: string; onPress: () => void }) {
+function StatCard({ icon, label, value, color, onPress }: { icon: IconName; label: string; value: number; color: string; onPress: () => void }) {
   return (
     <TouchableOpacity style={[styles.statCard, { borderTopColor: color }]} onPress={onPress} activeOpacity={0.8}>
-      <Text style={styles.statIcon}>{icon}</Text>
+      <View style={styles.statIcon}><Icon name={icon} size={22} color={color} /></View>
       <Text style={[styles.statValue, { color }]}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </TouchableOpacity>
   );
 }
 
-function QuickAction({ icon, label, color, textColor, onPress }: { icon: string; label: string; color: string; textColor: string; onPress: () => void }) {
+function QuickAction({ icon, label, color, textColor, onPress }: { icon: IconName; label: string; color: string; textColor: string; onPress: () => void }) {
   return (
     <TouchableOpacity style={[styles.quickAction, { backgroundColor: color }]} onPress={onPress} activeOpacity={0.8}>
-      <Text style={styles.quickActionIcon}>{icon}</Text>
+      <View style={styles.quickActionIcon}><Icon name={icon} size={26} color={textColor} /></View>
       <Text style={[styles.quickActionLabel, { color: textColor }]}>{label}</Text>
     </TouchableOpacity>
   );
@@ -253,7 +265,7 @@ const styles = StyleSheet.create({
   heroSub:          { fontSize: 13, color: 'rgba(255,255,255,0.75)' },
   statsGrid:        { flexDirection: 'row', gap: 10, marginBottom: 14 },
   statCard:         { flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: 14, borderTopWidth: 3, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
-  statIcon:         { fontSize: 22, marginBottom: 6 },
+  statIcon:         { marginBottom: 6 },
   statValue:        { fontSize: 26, fontWeight: '800', marginBottom: 2 },
   statLabel:        { fontSize: 11, color: '#6B7280' },
   card:             { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 14, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
@@ -266,7 +278,7 @@ const styles = StyleSheet.create({
   sectionTitle:     { fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 12 },
   actionsGrid:      { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 16 },
   quickAction:      { flex: 1, minWidth: '45%', borderRadius: 14, padding: 14, alignItems: 'center', gap: 6 },
-  quickActionIcon:  { fontSize: 26 },
+  quickActionIcon:  {},
   quickActionLabel: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
   grantJob:         { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 2 },
   grantCompany:     { fontSize: 12, color: '#6B7280', marginBottom: 10 },
@@ -290,6 +302,7 @@ const styles = StyleSheet.create({
   vacSalary:        { fontSize: 12, fontWeight: '700', color: '#2563EB' },
   vacCompany:       { fontSize: 12, color: '#6B7280', marginBottom: 6 },
   vacMeta:          { flexDirection: 'row', gap: 12, marginBottom: 8 },
+  vacMetaItem:      { flexDirection: 'row', alignItems: 'center', gap: 4 },
   vacMetaText:      { fontSize: 11, color: '#9CA3AF' },
   vacSkills:        { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   skillChip:        { backgroundColor: '#EFF6FF', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },

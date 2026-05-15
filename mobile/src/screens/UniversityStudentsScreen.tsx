@@ -6,6 +6,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { apiFetch } from '../services/api';
 import { documentService, type Document } from '../services/documentService';
+import Icon from '../components/Icon';
 
 interface Student {
   user_id: string;
@@ -127,7 +128,7 @@ export default function UniversityStudentsScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor="#059669" />}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>🎓</Text>
+              <View style={styles.emptyIcon}><Icon name="graduation-cap" size={48} color="#D1D5DB" /></View>
               <Text style={styles.emptyText}>{t('university.students.noStudents')}</Text>
             </View>
           }
@@ -145,7 +146,7 @@ export default function UniversityStudentsScreen() {
                   {item.graduation_year ? <Text style={styles.year}>{t('university.students.graduation')} {item.graduation_year}</Text> : null}
                 </View>
                 {item.diploma_verified && (
-                  <Text style={styles.checkIcon}>✓</Text>
+                  <Icon name="check-circle" size={18} color="#059669" />
                 )}
               </View>
               {item.gpa ? (
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   search:        { backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#111827', borderWidth: 1, borderColor: '#E5E7EB' },
   list:          { padding: 12, paddingBottom: 40 },
   empty:         { alignItems: 'center', paddingTop: 60 },
-  emptyIcon:     { fontSize: 48, marginBottom: 10 },
+  emptyIcon:     { marginBottom: 10 },
   emptyText:     { fontSize: 15, color: '#9CA3AF' },
   card:          { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
   cardRow:       { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -263,7 +264,6 @@ const styles = StyleSheet.create({
   name:          { fontSize: 15, fontWeight: '700', color: '#111827' },
   spec:          { fontSize: 12, color: '#6B7280', marginTop: 2 },
   year:          { fontSize: 11, color: '#9CA3AF', marginTop: 1 },
-  checkIcon:     { fontSize: 18, color: '#059669' },
   gpa:           { fontSize: 11, color: '#6B7280', marginTop: 6 },
   modal:         { flex: 1, backgroundColor: '#F8FAFC' },
   modalContent:  { padding: 20, paddingBottom: 40 },

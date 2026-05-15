@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import Icon from '../components/Icon';
 import { apiFetch } from '../utils/apiClient';
 import { applicationService } from '../services/applicationService';
 import { useAuth } from '../context/AuthContext';
@@ -111,7 +112,7 @@ const JobDetailsPage = () => {
                 </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-5 border-t border-gray-100 text-left">
-                {job.location && <div><p className="text-[11px] text-gray-500 mb-0.5">{t('jobs.browse.location')}</p><p className="text-sm font-semibold text-gray-900">📍 {job.location}</p></div>}
+                {job.location && <div><p className="text-[11px] text-gray-500 mb-0.5">{t('jobs.browse.location')}</p><p className="text-sm font-semibold text-gray-900 flex items-center gap-1"><Icon name="pin" size={14} className="text-gray-400 shrink-0" />{job.location}</p></div>}
                 {(job.salary_min > 0 || job.salary_max > 0) && (
                   <div><p className="text-[11px] text-gray-500 mb-0.5">₸</p><p className="text-sm font-semibold text-gray-900">{job.salary_min > 0 ? job.salary_min.toLocaleString() : ''}{job.salary_min > 0 && job.salary_max > 0 ? ' – ' : ''}{job.salary_max > 0 ? job.salary_max.toLocaleString() + ' ₸' : ''}</p></div>
                 )}
@@ -145,7 +146,7 @@ const JobDetailsPage = () => {
           <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
             {(applySuccess || alreadyApplied) && !showForm && (
               <div className="text-center py-4">
-                <div className="text-4xl mb-3">✅</div>
+                <div className="mb-3 text-green-500 flex justify-center"><Icon name="check-circle" size={40} /></div>
                 <p className="font-semibold text-gray-900 mb-1">{t('jobs.details.successTitle')}</p>
                 <p className="text-sm text-gray-500">{t('jobs.details.successMessage')}</p>
                 <button onClick={() => navigate('/profile')} className="mt-4 w-full px-4 py-2 bg-blue-50 text-blue-600 font-medium rounded-lg hover:bg-blue-100 text-sm">
@@ -198,7 +199,7 @@ const JobDetailsPage = () => {
               </div>
               <div>
                 <p className="font-semibold text-gray-900 text-sm">{job.company_name || t('jobs.details.employer')}</p>
-                {job.location && <p className="text-xs text-gray-500">📍 {job.location}</p>}
+                {job.location && <p className="text-xs text-gray-500 flex items-center gap-1"><Icon name="pin" size={12} className="shrink-0" />{job.location}</p>}
               </div>
             </div>
           </div>

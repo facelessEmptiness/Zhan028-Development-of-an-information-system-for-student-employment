@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import JobCard from '../components/JobCard';
+import Icon from '../components/Icon';
 import { type JobPosting } from '../services/employerService';
 import { applicationService } from '../services/applicationService';
 import { studentService } from '../services/studentService';
@@ -441,7 +442,7 @@ const BrowseJobsPage = () => {
                   ))
                 ) : (
                   <div className="col-span-2 bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                    <div className="text-4xl mb-3">🔍</div>
+                    <div className="mb-3 text-gray-300 flex justify-center"><Icon name="search" size={40} /></div>
                     <p className="text-gray-600 mb-4">{t('jobs.browse.empty')}</p>
                     <button onClick={resetFilters} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm">
                       {t('jobs.browse.resetFilters')}
@@ -502,7 +503,7 @@ const BrowseJobsPage = () => {
                 <h3 className="font-bold text-gray-900">{t('jobs.applyModal.title')}</h3>
                 <p className="text-xs text-gray-500 mt-0.5">{vacancies.find(v => v.id === applyingTo)?.title}</p>
               </div>
-              <button onClick={() => { setApplyingTo(null); setCoverLetter(''); }} className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500">✕</button>
+              <button onClick={() => { setApplyingTo(null); setCoverLetter(''); }} className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500"><Icon name="x" size={16} /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>

@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
   ActivityIndicator, RefreshControl, Alert,
 } from 'react-native';
+import Icon from '../components/Icon';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -95,7 +96,7 @@ export default function EmployerApplicationsScreen() {
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <View style={styles.emptyIcon}><Icon name="clipboard-list" size={48} color="#D1D5DB" /></View>
           <Text style={styles.emptyText}>{t('employer.apps.empty')}</Text>
         </View>
       }
@@ -219,6 +220,6 @@ const styles = StyleSheet.create({
   actionText:     { fontSize: 12, fontWeight: '700', color: '#2563EB' },
   rejectText:     { color: '#EF4444' },
   empty:       { alignItems: 'center', paddingTop: 80 },
-  emptyIcon:   { fontSize: 48, marginBottom: 12 },
+  emptyIcon:   { marginBottom: 12 },
   emptyText:   { fontSize: 16, color: '#9CA3AF' },
 });
