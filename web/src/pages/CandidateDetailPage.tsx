@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import MatchIndex from '../components/MatchIndex';
 import Icon from '../components/Icon';
 import { apiFetch } from '../utils/apiClient';
+import { parseSkills } from '../utils';
 import { applicationService } from '../services/applicationService';
 import { type BackendStudentProfile } from '../services/studentService';
 import { documentService, type Document, getTypeKey } from '../services/documentService';
@@ -158,7 +159,7 @@ const CandidateDetailPage = () => {
     );
   }
 
-  const skills = student.skills ? student.skills.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const skills = parseSkills(student.skills);
   const fullName = `${student.first_name} ${student.last_name}`.trim();
 
   return (

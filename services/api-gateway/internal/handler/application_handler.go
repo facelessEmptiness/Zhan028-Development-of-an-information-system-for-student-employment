@@ -361,7 +361,7 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 				universityID = studentResp.GetUniversityId()
 			}
 
-			payload := map[string]interface{}{
+			payload := map[string]any{
 				"student_id":     resp.GetStudentId(),
 				"employer_id":    employerID,
 				"application_id": id,

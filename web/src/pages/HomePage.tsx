@@ -9,11 +9,12 @@ import { applicationService, type Application } from '../services/applicationSer
 import { type JobPosting } from '../services/employerService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
 import { apiFetch } from '../utils/apiClient';
+import { parseSkills } from '../utils';
 
 /* ─── Match helpers ─────────────────────────────────────────── */
 function matchScore(profile: BackendStudentProfile, vacancy: JobPosting): number {
-  const studentSkills = (profile.skills || '').split(',').map(s => s.toLowerCase().trim()).filter(Boolean);
-  const vacancySkills = (vacancy.skills || '').split(',').map(s => s.toLowerCase().trim()).filter(Boolean);
+  const studentSkills = parseSkills(profile.skills).map(s => s.toLowerCase());
+  const vacancySkills = parseSkills(vacancy.skills).map(s => s.toLowerCase());
   let skillPoints = 0;
   if (vacancySkills.length > 0 && studentSkills.length > 0) {
     const matched = vacancySkills.filter(vs => studentSkills.some(ss => ss.includes(vs) || vs.includes(ss))).length;
@@ -415,8 +416,8 @@ const StudentHome = ({ userEmail }: { userEmail?: string }) => {
                     </p>
                     {v.skills && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
-                        {v.skills.split(',').slice(0, 4).map(s => (
-                          <SkillChip key={s}>{s.trim()}</SkillChip>
+                        {parseSkills(v.skills).slice(0, 4).map(s => (
+                          <SkillChip key={s}>{s}</SkillChip>
                         ))}
                       </div>
                     )}

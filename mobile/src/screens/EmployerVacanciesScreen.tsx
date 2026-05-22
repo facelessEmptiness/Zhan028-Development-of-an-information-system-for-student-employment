@@ -245,7 +245,7 @@ export default function EmployerVacanciesScreen() {
 
                 {item.skills ? (
                   <View style={styles.skillsRow}>
-                    {item.skills.split(',').slice(0, 3).map(s => (
+                    {String(item.skills ?? '').split(',').filter(Boolean).slice(0, 3).map(s => (
                       <View key={s} style={styles.skillChip}>
                         <Text style={styles.skillText}>{s.trim()}</Text>
                       </View>

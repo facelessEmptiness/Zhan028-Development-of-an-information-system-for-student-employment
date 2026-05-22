@@ -7,18 +7,21 @@ import (
 	"strings"
 	"time"
 
+	"api-gateway/internal/grpc/studentpb"
 	"api-gateway/internal/grpc/vacancypb"
+	"api-gateway/internal/match"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/metadata"
 )
 
 type VacancyHandler struct {
-	client vacancypb.VacancyServiceClient
+	client        vacancypb.VacancyServiceClient
+	studentClient studentpb.StudentServiceClient
 }
 
-func NewVacancyHandler(client vacancypb.VacancyServiceClient) *VacancyHandler {
-	return &VacancyHandler{client: client}
+func NewVacancyHandler(client vacancypb.VacancyServiceClient, studentClient studentpb.StudentServiceClient) *VacancyHandler {
+	return &VacancyHandler{client: client, studentClient: studentClient}
 }
 
 // vacancyResp is the JSON shape returned to the frontend — skills as []string.
@@ -36,6 +39,7 @@ type vacancyResp struct {
 	CreatedAt   string   `json:"created_at"`
 	UpdatedAt   string   `json:"updated_at"`
 	CompanyName string   `json:"company_name"`
+	MatchScore  *int32   `json:"match_score,omitempty"`
 }
 
 func toVacancyResp(v *vacancypb.VacancyMessage) vacancyResp {
@@ -155,9 +159,25 @@ func (h *VacancyHandler) GetAllVacancies(c *gin.Context) {
 		return
 	}
 
+	// Fetch student skills for match score calculation (only for student role)
+	studentSkills := ""
+	if c.GetHeader("X-User-Role") == "student" {
+		userID := c.GetHeader("X-User-ID")
+		sCtx, sCancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer sCancel()
+		if sp, err := h.studentClient.GetProfile(sCtx, &studentpb.GetProfileRequest{UserId: userID}); err == nil {
+			studentSkills = sp.GetSkills()
+		}
+	}
+
 	vacancies := make([]vacancyResp, 0, len(resp.GetVacancies()))
 	for _, v := range resp.GetVacancies() {
-		vacancies = append(vacancies, toVacancyResp(v))
+		vr := toVacancyResp(v)
+		if studentSkills != "" {
+			score := match.CalculateMatchIndex(studentSkills, v.GetSkills())
+			vr.MatchScore = &score
+		}
+		vacancies = append(vacancies, vr)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Icon from '../components/Icon';
 import { apiFetch } from '../utils/apiClient';
+import { parseSkills } from '../utils';
 import { studentService, type BackendStudentProfile } from '../services/studentService';
 import { EDUCATIONAL_PROGRAMS, PROGRAM_I18N_KEY, type EducationalProgram } from '../constants/programs';
 import { documentService, type Document, getTypeKey } from '../services/documentService';
@@ -943,9 +944,9 @@ const UniversityAnalyticsPage = () => {
                                             <td className="px-6 py-3">
                                               <div className="flex flex-wrap gap-1">
                                                 {s.skills
-                                                  ? s.skills.split(',').slice(0, 3).map(sk => (
-                                                      <span key={sk.trim()} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium whitespace-nowrap">
-                                                        {sk.trim()}
+                                                  ? parseSkills(s.skills).slice(0, 3).map(sk => (
+                                                      <span key={sk} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium whitespace-nowrap">
+                                                        {sk}
                                                       </span>
                                                     ))
                                                   : <span className="text-gray-400 text-xs">—</span>}
@@ -1274,6 +1275,61 @@ const UniversityAnalyticsPage = () => {
           {/* ── Statistics ── */}
           {activeTab === 'statistics' && (
             <div className="space-y-5">
+              {/* Export button */}
+              {data && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      const esc = (s: string) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                      const date = new Date().toLocaleDateString('ru-RU');
+                      const statusRows = data.applications.by_status.map(s => {
+                        const lbl: Record<string,string> = { applied:'Подано', interview:'Интервью', shortlisted:'Отобрано', offered:'Оффер', rejected:'Отказ' };
+                        return `<tr><td>${esc(lbl[s.status] ?? s.status)}</td><td style="text-align:center">${s.count}</td></tr>`;
+                      }).join('');
+                      const skillRows = data.vacancies.demanded_skills.slice(0, 15).map((sk, i) =>
+                        `<tr><td>${i+1}</td><td>${esc(sk.name)}</td><td style="text-align:center">${sk.count}</td></tr>`
+                      ).join('');
+                      const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+                        <title>Статистика</title>
+                        <style>body{font-family:Arial,sans-serif;padding:24px;color:#111}
+                        h1{font-size:18px;margin-bottom:4px}
+                        .sub{color:#666;font-size:13px;margin-bottom:20px}
+                        table{width:100%;border-collapse:collapse;margin-bottom:24px}
+                        th{background:#f3f4f6;padding:8px 12px;text-align:left;font-size:12px;text-transform:uppercase;color:#6b7280}
+                        td{padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px}
+                        h2{font-size:14px;font-weight:600;margin:20px 0 8px}
+                        </style></head><body>
+                        <h1>Отчёт по статистике университета</h1>
+                        <div class="sub">Сформирован: ${date}</div>
+                        <h2>Общие показатели</h2>
+                        <table><thead><tr><th>Показатель</th><th>Значение</th></tr></thead><tbody>
+                        <tr><td>Студентов в системе</td><td style="text-align:center">${data.students.total}</td></tr>
+                        <tr><td>Активных вакансий</td><td style="text-align:center">${data.vacancies.total}</td></tr>
+                        <tr><td>Всего заявок</td><td style="text-align:center">${data.applications.total}</td></tr>
+                        <tr><td>Получили оффер</td><td style="text-align:center">${data.applications.offered_count}</td></tr>
+                        <tr><td>Уровень трудоустройства</td><td style="text-align:center">${realEmploymentRate}%</td></tr>
+                        </tbody></table>
+                        <h2>Статусы заявок</h2>
+                        <table><thead><tr><th>Статус</th><th>Кол-во</th></tr></thead><tbody>${statusRows}</tbody></table>
+                        <h2>Топ навыки (из вакансий)</h2>
+                        <table><thead><tr><th>#</th><th>Навык</th><th>Кол-во вакансий</th></tr></thead><tbody>${skillRows}</tbody></table>
+                        </body></html>`;
+                      const w = window.open('', '_blank');
+                      if (!w) return;
+                      w.document.write(html);
+                      w.document.close();
+                      w.focus();
+                      setTimeout(() => { w.print(); }, 400);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-semibold hover:bg-red-100 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Экспорт PDF
+                  </button>
+                </div>
+              )}
 
               {/* 1. Employment by program — horizontal bar chart */}
               <div className="bg-white rounded-2xl border border-gray-200 p-6">
@@ -1426,13 +1482,6 @@ const UniversityAnalyticsPage = () => {
                       <span className={`text-sm font-bold ${row.cls}`}>{row.value}</span>
                     </div>
                   ))}
-                </div>
-                {/* Pagination note */}
-                <div className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex items-start gap-2">
-                  <svg className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p className="text-xs text-gray-400">{t('universityAnalytics.statistics.paginationNote')}</p>
                 </div>
               </div>
             </div>

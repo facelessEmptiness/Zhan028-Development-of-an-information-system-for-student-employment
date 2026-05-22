@@ -1,5 +1,6 @@
 import { apiFetch } from '../utils/apiClient';
 import type { JobPosting } from './employerService';
+import { parseSkills } from '../utils';
 
 export interface Job {
   id: string;
@@ -42,7 +43,7 @@ function toJob(v: JobPosting): Job {
     type: v.job_type as Job['type'],
     description: v.description,
     requirements: [],
-    skills: v.skills ? v.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
+    skills: parseSkills(v.skills),
     postedDate: v.created_at ? new Date(v.created_at).toLocaleDateString('ru-RU') : '',
     applicants: 0,
   };

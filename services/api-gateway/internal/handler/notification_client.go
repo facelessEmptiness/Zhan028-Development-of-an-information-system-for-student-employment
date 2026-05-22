@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -43,13 +44,18 @@ func (c *NotificationClient) Send(userID, notifType, title, body, relatedID stri
 	}
 	data, err := json.Marshal(payload)
 	if err != nil {
+		log.Printf("[notification] marshal error: %v", err)
 		return
 	}
 
 	url := fmt.Sprintf("%s/api/notifications/internal", c.baseURL)
 	resp, err := c.httpClient.Post(url, "application/json", bytes.NewReader(data))
 	if err != nil {
+		log.Printf("[notification] send error for user %s: %v", userID, err)
 		return
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		log.Printf("[notification] unexpected status %d for user %s", resp.StatusCode, userID)
+	}
 }

@@ -24,17 +24,21 @@ const ROLE_AVATAR_GRAD: Record<string, string> = {
 };
 
 function getProfilePath(role?: string) {
-  if (role === 'student')                          return '/profile';
-  if (role === 'employer')                         return '/employer-dashboard';
-  if (role === 'university' || role === 'admin')   return '/analytics';
+  if (role === 'student')    return '/profile';
+  if (role === 'employer')   return '/employer-dashboard';
+  if (role === 'university') return '/analytics';
+  if (role === 'admin')      return '/admin';
   return '/';
 }
 
 function getNavLinks(t: (k: string) => string, role?: string) {
   const links = [{ to: '/jobs', label: t('nav.jobs') }];
-  if (role === 'student')                        links.push({ to: '/profile',            label: t('nav.myProfile')  });
-  else if (role === 'employer')                  links.push({ to: '/employer-dashboard', label: t('nav.dashboard') });
-  else if (role === 'university' || role === 'admin') links.push({ to: '/analytics',    label: t('nav.analytics')  });
+  if (role === 'student')    links.push({ to: '/profile',            label: t('nav.myProfile')  });
+  else if (role === 'employer')  links.push({ to: '/employer-dashboard', label: t('nav.dashboard') });
+  else if (role === 'university') links.push({ to: '/analytics',    label: t('nav.analytics')  });
+  else if (role === 'admin') {
+    links.push({ to: '/admin', label: 'Администрирование' });
+  }
   return links;
 }
 
@@ -85,11 +89,62 @@ export default function Header() {
     if (cr.status === 'fulfilled') setUnreadCount(cr.value);
   }, [isAuthenticated]);
 
+  // SSE real-time notifications
   useEffect(() => {
+    if (!isAuthenticated) return;
     fetchNotifications();
-    const id = setInterval(fetchNotifications, 15_000);
-    return () => clearInterval(id);
-  }, [fetchNotifications]);
+
+    let aborted = false;
+    const ctrl = new AbortController();
+
+    const connectSSE = async () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+      try {
+        const res = await fetch('/api/notifications/stream', {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: ctrl.signal,
+        });
+        if (!res.ok || !res.body) throw new Error('SSE failed');
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+        while (!aborted) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop() ?? '';
+          for (const line of lines) {
+            if (!line.startsWith('data:')) continue;
+            try {
+              const evt = JSON.parse(line.slice(5).trim());
+              if (evt && evt.id) {
+                setNotifications(prev => [evt, ...prev.filter(n => n.id !== evt.id)]);
+                if (!evt.is_read) setUnreadCount(c => c + 1);
+              }
+            } catch { /* non-JSON ping */ }
+          }
+        }
+      } catch {
+        // SSE failed — fall back to polling every 30s
+        if (!aborted) {
+          const id = setTimeout(connectSSE, 30_000);
+          return () => clearTimeout(id);
+        }
+      }
+    };
+
+    connectSSE();
+    // Fallback polling every 60s in case SSE misses events
+    const poll = setInterval(fetchNotifications, 60_000);
+    return () => {
+      aborted = true;
+      ctrl.abort();
+      clearInterval(poll);
+    };
+  }, [isAuthenticated, fetchNotifications]);
 
   const handleMarkAllRead = async () => {
     await notificationService.markAllRead();

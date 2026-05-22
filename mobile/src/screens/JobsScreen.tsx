@@ -68,7 +68,11 @@ export default function JobsScreen() {
         salary_max: f.salaryMax ? Number(f.salaryMax) : undefined,
         sort:      f.sort || undefined,
       });
-      setVacancies(prev => append ? [...prev, ...data.vacancies] : data.vacancies);
+      setVacancies(prev => {
+        if (!append) return data.vacancies;
+        const seen = new Set(prev.map(v => v.id));
+        return [...prev, ...data.vacancies.filter(v => !seen.has(v.id))];
+      });
       setHasMore(data.vacancies.length === PAGE_SIZE);
     } catch {
       // silent
@@ -117,9 +121,18 @@ export default function JobsScreen() {
       </View>
       {item.skills ? (
         <View style={styles.skills}>
-          {item.skills.split(',').slice(0, 4).map(s => (
+          {String(item.skills ?? '').split(',').filter(Boolean).slice(0, 4).map(s => (
             <View key={s} style={styles.skill}><Text style={styles.skillText}>{s.trim()}</Text></View>
           ))}
+        </View>
+      ) : null}
+      {item.match_score != null ? (
+        <View style={styles.matchRow}>
+          <View style={[styles.matchBar, { width: `${Math.min(item.match_score, 100)}%` as any,
+            backgroundColor: item.match_score >= 70 ? '#10B981' : item.match_score >= 40 ? '#F59E0B' : '#EF4444' }]} />
+          <Text style={[styles.matchText, {
+            color: item.match_score >= 70 ? '#047857' : item.match_score >= 40 ? '#92400E' : '#991B1B',
+          }]}>{t('apps.match', { score: item.match_score })}</Text>
         </View>
       ) : null}
     </TouchableOpacity>
@@ -288,6 +301,9 @@ const styles = StyleSheet.create({
   skills:          { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   skill:           { backgroundColor: '#EFF6FF', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
   skillText:       { fontSize: 11, color: '#1D4ED8', fontWeight: '500' },
+  matchRow:        { marginTop: 10, gap: 4 },
+  matchBar:        { height: 4, borderRadius: 2, backgroundColor: '#10B981' },
+  matchText:       { fontSize: 11, fontWeight: '700' },
   empty:           { alignItems: 'center', paddingTop: 80 },
   emptyIcon:       { marginBottom: 12 },
   emptyText:       { fontSize: 16, color: '#9CA3AF', marginBottom: 16 },

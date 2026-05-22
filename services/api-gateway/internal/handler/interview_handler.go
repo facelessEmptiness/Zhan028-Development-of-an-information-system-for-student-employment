@@ -43,7 +43,7 @@ func (h *InterviewHandler) Schedule(c *gin.Context) {
 	}
 
 	// Decode to get student_id for notification
-	var reqData map[string]interface{}
+	var reqData map[string]any
 	if err := json.Unmarshal(body, &reqData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON"})
 		return
@@ -84,7 +84,7 @@ func (h *InterviewHandler) Schedule(c *gin.Context) {
 			}
 
 			// Parse the created interview ID for related_id
-			var createdInterview map[string]interface{}
+			var createdInterview map[string]any
 			relatedID := ""
 			if json.Unmarshal(respBody, &createdInterview) == nil {
 				if id, ok := createdInterview["id"].(string); ok {

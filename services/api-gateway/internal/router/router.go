@@ -45,7 +45,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	notifClient := handler.NewNotificationClient(cfg.DocumentServiceUrl)
 
 	studentHandler := handler.NewStudentHandler(studentClient, cfg.DocumentServiceUrl)
-	vacancyHandler := handler.NewVacancyHandler(vacancyClient)
+	vacancyHandler := handler.NewVacancyHandler(vacancyClient, studentClient)
 	universityHandler := handler.NewUniversityHandler(universityClient)
 	applicationHandler := handler.NewApplicationHandler(applicationClient, studentClient, vacancyClient, notifClient, cfg.ApplicationServiceHttpUrl)
 	employerProfileHandler := handler.NewEmployerProfileHandler(vacancyClient)

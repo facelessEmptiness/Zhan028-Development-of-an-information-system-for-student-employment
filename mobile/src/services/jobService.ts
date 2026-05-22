@@ -13,6 +13,7 @@ export interface Vacancy {
   status: string;
   company_name?: string;
   created_at: string;
+  match_score?: number | null;
 }
 
 export interface VacanciesResponse {

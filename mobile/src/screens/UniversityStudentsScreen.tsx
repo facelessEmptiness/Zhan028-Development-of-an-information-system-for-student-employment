@@ -179,7 +179,7 @@ export default function UniversityStudentsScreen() {
                 <View style={styles.skillsSection}>
                   <Text style={styles.skillsLabel}>{t('profileEdit.skills')}:</Text>
                   <View style={styles.skillsWrap}>
-                    {selected.skills.split(',').map(s => s.trim()).filter(Boolean).map(s => (
+                    {String(selected.skills ?? '').split(',').map(s => s.trim()).filter(Boolean).map(s => (
                       <View key={s} style={styles.skillChip}>
                         <Text style={styles.skillText}>{s}</Text>
                       </View>

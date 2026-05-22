@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { API_BASE, apiFetch } from './api';
 
 export type DocumentType = 'cv' | 'diploma' | 'certificate';
@@ -44,7 +44,7 @@ export const documentService = {
     mimeType: string,
     docType: DocumentType,
   ): Promise<Document> {
-    const token = await AsyncStorage.getItem('access_token');
+    const token = await SecureStore.getItemAsync('access_token');
     const formData = new FormData();
     formData.append('file', { uri: fileUri, name: fileName, type: mimeType } as any);
     formData.append('type', docType);

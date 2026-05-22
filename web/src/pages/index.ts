@@ -12,3 +12,4 @@ export { default as NotFoundPage } from './NotFoundPage';
 export { default as VerifyEmailPage } from './VerifyEmailPage';
 export { default as ForgotPasswordPage } from './ForgotPasswordPage';
 export { default as ResetPasswordPage } from './ResetPasswordPage';
+export { default as AdminPage } from './AdminPage';

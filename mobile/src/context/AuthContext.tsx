@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { AppState, AppStateStatus, Alert } from 'react-native';
 import { authService, type User, type RegisterInput } from '../services/authService';
+import { pushService } from '../services/pushService';
 import i18n from '../i18n';
 
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
@@ -82,11 +83,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const data = await authService.login(email, password);
     resetActivity();
     setUser(data.user);
+    pushService.registerForPushNotifications().then(token => {
+      if (token) pushService.syncTokenWithServer(token);
+    });
   };
 
   const logout = async () => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    await authService.logout();
+    try { await authService.logout(); } catch {}
     setUser(null);
   };
 

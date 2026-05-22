@@ -6,6 +6,7 @@ import { ChatModal } from '../components';
 import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
 import { employerService, type JobPosting } from '../services/employerService';
+import { parseSkills } from '../utils';
 import { applicationService, type Application } from '../services/applicationService';
 import { employerProfileService, type EmployerProfile } from '../services/employerProfileService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
@@ -634,7 +635,7 @@ const EmployerDashboardPage = () => {
             const bg = statusBg[app.status] || '#EFF6FF';
             const fg = statusFg[app.status] || '#1D4ED8';
             const dot = statusDotColor[app.status] || '#2563EB';
-            const skills = app.student?.skills?.split(',').map(s => s.trim()).filter(Boolean) || [];
+            const skills = parseSkills(app.student?.skills);
             return (
               <div key={app.id} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 flex-wrap sm:flex-nowrap">
                 <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold shrink-0" style={{ background: 'linear-gradient(135deg,#3B82F6,#6366F1)' }}>

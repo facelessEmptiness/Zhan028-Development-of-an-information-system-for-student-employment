@@ -1151,7 +1151,14 @@
     "aiBusiness":                  "AI Business",
     "mediaTechnologies":           "Media Technologies",
     "digitalJournalism":           "Digital Journalism",
-    "digitalPublicAdministration": "Digital Public Administration"
+    "digitalPublicAdministration": "Digital Public Administration",
+    "dataScience":                 "Data Science",
+    "informationSystems":          "Information Systems",
+    "mobileDevelopment":           "Mobile Development",
+    "artificialIntelligence":      "Artificial Intelligence",
+    "computerEngineering":         "Computer Engineering",
+    "webDevelopment":              "Web Development",
+    "appliedMathematics":          "Applied Mathematics"
   },
   "programSchools": {
     "schoolSoftwareEngineering":   "School of Software Engineering",

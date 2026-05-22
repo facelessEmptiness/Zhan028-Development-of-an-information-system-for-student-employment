@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { applicationService, type Application } from '../services/applicationService';
+import { chatService } from '../services/chatService';
 import { formatDate } from '../utils/dateUtils';
 import type { ChatsStackParamList } from '../navigation/MainNavigator';
 import Icon from '../components/Icon';
@@ -21,14 +22,28 @@ type Nav = NativeStackNavigationProp<ChatsStackParamList>;
 export default function ChatsListScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<Nav>();
-  const [apps,      setApps]      = useState<Application[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [refreshing,setRefreshing]= useState(false);
+  const [apps,         setApps]        = useState<Application[]>([]);
+  const [lastMessages, setLastMessages] = useState<Record<string, string>>({});
+  const [loading,      setLoading]     = useState(true);
+  const [refreshing,   setRefreshing]  = useState(false);
 
   const load = useCallback(async () => {
     try {
       const data = await applicationService.getMyApplications();
       setApps(data);
+      // Fetch last message for each application in parallel
+      const entries = await Promise.all(
+        data.map(async (app) => {
+          try {
+            const msgs = await chatService.getMessages(app.id);
+            const last = msgs[msgs.length - 1];
+            return [app.id, last?.content ?? ''] as [string, string];
+          } catch {
+            return [app.id, ''] as [string, string];
+          }
+        })
+      );
+      setLastMessages(Object.fromEntries(entries));
     } catch {
       // silent
     } finally {
@@ -88,7 +103,7 @@ export default function ChatsListScreen() {
                 </View>
               </View>
               <Text style={styles.snippet} numberOfLines={1}>
-                {item.cover_letter || t('chats.openChat')}
+                {lastMessages[item.id] || t('chats.openChat')}
               </Text>
             </View>
             <Text style={styles.arrow}>›</Text>

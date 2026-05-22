@@ -1151,7 +1151,14 @@
     "aiBusiness":                  "ИИ-бизнес",
     "mediaTechnologies":           "Медиатехнологии",
     "digitalJournalism":           "Цифровая журналистика",
-    "digitalPublicAdministration": "Цифровое государственное управление"
+    "digitalPublicAdministration": "Цифровое государственное управление",
+    "dataScience":                 "Наука о данных",
+    "informationSystems":          "Информационные системы",
+    "mobileDevelopment":           "Мобильная разработка",
+    "artificialIntelligence":      "Искусственный интеллект",
+    "computerEngineering":         "Компьютерная инженерия",
+    "webDevelopment":              "Веб-разработка",
+    "appliedMathematics":          "Прикладная математика"
   },
   "programSchools": {
     "schoolSoftwareEngineering":   "Школа программной инженерии",

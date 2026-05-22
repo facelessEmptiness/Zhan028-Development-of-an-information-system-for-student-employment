@@ -71,7 +71,7 @@ export default function JobDetailScreen({ route }: Props) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('jobDetail.skills')}</Text>
             <View style={styles.skills}>
-              {vacancy.skills.split(',').map((s: string) => (
+              {String(vacancy.skills ?? '').split(',').filter(Boolean).map((s: string) => (
                 <View key={s} style={styles.skill}>
                   <Text style={styles.skillText}>{s.trim()}</Text>
                 </View>

@@ -41,6 +41,10 @@ func LoadConfig() (*Config, error) {
 		AllowedOrigins: strings.Split(getEnvOrDefault("ALLOWED_ORIGINS", "http://localhost:3000"), ","),
 	}
 
+	if config.JWTSecret == "your_super_secret_jwt_key_change_in_production" {
+		log.Println("WARNING: JWT_SECRET is set to the default value. Set JWT_SECRET env variable before deploying to production.")
+	}
+
 	return config, nil
 }
 

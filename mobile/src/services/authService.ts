@@ -1,3 +1,4 @@
+import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_BASE } from './api';
 
@@ -103,9 +104,9 @@ export const authService = {
       throw new Error(err.error ?? 'Ошибка входа');
     }
     const data: AuthResponse = await res.json();
-    await AsyncStorage.setItem('access_token', data.tokens.access_token);
-    await AsyncStorage.setItem('refresh_token', data.tokens.refresh_token);
-    await AsyncStorage.setItem('user', JSON.stringify(data.user));
+    await SecureStore.setItemAsync('access_token', data.tokens.access_token);
+    await SecureStore.setItemAsync('refresh_token', data.tokens.refresh_token);
+    await SecureStore.setItemAsync('user', JSON.stringify(data.user));
     return data;
   },
 
@@ -118,17 +119,19 @@ export const authService = {
         body: JSON.stringify({ refresh_token }),
       }).catch(() => {});
     }
-    await AsyncStorage.removeItem('access_token');
-    await AsyncStorage.removeItem('refresh_token');
-    await AsyncStorage.removeItem('user');
+    try { await SecureStore.deleteItemAsync('access_token'); } catch {}
+    try { await SecureStore.deleteItemAsync('refresh_token'); } catch {}
+    try { await SecureStore.deleteItemAsync('user'); } catch {}
+    // clean up legacy AsyncStorage tokens (migration safety)
+    await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']).catch(() => {});
   },
 
   async getStoredUser(): Promise<User | null> {
-    const raw = await AsyncStorage.getItem('user');
+    const raw = await SecureStore.getItemAsync('user');
     return raw ? JSON.parse(raw) : null;
   },
 
   async getToken(): Promise<string | null> {
-    return AsyncStorage.getItem('access_token');
+    return SecureStore.getItemAsync('access_token');
   },
 };

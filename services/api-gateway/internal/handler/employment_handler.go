@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -66,19 +67,24 @@ func (h *EmploymentHandler) End(c *gin.Context) {
 
 // CreateInternal is called internally by UpdateStatus when status → "offered".
 // It is NOT exposed as a public route — called directly from UpdateStatus handler.
-func CreateEmploymentRecord(appServiceURL string, payload map[string]interface{}) {
+func CreateEmploymentRecord(appServiceURL string, payload map[string]any) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	body, _ := json.Marshal(payload)
 	req, err := http.NewRequest("POST", appServiceURL+"/api/employment/internal", bytes.NewReader(body))
 	if err != nil {
+		log.Printf("[employment] failed to create request: %v", err)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Printf("[employment] failed to create record for student %v: %v", payload["student_id"], err)
 		return
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		log.Printf("[employment] unexpected status %d for student %v", resp.StatusCode, payload["student_id"])
+	}
 }
 
 func (h *EmploymentHandler) proxy(c *gin.Context, method, path string, extraBody []byte) {

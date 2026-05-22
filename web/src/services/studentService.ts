@@ -196,8 +196,8 @@ export const studentService = {
   },
 
   // List students for university admin (filtered by their university_id automatically)
-  listByUniversity: async (): Promise<{ students: BackendStudentProfile[]; total: number }> => {
-    const res = await apiFetch(`${API_BASE}/students`);
+  listByUniversity: async (pageSize = 500): Promise<{ students: BackendStudentProfile[]; total: number }> => {
+    const res = await apiFetch(`${API_BASE}/students?page=1&page_size=${pageSize}`);
     if (!res.ok) throw new Error(`Ошибка ${res.status}`);
     return res.json();
   },
@@ -213,8 +213,7 @@ export const studentService = {
     return [];
   },
 
-  saveJob: async (_studentId: string, jobId: number): Promise<boolean> => {
-    console.log('Saving job:', jobId);
+  saveJob: async (_studentId: string, _jobId: number): Promise<boolean> => {
     return true;
   },
 

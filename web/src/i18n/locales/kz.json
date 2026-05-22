@@ -1112,7 +1112,14 @@
     "aiBusiness":                  "ЖИ-бизнес",
     "mediaTechnologies":           "Медиатехнологиялар",
     "digitalJournalism":           "Цифрлық журналистика",
-    "digitalPublicAdministration": "Цифрлық мемлекеттік басқару"
+    "digitalPublicAdministration": "Цифрлық мемлекеттік басқару",
+    "dataScience":                 "Деректер ғылымы",
+    "informationSystems":          "Ақпараттық жүйелер",
+    "mobileDevelopment":           "Мобильді әзірлеу",
+    "artificialIntelligence":      "Жасанды интеллект",
+    "computerEngineering":         "Компьютерлік инженерия",
+    "webDevelopment":              "Веб-әзірлеу",
+    "appliedMathematics":          "Қолданбалы математика"
   },
   "programSchools": {
     "schoolSoftwareEngineering":   "Бағдарламалық инженерия мектебі",

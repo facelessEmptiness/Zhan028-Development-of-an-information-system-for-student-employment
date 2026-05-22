@@ -125,7 +125,9 @@ export default function StudentProfileEditScreen() {
           graduation_year: p.graduation_year ? String(p.graduation_year) : '',
           gpa:             p.gpa             ? String(p.gpa)             : '',
           bio:             p.bio             ?? '',
-          skills:          p.skills          ?? '',
+          skills:          Array.isArray(p.skills)
+                             ? (p.skills as any[]).join(', ')
+                             : String(p.skills ?? ''),
           github_url:      p.github_url      ?? '',
         });
       })
@@ -164,28 +166,30 @@ export default function StudentProfileEditScreen() {
     setForm(prev => ({ ...prev, [key]: val }));
 
   const handleSave = async () => {
-    if (!form.first_name.trim() || !form.last_name.trim()) {
+    if (!(form.first_name ?? '').trim() || !(form.last_name ?? '').trim()) {
       Alert.alert(t('common.error'), t('profileEdit.error.name'));
       return;
     }
-    if (form.iin.trim()) {
-      const iinError = validateIIN(form.iin.trim(), t);
+    if ((form.iin ?? '').trim()) {
+      const iinError = validateIIN((form.iin ?? '').trim(), t);
       if (iinError) { Alert.alert(t('common.error'), iinError); return; }
     }
     setSaving(true);
     try {
       const payload = {
-        first_name:      form.first_name.trim(),
-        last_name:       form.last_name.trim(),
-        iin:             form.iin.trim() || undefined,
-        phone:           form.phone.trim() || undefined,
-        location_city:   form.location_city.trim() || undefined,
-        specialization:  form.specialization.trim() || undefined,
+        first_name:      (form.first_name ?? '').trim(),
+        last_name:       (form.last_name ?? '').trim(),
+        iin:             (form.iin ?? '').trim() || undefined,
+        phone:           (form.phone ?? '').trim() || undefined,
+        location_city:   (form.location_city ?? '').trim() || undefined,
+        specialization:  (form.specialization ?? '').trim() || undefined,
         graduation_year: form.graduation_year ? parseInt(form.graduation_year) : undefined,
         gpa:             form.gpa ? parseFloat(form.gpa) : undefined,
-        bio:             form.bio.trim() || undefined,
-        skills:          form.skills.trim() || undefined,
-        github_url:      form.github_url.trim() || undefined,
+        bio:             (form.bio ?? '').trim() || undefined,
+        skills:          (Array.isArray(form.skills)
+                           ? (form.skills as any[]).join(', ')
+                           : String(form.skills ?? '')).trim() || undefined,
+        github_url:      (form.github_url ?? '').trim() || undefined,
       };
       const saved = exists
         ? await studentService.updateProfile(payload)

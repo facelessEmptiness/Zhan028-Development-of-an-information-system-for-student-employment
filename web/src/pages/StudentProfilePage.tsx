@@ -42,6 +42,7 @@ function validateIIN(iin: string, t: (key: string) => string): string | null {
 import { applicationService, type Application } from '../services/applicationService';
 import { EDUCATIONAL_PROGRAMS, PROGRAM_I18N_KEY } from '../constants/programs';
 import { apiFetch } from '../utils/apiClient';
+import { parseSkills, skillsToString } from '../utils';
 import { getUniversities, type University } from '../services/universityService';
 import { documentService, type Document, type DocumentType, getTypeKey } from '../services/documentService';
 import MatchIndex from '../components/MatchIndex';
@@ -136,7 +137,7 @@ const StudentProfilePage = () => {
           first_name: p.first_name, last_name: p.last_name, iin: p.iin,
           phone: p.phone || '', location_city: p.location_city || '',
           specialization: p.specialization || '', graduation_year: p.graduation_year ? String(p.graduation_year) : '',
-          gpa: p.gpa ? String(p.gpa) : '', bio: p.bio || '', skills: p.skills || '',
+          gpa: p.gpa ? String(p.gpa) : '', bio: p.bio || '', skills: skillsToString(p.skills),
           university_id: p.university_id || '', github_url: p.github_url || '',
         });
       } catch {
@@ -222,7 +223,7 @@ const StudentProfilePage = () => {
 
   const universityName = (id: string) => universities.find(u => u.id === id)?.name ?? '';
 
-  const getSkillsArray = () => formData.skills.split(',').map(s => s.trim()).filter(Boolean);
+  const getSkillsArray = () => parseSkills(formData.skills);
 
   const handleAddSkill = () => {
     if (!newSkill.trim()) return;

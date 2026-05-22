@@ -9,6 +9,7 @@ import { applicationService } from '../services/applicationService';
 import { studentService } from '../services/studentService';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../utils/apiClient';
+import { parseSkills } from '../utils';
 
 const PAGE_SIZE = 10;
 
@@ -141,11 +142,10 @@ const BrowseJobsPage = () => {
     }
   };
 
-  const calculateMatchIndex = (studentSkillsStr: string, vacancySkillsStr: string): number => {
-    if (!vacancySkillsStr?.trim()) return 50;
-    const vacancy = vacancySkillsStr.split(',').map(s => s.toLowerCase().trim()).filter(Boolean);
+  const calculateMatchIndex = (studentSkillsStr: string | string[], vacancySkillsStr: string | string[]): number => {
+    const vacancy = parseSkills(vacancySkillsStr).map(s => s.toLowerCase());
     if (vacancy.length === 0) return 50;
-    const student = studentSkillsStr.split(',').map(s => s.toLowerCase().trim()).filter(Boolean);
+    const student = parseSkills(studentSkillsStr).map(s => s.toLowerCase());
     if (student.length === 0) return 10;
     const matched = vacancy.filter(vs => student.some(ss => ss.includes(vs) || vs.includes(ss))).length;
     return Math.round((matched / vacancy.length) * 100);
@@ -159,14 +159,14 @@ const BrowseJobsPage = () => {
     salary: { min: v.salary_min, max: v.salary_max },
     type: v.job_type as 'Full-time' | 'Part-time' | 'Internship' | 'Contract',
     description: v.description,
-    skills: v.skills ? v.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
+    skills: parseSkills(v.skills),
     postedDate: new Date(v.created_at).toLocaleDateString('ru-RU'),
   });
 
   // Extract unique skills from loaded vacancies for sidebar chips
   const sidebarSkillOptions = useMemo(() => {
     const set = new Set<string>();
-    vacancies.forEach(v => { if (v.skills) v.skills.split(',').map(s => s.trim()).filter(Boolean).forEach(s => set.add(s)); });
+    vacancies.forEach(v => { parseSkills(v.skills).forEach(s => set.add(s)); });
     return Array.from(set).slice(0, 12);
   }, [vacancies]);
 

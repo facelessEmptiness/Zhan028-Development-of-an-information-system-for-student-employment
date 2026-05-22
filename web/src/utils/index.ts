@@ -2,6 +2,24 @@
 // Export utility functions from here
 
 /**
+ * Normalizes skills from backend (text[] array OR comma-separated string) → string[]
+ */
+export const parseSkills = (skills: string | string[] | null | undefined): string[] => {
+  if (!skills) return [];
+  if (Array.isArray(skills)) return skills.map(s => s.trim()).filter(Boolean);
+  return skills.split(',').map(s => s.trim()).filter(Boolean);
+};
+
+/**
+ * Converts skills array → comma-separated string for form fields
+ */
+export const skillsToString = (skills: string | string[] | null | undefined): string => {
+  if (!skills) return '';
+  if (Array.isArray(skills)) return skills.join(', ');
+  return skills;
+};
+
+/**
  * Format date to readable string
  */
 export const formatDate = (date: string | Date): string => {

@@ -136,12 +136,12 @@ func (h *StudentHandler) ListStudentsByUniversity(c *gin.Context) {
 	}
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "100"))
 	if page < 1 {
 		page = 1
 	}
-	if pageSize < 1 || pageSize > 100 {
-		pageSize = 20
+	if pageSize < 1 || pageSize > 500 {
+		pageSize = 100
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

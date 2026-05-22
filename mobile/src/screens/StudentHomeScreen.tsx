@@ -212,7 +212,7 @@ export default function StudentHomeScreen() {
               </View>
               {v.skills ? (
                 <View style={styles.vacSkills}>
-                  {v.skills.split(',').slice(0, 3).map(s => (
+                  {String(v.skills ?? '').split(',').filter(Boolean).slice(0, 3).map(s => (
                     <View key={s} style={styles.skillChip}><Text style={styles.skillText}>{s.trim()}</Text></View>
                   ))}
                 </View>

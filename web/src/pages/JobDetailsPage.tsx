@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Icon from '../components/Icon';
 import { apiFetch } from '../utils/apiClient';
+import { parseSkills } from '../utils';
 import { applicationService } from '../services/applicationService';
 import { useAuth } from '../context/AuthContext';
 import { type JobPosting } from '../services/employerService';
@@ -84,7 +85,7 @@ const JobDetailsPage = () => {
     );
   }
 
-  const skills = job.skills ? job.skills.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const skills = parseSkills(job.skills);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

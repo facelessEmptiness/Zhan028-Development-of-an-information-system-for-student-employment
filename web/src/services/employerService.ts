@@ -1,6 +1,7 @@
 // Employer Service - Handles all employer-related operations
 
 import { apiFetch } from '../utils/apiClient';
+import { parseSkills } from '../utils';
 
 const API_BASE = '/api';
 
@@ -108,9 +109,37 @@ export const employerService = {
     return res.ok;
   },
 
-  // Search candidates — not yet supported by backend
-  searchCandidates: async (_employerId: string, _filters?: any): Promise<CandidateProfile[]> => {
-    return [];
+  searchCandidates: async (_employerId: string, filters?: { skills?: string; specialization?: string }): Promise<CandidateProfile[]> => {
+    try {
+      const res = await apiFetch(`${API_BASE}/students?page=1&page_size=100`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      const students: any[] = data.students ?? [];
+      return students
+        .filter(s => {
+          if (filters?.skills) {
+            const needle = filters.skills.toLowerCase();
+            if (!String(s.skills ?? '').toLowerCase().includes(needle)) return false;
+          }
+          if (filters?.specialization) {
+            if (!String(s.specialization ?? '').toLowerCase().includes(filters.specialization.toLowerCase())) return false;
+          }
+          return true;
+        })
+        .map(s => ({
+          id: s.user_id,
+          name: `${s.first_name} ${s.last_name}`,
+          email: '',
+          university: s.university_id ?? '',
+          major: s.specialization ?? '',
+          skills: parseSkills(s.skills),
+          experience: s.bio ?? '',
+          matchIndex: 0,
+          resumeUrl: '#',
+        }));
+    } catch {
+      return [];
+    }
   },
 
   // Get candidate profile by user_id
@@ -125,7 +154,7 @@ export const employerService = {
         email: '',
         university: s.university_id ?? '',
         major: s.specialization ?? '',
-        skills: s.skills ? s.skills.split(',').map((x: string) => x.trim()) : [],
+        skills: parseSkills(s.skills),
         experience: s.bio ?? '',
         matchIndex: 0,
         resumeUrl: '#',
