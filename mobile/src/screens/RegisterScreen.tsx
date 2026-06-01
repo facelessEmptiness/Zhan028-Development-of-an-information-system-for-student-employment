@@ -31,8 +31,8 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
 
   useEffect(() => {
     fetch(`${API_BASE}/api/universities`)
-      .then(r => r.ok ? r.json() : [])
-      .then((data: University[]) => setUniversities(Array.isArray(data) ? data : []))
+      .then(r => r.ok ? r.json() : { universities: [] })
+      .then((data: any) => setUniversities(Array.isArray(data) ? data : (data.universities ?? [])))
       .catch(() => {});
   }, []);
 

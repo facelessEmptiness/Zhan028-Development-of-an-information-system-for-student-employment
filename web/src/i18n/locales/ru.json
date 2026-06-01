@@ -32,6 +32,7 @@
     "notifications": "Уведомления",
     "noNotifications": "Нет уведомлений",
     "markAllRead": "Отметить все",
+    "showAllNotifications": "Показать все уведомления",
     "loggedInAs": "Вы вошли как",
     "language": "Язык"
   },
@@ -1082,6 +1083,7 @@
     "enterHint": "Enter — отправить, Shift+Enter — новая строка",
     "empty": "Нет сообщений. Начните разговор!",
     "online": "В сети",
+    "connecting": "Подключение...",
     "employer": "Работодатель",
     "student": "Студент"
   },
@@ -1116,6 +1118,7 @@
     },
     "chat_message": {
       "title": "💬 Новое сообщение",
+      "bodySender": "{{name}} написал(а) вам в чате",
       "bodyForStudent": "Работодатель написал вам в чате",
       "bodyForEmployer": "Студент ответил на ваше сообщение"
     },

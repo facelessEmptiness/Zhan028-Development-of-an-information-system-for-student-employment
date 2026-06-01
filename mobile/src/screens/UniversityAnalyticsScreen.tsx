@@ -6,7 +6,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { universityService, type AnalyticsSummary } from '../services/universityService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
 
@@ -31,7 +31,7 @@ const EMP_STATUS_COLORS: Record<string, { color: string; bg: string }> = {
 };
 
 export default function UniversityAnalyticsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [tab,             setTab]             = useState<Tab>('overview');
   const [data,            setData]            = useState<AnalyticsSummary | null>(null);
   const [empRecs,    setEmpRecs]    = useState<EmploymentRecord[]>([]);
@@ -246,7 +246,7 @@ export default function UniversityAnalyticsScreen() {
             ) : empRecs.map(r => {
               const cfg   = EMP_STATUS_COLORS[r.status] ?? EMP_STATUS_COLORS.active;
               const label = empStatusLabels[r.status] ?? r.status;
-              const date  = formatDate(r.started_at, 'ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+              const date  = formatDate(r.started_at, langToLocale(i18n.language), { day: 'numeric', month: 'short', year: 'numeric' });
               return (
                 <View key={r.id} style={styles.empCard}>
                   <View style={styles.empCardTop}>

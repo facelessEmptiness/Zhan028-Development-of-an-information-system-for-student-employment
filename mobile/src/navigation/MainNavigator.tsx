@@ -82,6 +82,7 @@ export type UniversityStackParamList = {
 export type RootStackParamList = {
   MainTabs:      undefined;
   Notifications: undefined;
+  Chat:          { applicationId: string; title: string; standalone?: boolean };
 };
 
 // ─── Stack navigators ────────────────────────────────────────────
@@ -308,6 +309,16 @@ export default function MainNavigator() {
           headerStyle: { backgroundColor: '#fff' },
           headerTitleStyle: { fontWeight: '700' as const },
         }}
+      />
+      <RootStack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={({ route }) => ({
+          headerShown: true,
+          title: route.params.title,
+          headerStyle: { backgroundColor: '#fff' },
+          headerTitleStyle: { fontWeight: '700' as const },
+        })}
       />
     </RootStack.Navigator>
   );

@@ -384,6 +384,12 @@
       "hoursAgo": "{{count}} ч. назад",
       "yesterday": "вчера",
       "daysAgo": "{{count}} дн. назад"
+    },
+    "chat_message": {
+      "title": "💬 Новое сообщение",
+      "bodySender": "{{name}} написал(а) вам в чате",
+      "bodyForStudent": "Работодатель написал вам в чате",
+      "bodyForEmployer": "Студент ответил на ваше сообщение"
     }
   },
   "chats": {
@@ -398,7 +404,8 @@
     "startChat": "Начните переписку с работодателем",
     "messagePlaceholder": "Введите сообщение...",
     "sendBtn": "Отправить",
-    "withEmployer": "Чат с работодателем"
+    "withEmployer": "Чат с работодателем",
+    "connecting": "Подключение..."
   },
   "employer": {
     "overview": "Обзор",

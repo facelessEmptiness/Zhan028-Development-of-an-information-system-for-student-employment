@@ -111,7 +111,7 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    const refresh_token = await AsyncStorage.getItem('refresh_token');
+    const refresh_token = await SecureStore.getItemAsync('refresh_token');
     if (refresh_token) {
       await fetch(`${API_BASE}/api/auth/logout`, {
         method: 'POST',

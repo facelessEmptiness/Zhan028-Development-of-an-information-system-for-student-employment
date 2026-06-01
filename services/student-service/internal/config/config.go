@@ -45,7 +45,7 @@ func LoadConfig() (*Config, error) {
 		DBHost:         getEnv("DB_HOST", "localhost"),
 		DBPort:         getEnv("DB_PORT", "5433"),
 		DBUser:         getEnv("DB_USER", "postgres"),
-		DBPassword:     getEnv("DB_PASSWORD", "Supoga80"),
+		DBPassword:     getEnv("DB_PASSWORD", ""),
 		DBName:         getEnv("DB_NAME", "student_db"),
 		DBSSLMode:      getEnv("DB_SSLMODE", "disable"),
 		JWTSecret:      getEnv("JWT_SECRET", "some_jwt_secret"),
@@ -59,6 +59,9 @@ func LoadConfig() (*Config, error) {
 	// Проверка обязательных переменных
 	if config.JWTSecret == "" {
 		return nil, fmt.Errorf("JWT_SECRET не установлен")
+	}
+	if config.DBPassword == "" {
+		return nil, fmt.Errorf("DB_PASSWORD не установлен")
 	}
 
 	// Парсинг времени жизни JWT токена

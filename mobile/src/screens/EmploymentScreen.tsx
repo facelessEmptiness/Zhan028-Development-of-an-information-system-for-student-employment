@@ -6,12 +6,12 @@ import {
 import Icon from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 
 const GRANT_DAYS = 1095;
 
 export default function EmploymentScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [records,    setRecords]    = useState<EmploymentRecord[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -61,7 +61,7 @@ function RecordCard({ record: r, t }: { record: EmploymentRecord; t: (k: string,
   };
 
   const cfg = STATUS_CFG[r.status] ?? { label: r.status, color: '#6B7280' };
-  const startDate = formatDate(r.started_at, 'ru-RU', { day: '2-digit', month: 'short', year: 'numeric' });
+  const startDate = formatDate(r.started_at, langToLocale(i18n.language), { day: '2-digit', month: 'short', year: 'numeric' });
   const progress  = Math.min(r.progress ?? 0, 100);
   const barColor  = r.grant_fulfilled ? '#10B981' : '#2563EB';
 

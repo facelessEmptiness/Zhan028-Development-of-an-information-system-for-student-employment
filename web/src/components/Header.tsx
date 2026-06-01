@@ -294,7 +294,7 @@ export default function Header() {
 
                       <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50 text-center">
                         <button className="text-xs font-medium text-blue-600 hover:underline">
-                          Показать все уведомления
+                          {t('nav.showAllNotifications')}
                         </button>
                       </div>
                     </div>
@@ -459,8 +459,17 @@ function useNotifTexts(notification: Notification, userRole?: string) {
       if (notes) body += '. ' + t('notifications.interview_scheduled.notes') + ' ' + notes;
       return { title: t('notifications.interview_scheduled.title'), body };
     }
-    case 'chat_message':
-      return { title: t('notifications.chat_message.title'), body: userRole === 'employer' ? t('notifications.chat_message.bodyForEmployer') : t('notifications.chat_message.bodyForStudent') };
+    case 'chat_message': {
+      // body now stores sender name only; legacy entries may contain the full Russian sentence
+      const rawBody = notification.body ?? '';
+      const senderName = rawBody.includes(' написал') ? rawBody.split(' написал')[0].trim() : rawBody;
+      const body = senderName
+        ? t('notifications.chat_message.bodySender', { name: senderName })
+        : userRole === 'employer'
+          ? t('notifications.chat_message.bodyForEmployer')
+          : t('notifications.chat_message.bodyForStudent');
+      return { title: t('notifications.chat_message.title'), body };
+    }
     case 'document_verified':
       return { title: t('notifications.document_verified.title'), body: t('notifications.document_verified.body') };
     case 'document_rejected':

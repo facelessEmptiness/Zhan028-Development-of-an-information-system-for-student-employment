@@ -13,7 +13,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { useAuth } from '../context/AuthContext';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import LanguageSelector from '../components/LanguageSelector';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
 
@@ -89,7 +89,7 @@ const emptyForm: FormData = {
 type TabType = 'profile' | 'applications' | 'documents';
 
 export default function StudentProfileEditScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const route      = useRoute<any>();
   const navigation = useNavigation<any>();
@@ -370,7 +370,7 @@ export default function StudentProfileEditScreen() {
               }
               renderItem={({ item }) => {
                 const color = STATUS_COLORS[item.status] ?? '#6B7280';
-                const date  = formatDate(item.created_at, 'ru-RU', { day: '2-digit', month: 'short' });
+                const date  = formatDate(item.created_at, langToLocale(i18n.language), { day: '2-digit', month: 'short' });
                 return (
                   <TouchableOpacity style={styles.appCard} activeOpacity={0.7} onPress={() => handleOpenVacancy(item.vacancy_id)}>
                     <View style={styles.appTop}>

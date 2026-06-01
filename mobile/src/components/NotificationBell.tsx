@@ -15,7 +15,7 @@ export default function NotificationBell() {
 
     const interval = setInterval(() => {
       notificationService.getUnreadCount().then(setCount).catch(() => {});
-    }, 30_000);
+    }, 10_000);
 
     return () => clearInterval(interval);
   }, []);

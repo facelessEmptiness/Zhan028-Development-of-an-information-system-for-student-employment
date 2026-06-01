@@ -9,7 +9,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { employerVacancyService } from '../services/employerVacancyService';
 import { applicationService, STATUS_COLORS } from '../services/applicationService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 import type { EmployerChatsStackParamList } from '../navigation/MainNavigator';
 
 type Nav = NativeStackNavigationProp<EmployerChatsStackParamList>;
@@ -23,7 +23,7 @@ interface ChatItem {
 }
 
 export default function EmployerChatsListScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation  = useNavigation<Nav>();
   const [chats,     setChats]     = useState<ChatItem[]>([]);
   const [loading,   setLoading]   = useState(true);
@@ -91,7 +91,7 @@ export default function EmployerChatsListScreen() {
       renderItem={({ item }) => {
         const statusColor = STATUS_COLORS[item.status] ?? '#6B7280';
         const statusLabel = t(`status.${item.status}`, { defaultValue: item.status });
-        const date = formatDate(item.date, 'ru-RU', { day: '2-digit', month: 'short' });
+        const date = formatDate(item.date, langToLocale(i18n.language), { day: '2-digit', month: 'short' });
 
         return (
           <TouchableOpacity

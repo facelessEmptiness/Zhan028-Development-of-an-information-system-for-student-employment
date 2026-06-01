@@ -1,3 +1,9 @@
+export function langToLocale(lang: string): string {
+  if (lang === 'kz') return 'kk-KZ';
+  if (lang === 'en') return 'en-US';
+  return 'ru-RU';
+}
+
 export function formatDate(
   value: string | null | undefined,
   locale = 'ru-RU',

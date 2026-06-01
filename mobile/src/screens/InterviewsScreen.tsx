@@ -6,16 +6,16 @@ import { useTranslation } from 'react-i18next';
 import { interviewService, type Interview } from '../services/interviewService';
 import Icon from '../components/Icon';
 
-function formatDate(iso: string, t: (k: string, opts?: any) => string) {
+function formatDate(iso: string, t: (k: string, opts?: any) => string, locale: string) {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' })
-    + ' ' + t('interviews.at') + ' ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' })
+    + ' ' + t('interviews.at') + ' ' + d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
 export default function InterviewsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -102,7 +102,7 @@ function InterviewCard({ interview: i, statusConfig, t }: {
 
       <View style={styles.row}>
         <View style={styles.metaIcon}><Icon name="calendar" size={14} color="#6B7280" /></View>
-        <Text style={styles.metaText}>{formatDate(i.scheduled_at, t)}</Text>
+        <Text style={styles.metaText}>{formatDate(i.scheduled_at, t, i18n.language === 'kz' ? 'kk-KZ' : i18n.language === 'en' ? 'en-US' : 'ru-RU')}</Text>
       </View>
       <View style={styles.row}>
         <View style={styles.metaIcon}><Icon name="hourglass" size={14} color="#6B7280" /></View>

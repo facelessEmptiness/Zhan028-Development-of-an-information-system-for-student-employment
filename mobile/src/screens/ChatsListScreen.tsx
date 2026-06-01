@@ -3,12 +3,12 @@ import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
   ActivityIndicator, RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { applicationService, type Application } from '../services/applicationService';
 import { chatService } from '../services/chatService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 import type { ChatsStackParamList } from '../navigation/MainNavigator';
 import Icon from '../components/Icon';
 
@@ -20,7 +20,7 @@ const STATUS_COLORS: Record<string, string> = {
 type Nav = NativeStackNavigationProp<ChatsStackParamList>;
 
 export default function ChatsListScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<Nav>();
   const [apps,         setApps]        = useState<Application[]>([]);
   const [lastMessages, setLastMessages] = useState<Record<string, string>>({});
@@ -54,6 +54,14 @@ export default function ChatsListScreen() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Refresh last messages every time the screen comes into focus
+  // (e.g. when user returns from a chat conversation)
+  useFocusEffect(useCallback(() => {
+    load();
+    const interval = setInterval(load, 15_000);
+    return () => clearInterval(interval);
+  }, [load]));
+
   if (loading) return <ActivityIndicator style={styles.loader} size="large" color="#2563EB" />;
 
   return (
@@ -79,7 +87,7 @@ export default function ChatsListScreen() {
       renderItem={({ item }) => {
         const statusColor = STATUS_COLORS[item.status] ?? '#6B7280';
         const statusLabel = t(`status.${item.status}`, { defaultValue: item.status });
-        const date = formatDate(item.created_at, 'ru-RU', { day: '2-digit', month: 'short' });
+        const date = formatDate(item.created_at, langToLocale(i18n.language), { day: '2-digit', month: 'short' });
 
         return (
           <TouchableOpacity

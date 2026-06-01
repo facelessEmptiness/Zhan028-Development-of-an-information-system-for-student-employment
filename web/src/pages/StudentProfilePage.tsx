@@ -321,14 +321,9 @@ const StudentProfilePage = () => {
                 )}
               </div>
               {profileExists && !isCreating && (
-                <div className="flex flex-col gap-1.5 shrink-0">
-                  <button onClick={() => setEditMode(true)} className="px-3 py-1.5 text-xs sm:text-sm font-semibold text-white rounded-lg bg-blue-600 hover:bg-blue-700 whitespace-nowrap">
-                    {t('profile.edit')}
-                  </button>
-                  <button className="px-3 py-1.5 text-xs sm:text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 whitespace-nowrap">
-                    {t('profile.downloadResume', { defaultValue: 'Скачать резюме' })}
-                  </button>
-                </div>
+                <button onClick={() => setEditMode(true)} className="px-3 py-1.5 text-xs sm:text-sm font-semibold text-white rounded-lg bg-blue-600 hover:bg-blue-700 whitespace-nowrap shrink-0">
+                  {t('profile.edit')}
+                </button>
               )}
             </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { chatService, type ChatMessage } from '../services/chatService';
 import { useAuth } from '../context';
@@ -6,48 +6,71 @@ import Icon from './Icon';
 
 interface Props {
   applicationId: string;
-  /** Display name of the other party */
   otherPartyName: string;
   onClose: () => void;
 }
 
-const POLL_INTERVAL = 4000;
-
 const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [sending, setSending] = useState(false);
+  const { user, accessToken } = useAuth();
+  const [messages, setMessages]   = useState<ChatMessage[]>([]);
+  const [input, setInput]         = useState('');
+  const [sending, setSending]     = useState(false);
+  const [connected, setConnected] = useState(false);
   const [modalHeight, setModalHeight] = useState<string>('92dvh');
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const bottomRef      = useRef<HTMLDivElement>(null);
+  const wsRef          = useRef<WebSocket | null>(null);
+  const reconnectRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    const update = () => {
-      const h = Math.round(vv.height * 0.95);
-      setModalHeight(`${h}px`);
-    };
+    const update = () => setModalHeight(`${Math.round(vv.height * 0.95)}px`);
     vv.addEventListener('resize', update);
     update();
     return () => vv.removeEventListener('resize', update);
   }, []);
 
-  const load = () => {
-    chatService.getMessages(applicationId)
-      .then(setMessages)
-      .catch(() => {});
-  };
+  // Load message history once on open
+  useEffect(() => {
+    chatService.getMessages(applicationId).then(setMessages).catch(() => {});
+  }, [applicationId]);
+
+  const connect = useCallback(() => {
+    if (!accessToken) return;
+    const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // Browser WebSocket API cannot send custom headers, so the JWT goes in the query string.
+    // This is the standard pattern for browser-based WebSocket auth.
+    const ws = new WebSocket(
+      `${proto}://${window.location.host}/ws/chat/${applicationId}?token=${accessToken}`
+    );
+    wsRef.current = ws;
+
+    ws.onopen = () => setConnected(true);
+
+    ws.onmessage = (e) => {
+      try {
+        const msg: ChatMessage = JSON.parse(e.data);
+        setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
+      } catch {}
+    };
+
+    ws.onclose = () => {
+      setConnected(false);
+      // Reconnect after 3 s
+      reconnectRef.current = setTimeout(connect, 3000);
+    };
+
+    ws.onerror = () => ws.close();
+  }, [applicationId, accessToken]);
 
   useEffect(() => {
-    load();
-    pollRef.current = setInterval(load, POLL_INTERVAL);
+    connect();
     return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
+      if (reconnectRef.current) clearTimeout(reconnectRef.current);
+      wsRef.current?.close();
     };
-  }, [applicationId]);
+  }, [connect]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -56,34 +79,39 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
   const send = async () => {
     const text = input.trim();
     if (!text || sending) return;
-    setSending(true);
-    try {
-      const msg = await chatService.sendMessage(applicationId, text);
-      setMessages(prev => [...prev, msg]);
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      // Server broadcasts the message back — no manual state update needed
+      ws.send(JSON.stringify({ content: text }));
       setInput('');
-    } catch {
-      // ignore
-    } finally {
-      setSending(false);
+    } else {
+      // WS not ready — fall back to HTTP POST
+      setSending(true);
+      try {
+        const msg = await chatService.sendMessage(applicationId, text);
+        setMessages(prev => [...prev, msg]);
+        setInput('');
+      } catch {
+        // ignore
+      } finally {
+        setSending(false);
+      }
     }
   };
 
   const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   };
 
-  const formatTime = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-lg flex flex-col sm:h-[560px]" style={{ height: modalHeight }}>
-
+      <div
+        className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-lg flex flex-col sm:h-[560px]"
+        style={{ height: modalHeight }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
@@ -92,13 +120,15 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
             </div>
             <div>
               <p className="font-semibold text-gray-900 text-sm">{otherPartyName}</p>
-              <p className="text-xs text-gray-400">{t('chat.online')}</p>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-green-500' : 'bg-gray-400'}`} />
+                <p className="text-xs text-gray-400">
+                  {connected ? t('chat.online') : t('chat.connecting')}
+                </p>
+              </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <Icon name="x" size={18} />
           </button>
         </div>

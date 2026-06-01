@@ -383,6 +383,12 @@
       "hoursAgo": "{{count}} сағ. бұрын",
       "yesterday": "кеше",
       "daysAgo": "{{count}} күн бұрын"
+    },
+    "chat_message": {
+      "title": "💬 Жаңа хабарлама",
+      "bodySender": "{{name}} сізге чатта хабарлама жазды",
+      "bodyForStudent": "Жұмыс беруші сізге чатта хабарлама жазды",
+      "bodyForEmployer": "Студент сіздің хабарламаңызға жауап берді"
     }
   },
   "chats": {
@@ -397,7 +403,8 @@
     "startChat": "Жұмыс берушімен хат алмасуды бастаңыз",
     "messagePlaceholder": "Хабарлама енгізіңіз...",
     "sendBtn": "Жіберу",
-    "withEmployer": "Жұмыс берушімен чат"
+    "withEmployer": "Жұмыс берушімен чат",
+    "connecting": "Қосылуда..."
   },
   "employer": {
     "overview": "Шолу",

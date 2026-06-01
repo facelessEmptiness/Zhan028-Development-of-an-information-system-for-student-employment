@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -375,6 +376,31 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
+}
+
+// GET /api/applications/:id — get single application by ID (student or employer)
+func (h *ApplicationHandler) GetByID(c *gin.Context) {
+	id := c.Param("id")
+	url := fmt.Sprintf("%s/api/applications/%s", h.appHTTPURL, id)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "proxy error"})
+		return
+	}
+	req.Header.Set("X-User-ID", c.GetHeader("X-User-ID"))
+	req.Header.Set("X-User-Role", c.GetHeader("X-User-Role"))
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"error": "application service unavailable"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	c.Data(resp.StatusCode, "application/json", body)
 }
 
 // DELETE /api/applications/:id — student withdraws application

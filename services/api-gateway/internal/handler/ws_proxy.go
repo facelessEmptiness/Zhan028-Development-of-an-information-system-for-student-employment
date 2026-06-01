@@ -23,21 +23,29 @@ var wsUpgrader = websocket.Upgrader{
 type WSChatProxy struct {
 	appWSURL  string // e.g. ws://application-service:8083
 	jwtSecret string
+	// notifyFn is called after each message forwarded from client → backend,
+	// so that chat notifications are created for WS messages (same as HTTP POST).
+	notifyFn func(applicationID, senderID, senderRole string)
 }
 
-func NewWSChatProxy(cfg *config.Config) *WSChatProxy {
+func NewWSChatProxy(cfg *config.Config, notifyFn func(applicationID, senderID, senderRole string)) *WSChatProxy {
 	// Convert http:// to ws://
 	wsURL := strings.Replace(cfg.ApplicationServiceHttpUrl, "http://", "ws://", 1)
 	wsURL = strings.Replace(wsURL, "https://", "wss://", 1)
-	return &WSChatProxy{appWSURL: wsURL, jwtSecret: cfg.JWTSecret}
+	return &WSChatProxy{appWSURL: wsURL, jwtSecret: cfg.JWTSecret, notifyFn: notifyFn}
 }
 
 // ProxyChat — GET /ws/chat/:application_id?token=<jwt>
 func (p *WSChatProxy) ProxyChat(c *gin.Context) {
 	appID := c.Param("application_id")
 
-	// Extract JWT from query parameter (browsers cannot set custom headers on WS)
-	tokenStr := c.Query("token")
+	// Extract JWT: prefer Authorization header (mobile), fall back to ?token= (browser WS)
+	tokenStr := ""
+	if auth := c.GetHeader("Authorization"); strings.HasPrefix(auth, "Bearer ") {
+		tokenStr = strings.TrimPrefix(auth, "Bearer ")
+	} else {
+		tokenStr = c.Query("token")
+	}
 	if tokenStr == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "token required"})
 		return
@@ -80,6 +88,10 @@ func (p *WSChatProxy) ProxyChat(c *gin.Context) {
 			backendConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err := backendConn.WriteMessage(mt, msg); err != nil {
 				return
+			}
+			// Notify the other party about the new message
+			if p.notifyFn != nil && mt == websocket.TextMessage {
+				go p.notifyFn(appID, userID, userRole)
 			}
 		}
 	}()

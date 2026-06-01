@@ -3,13 +3,14 @@ import {
   View, Text, FlatList, TouchableOpacity,
   StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { notificationService, type Notification } from '../services/notificationService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
 
-function relativeTime(dateStr: string, t: (k: string, opts?: any) => string): string {
+function relativeTime(dateStr: string, t: (k: string, opts?: any) => string, locale: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins  = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
@@ -19,7 +20,7 @@ function relativeTime(dateStr: string, t: (k: string, opts?: any) => string): st
   if (hours < 24) return t('notifications.time.hoursAgo', { count: hours });
   if (days === 1) return t('notifications.time.yesterday');
   if (days < 7)   return t('notifications.time.daysAgo', { count: days });
-  return formatDate(dateStr, 'ru-RU', { day: 'numeric', month: 'short' });
+  return formatDate(dateStr, locale, { day: 'numeric', month: 'short' });
 }
 
 const TYPE_CFG: Record<string, { icon: IconName; color: string }> = {
@@ -28,10 +29,12 @@ const TYPE_CFG: Record<string, { icon: IconName; color: string }> = {
   interview_scheduled:   { icon: 'calendar', color: '#8B5CF6' },
   document_verified:     { icon: 'check-circle', color: '#10B981' },
   document_rejected:     { icon: 'x-circle', color: '#EF4444' },
+  chat_message:          { icon: 'chat', color: '#2563EB' },
 };
 
 export default function NotificationsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigation = useNavigation<any>();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading,       setLoading]       = useState(true);
   const [refreshing,    setRefreshing]    = useState(false);
@@ -48,7 +51,11 @@ export default function NotificationsScreen() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+    const interval = setInterval(load, 10_000);
+    return () => clearInterval(interval);
+  }, [load]);
 
   const handleMarkAllRead = async () => {
     await notificationService.markAllRead();
@@ -60,29 +67,52 @@ export default function NotificationsScreen() {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
   };
 
+  const handleNotificationPress = (item: Notification) => {
+    if (!item.is_read) handleMarkRead(item.id);
+    if (item.type === 'chat_message' && item.related_id) {
+      const applicationId = item.related_id.split(':')[0];
+      navigation.navigate('Chat', { applicationId, title: t('nav.chats'), standalone: true });
+    }
+  };
+
+  const getNotifTexts = (item: Notification): { title: string; body: string } => {
+    if (item.type === 'chat_message') {
+      const rawBody = item.body ?? '';
+      // body now stores sender name only; legacy entries may have the full Russian sentence
+      const senderName = rawBody.includes(' написал') ? rawBody.split(' написал')[0].trim() : rawBody;
+      const body = senderName
+        ? t('notifications.chat_message.bodySender', { name: senderName })
+        : t('notifications.chat_message.bodyForStudent');
+      return { title: t('notifications.chat_message.title'), body };
+    }
+    return { title: item.title, body: item.body };
+  };
+
   const renderItem = ({ item }: { item: Notification }) => {
     const cfg   = TYPE_CFG[item.type] ?? { icon: 'bell' as IconName, color: '#6B7280' };
     const unread = !item.is_read;
-    const date  = relativeTime(item.created_at, t);
+    const date  = relativeTime(item.created_at, t, langToLocale(i18n.language));
+    const tappable = unread || item.type === 'chat_message';
+    const { title: notifTitle, body: notifBody } = getNotifTexts(item);
 
     return (
       <TouchableOpacity
         style={[styles.card, unread && styles.cardUnread]}
-        onPress={() => unread && handleMarkRead(item.id)}
-        activeOpacity={unread ? 0.7 : 1}
+        onPress={() => handleNotificationPress(item)}
+        activeOpacity={tappable ? 0.7 : 1}
       >
         <View style={[styles.iconBox, { backgroundColor: cfg.color + '20' }]}>
           <Icon name={cfg.icon} size={18} color={cfg.color} />
         </View>
         <View style={styles.cardBody}>
-          {item.title ? (
+          {notifTitle ? (
             <Text style={[styles.title, unread && styles.titleUnread]} numberOfLines={1}>
-              {item.title}
+              {notifTitle}
             </Text>
           ) : null}
-          {item.body ? (
+          {notifBody ? (
             <Text style={styles.body} numberOfLines={3}>
-              {item.body}
+              {notifBody}
             </Text>
           ) : null}
           <Text style={styles.date}>{date}</Text>

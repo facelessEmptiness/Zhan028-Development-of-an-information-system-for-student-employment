@@ -7,15 +7,16 @@ import Icon from '../components/Icon';
 import { useTranslation } from 'react-i18next';
 import { interviewService, type Interview } from '../services/interviewService';
 import { applicationService, type Application } from '../services/applicationService';
+import { apiFetch } from '../services/api';
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
 
-function formatDate(iso: string, at: string) {
+function formatDate(iso: string, at: string, locale: string) {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' })
-    + ` ${at} ` + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' })
+    + ` ${at} ` + d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
 export default function EmployerInterviewsScreen() {
@@ -52,8 +53,18 @@ export default function EmployerInterviewsScreen() {
 
   const openForm = async () => {
     try {
-      const data = await applicationService.getVacancyApplications('');
-      setApps(data.filter(a => a.status === 'interview'));
+      // Fetch employer's vacancies, then aggregate applications in "interview" status
+      const vacRes = await apiFetch('/api/vacancies/my');
+      const vacData = vacRes.ok ? await vacRes.json() : { vacancies: [] };
+      const vacancies: { id: string }[] = vacData.vacancies ?? vacData ?? [];
+      const allApps = (
+        await Promise.all(
+          vacancies.map(v =>
+            applicationService.getVacancyApplications(v.id).catch(() => [])
+          )
+        )
+      ).flat();
+      setApps(allApps.filter(a => a.status === 'interview'));
     } catch {
       setApps([]);
     }
@@ -269,6 +280,7 @@ function InterviewCard({ interview: i, statusConfig, atLabel, durationLabel, can
   cancelLabel?: string;
   onCancel?: () => void;
 }) {
+  const { i18n } = useTranslation();
   const cfg = statusConfig[i.status] ?? statusConfig.scheduled;
   const studentName = i.student ? `${i.student.first_name} ${i.student.last_name}` : candidateFallback;
 
@@ -283,7 +295,7 @@ function InterviewCard({ interview: i, statusConfig, atLabel, durationLabel, can
           <Text style={[styles.badgeText, { color: cfg.color }]}>{cfg.label}</Text>
         </View>
       </View>
-      <View style={styles.metaRow}><View style={styles.metaIcon}><Icon name="calendar" size={13} color="#6B7280" /></View><Text style={styles.metaText}>{formatDate(i.scheduled_at, atLabel)}</Text></View>
+      <View style={styles.metaRow}><View style={styles.metaIcon}><Icon name="calendar" size={13} color="#6B7280" /></View><Text style={styles.metaText}>{formatDate(i.scheduled_at, atLabel, i18n.language === 'kz' ? 'kk-KZ' : i18n.language === 'en' ? 'en-US' : 'ru-RU')}</Text></View>
       <View style={styles.metaRow}><View style={styles.metaIcon}><Icon name="hourglass" size={13} color="#6B7280" /></View><Text style={styles.metaText}>{durationLabel}</Text></View>
       {i.location ? <View style={styles.metaRow}><View style={styles.metaIcon}><Icon name="pin" size={13} color="#6B7280" /></View><Text style={styles.metaText}>{i.location}</Text></View> : null}
       {onCancel && i.status === 'scheduled' && cancelLabel && (

@@ -383,6 +383,12 @@
       "hoursAgo": "{{count}} h ago",
       "yesterday": "yesterday",
       "daysAgo": "{{count}} d ago"
+    },
+    "chat_message": {
+      "title": "💬 New message",
+      "bodySender": "{{name}} wrote to you in chat",
+      "bodyForStudent": "The employer wrote to you in chat",
+      "bodyForEmployer": "The student replied to your message"
     }
   },
   "chats": {
@@ -397,7 +403,8 @@
     "startChat": "Start a conversation with the employer",
     "messagePlaceholder": "Type a message...",
     "sendBtn": "Send",
-    "withEmployer": "Chat with Employer"
+    "withEmployer": "Chat with Employer",
+    "connecting": "Connecting..."
   },
   "employer": {
     "overview": "Overview",

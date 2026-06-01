@@ -11,7 +11,7 @@ import { studentService, type StudentProfile } from '../services/studentService'
 import { applicationService, type Application } from '../services/applicationService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
 import { jobService, type Vacancy } from '../services/jobService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 import type { HomeStackParamList } from '../navigation/MainNavigator';
 import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
@@ -35,7 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function StudentHomeScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const navigation = useNavigation<Nav>();
 
@@ -167,7 +167,7 @@ export default function StudentHomeScreen() {
           {apps.slice(0, 3).map(app => {
             const color = STATUS_COLORS[app.status] ?? '#6B7280';
             const label = STATUS_LABELS[app.status] ?? app.status;
-            const date  = formatDate(app.created_at, 'ru-RU', { day: '2-digit', month: 'short' });
+            const date  = formatDate(app.created_at, langToLocale(i18n.language), { day: '2-digit', month: 'short' });
             return (
               <View key={app.id} style={styles.appCard}>
                 <View style={styles.appLeft}>

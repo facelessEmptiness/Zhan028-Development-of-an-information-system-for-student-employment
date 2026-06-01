@@ -1,6 +1,6 @@
 import { apiFetch } from '../utils/apiClient';
 import type { JobPosting } from './employerService';
-import { parseSkills } from '../utils';
+import { parseSkills, calculateSkillMatch } from '../utils';
 
 export interface Job {
   id: string;
@@ -100,8 +100,23 @@ export const jobService = {
     return jobService.getAllJobs({ searchTerm: companyId });
   },
 
-  calculateMatchIndex: async (_jobId: string, _candidateId?: string): Promise<number> => {
-    return 0;
+  calculateMatchIndex: async (jobId: string, candidateId?: string): Promise<number> => {
+    const job = await jobService.getJobById(jobId);
+    if (!job || job.skills.length === 0) return 50;
+
+    let studentSkills: string[] = [];
+    try {
+      const url = candidateId ? `/api/students/${candidateId}` : '/api/students/profile';
+      const res = await apiFetch(url);
+      if (res.ok) {
+        const profile = await res.json();
+        studentSkills = parseSkills(profile.skills);
+      }
+    } catch {
+      // fall through — return low score if profile unavailable
+    }
+
+    return calculateSkillMatch(studentSkills, job.skills);
   },
 
   getSimilarJobs: async (jobId: string, limit: number = 3): Promise<Job[]> => {

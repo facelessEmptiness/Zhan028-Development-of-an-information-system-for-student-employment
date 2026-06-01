@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { employerVacancyService } from '../services/employerVacancyService';
 import { applicationService, Application, STATUS_COLORS } from '../services/applicationService';
 import type { Vacancy } from '../services/jobService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, langToLocale } from '../utils/dateUtils';
 import type { EmployerStackParamList } from '../navigation/MainNavigator';
 
 const FUNNEL_STAGE_KEYS = ['applied', 'review', 'interview', 'offered'] as const;
@@ -25,7 +25,7 @@ const VACANCY_STATUS_COLORS: Record<string, string> = {
 type Tab = 'overview' | 'vacancies';
 
 export default function EmployerVacanciesScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<EmployerStackParamList>>();
   const [tab,        setTab]        = useState<Tab>('overview');
   const [vacancies,  setVacancies]  = useState<Vacancy[]>([]);
@@ -164,7 +164,7 @@ export default function EmployerVacanciesScreen() {
               const initial = (a.student?.first_name?.[0] ?? '?').toUpperCase();
               const statusColor = STATUS_COLORS[a.status] ?? '#6B7280';
               const statusLabel = t(`status.${a.status}`, { defaultValue: a.status });
-              const date = formatDate(a.created_at, 'ru-RU', { day: 'numeric', month: 'short' });
+              const date = formatDate(a.created_at, langToLocale(i18n.language), { day: 'numeric', month: 'short' });
               return (
                 <View key={a.id} style={styles.recentCard}>
                   <View style={styles.recentAvatar}>

@@ -32,6 +32,7 @@
     "notifications": "Notifications",
     "noNotifications": "No notifications",
     "markAllRead": "Mark all read",
+    "showAllNotifications": "Show all notifications",
     "loggedInAs": "Logged in as",
     "language": "Language"
   },
@@ -1082,6 +1083,7 @@
     "enterHint": "Enter to send, Shift+Enter for new line",
     "empty": "No messages yet. Start the conversation!",
     "online": "Online",
+    "connecting": "Connecting...",
     "employer": "Employer",
     "student": "Student"
   },
@@ -1116,6 +1118,7 @@
     },
     "chat_message": {
       "title": "💬 New message",
+      "bodySender": "{{name}} wrote to you in chat",
       "bodyForStudent": "The employer wrote to you in chat",
       "bodyForEmployer": "The student replied to your message"
     },

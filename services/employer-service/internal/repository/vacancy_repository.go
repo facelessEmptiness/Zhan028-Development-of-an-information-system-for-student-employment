@@ -61,12 +61,10 @@ func (r *vacancyRepository) Search(params SearchParams) ([]models.Vacancy, int64
 		query = query.Where("skills @> ?", pq.Array(params.Skills))
 	}
 	if params.SalaryMin > 0 {
-		// vacancy's max salary >= requested min (some overlap)
-		query = query.Where("(salary_max = 0 OR salary_max >= ?)", params.SalaryMin)
+		query = query.Where("salary_min >= ?", params.SalaryMin)
 	}
 	if params.SalaryMax > 0 {
-		// vacancy's min salary <= requested max (some overlap)
-		query = query.Where("(salary_min = 0 OR salary_min <= ?)", params.SalaryMax)
+		query = query.Where("salary_max > 0 AND salary_max <= ?", params.SalaryMax)
 	}
 
 	var total int64

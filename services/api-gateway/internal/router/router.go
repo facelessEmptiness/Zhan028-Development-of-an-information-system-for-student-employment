@@ -52,8 +52,8 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	analyticsHandler := handler.NewAnalyticsHandler(studentClient, vacancyClient, applicationClient)
 	interviewHandler := handler.NewInterviewHandler(cfg.ApplicationServiceHttpUrl, notifClient)
 	employmentHandler := handler.NewEmploymentHandler(cfg.ApplicationServiceHttpUrl)
-	chatHandler := handler.NewChatHandler(cfg.ApplicationServiceHttpUrl, notifClient, vacancyClient)
-	wsChatProxy := handler.NewWSChatProxy(cfg)
+	chatHandler := handler.NewChatHandler(cfg.ApplicationServiceHttpUrl, notifClient, vacancyClient, studentClient)
+	wsChatProxy := handler.NewWSChatProxy(cfg, chatHandler.NotifyRecipient)
 
 	api := r.Group("/api")
 
@@ -143,6 +143,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		applications.POST("", applicationHandler.Apply)
 		applications.GET("/my", applicationHandler.GetMyApplications)
 		applications.GET("/vacancy/:vacancy_id", applicationHandler.GetVacancyApplications)
+		applications.GET("/:id", applicationHandler.GetByID)
 		applications.PUT("/:id/status", applicationHandler.UpdateStatus)
 		applications.DELETE("/:id", applicationHandler.Withdraw)
 	}

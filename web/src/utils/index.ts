@@ -20,31 +20,20 @@ export const skillsToString = (skills: string | string[] | null | undefined): st
 };
 
 /**
- * Format date to readable string
+ * Calculates skill match percentage between student skills and vacancy skills.
+ * Returns 0-100. Returns 50 if vacancy has no skills, 10 if student has no skills.
  */
-export const formatDate = (date: string | Date): string => {
-  return new Date(date).toLocaleDateString('ru-RU', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
-/**
- * Format date to relative time (e.g., "2 hours ago")
- */
-export const formatRelativeTime = (date: string | Date): string => {
-  const now = new Date()
-  const then = new Date(date)
-  const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000)
-
-  if (diffInSeconds < 60) return 'только что'
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} минут назад`
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} часов назад`
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} дней назад`
-  
-  return formatDate(date)
-}
+export const calculateSkillMatch = (
+  studentSkills: string | string[] | null | undefined,
+  vacancySkills: string | string[] | null | undefined,
+): number => {
+  const vacancy = parseSkills(vacancySkills).map(s => s.toLowerCase());
+  if (vacancy.length === 0) return 50;
+  const student = parseSkills(studentSkills).map(s => s.toLowerCase());
+  if (student.length === 0) return 10;
+  const matched = vacancy.filter(vs => student.some(ss => ss.includes(vs) || vs.includes(ss))).length;
+  return Math.round((matched / vacancy.length) * 100);
+};
 
 /**
  * Debounce function

@@ -24,7 +24,7 @@ interface StudentProfile {
   graduation_year?: number;
   gpa?: number;
   bio?: string;
-  skills?: string;
+  skills?: string | string[];
   github_url?: string;
   diploma_verified?: boolean;
 }
@@ -74,7 +74,12 @@ export default function CandidateDetailScreen() {
   };
 
   const name = profile ? `${profile.first_name} ${profile.last_name}` : t('role.student');
-  const skills = (profile?.skills ?? '').split(',').map(s => s.trim()).filter(Boolean);
+  const rawSkills = profile?.skills as unknown;
+  const skills = Array.isArray(rawSkills)
+    ? (rawSkills as string[]).map(s => s.trim()).filter(Boolean)
+    : typeof rawSkills === 'string'
+      ? rawSkills.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

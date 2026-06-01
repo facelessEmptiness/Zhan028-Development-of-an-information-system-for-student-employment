@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context';
 import { studentApi } from '../api/auth';
+import { employerProfileService } from '../services/employerProfileService';
 import { StudentProfileForm, EmployerProfileForm, UniversityProfileForm } from '../components';
 import type { CreateStudentProfileRequest, EmployerProfile, UniversityProfile } from '../types/auth';
 
@@ -25,13 +26,22 @@ const MySessionsPage = () => {
       if (user.role === 'student') {
         await studentApi.createProfile(accessToken, data as CreateStudentProfileRequest);
       } else if (user.role === 'employer') {
-        // TODO: Implement employer API when backend is ready
-        console.warn('Employer profile API not implemented yet');
-        throw new Error('Employer profile creation not available yet');
+        const d = data as EmployerProfile;
+        await employerProfileService.createProfile({
+          bin:                 d.bin,
+          bin_status:          '',
+          company_name:        d.companyName,
+          company_description: '',
+          industry:            '',
+          company_size:        '',
+          website:             '',
+          location:            '',
+          contact_email:       d.companyEmail,
+          contact_phone:       d.contactPhone,
+        });
       } else if (user.role === 'university') {
-        // TODO: Implement university API when backend is ready
-        console.warn('University profile API not implemented yet');
-        throw new Error('University profile creation not available yet');
+        // University users are pre-associated with their institution at registration;
+        // no separate profile creation endpoint exists — proceed directly to dashboard.
       }
       setSuccessMessage(t('sessions.successMessage'));
       setTimeout(() => {
