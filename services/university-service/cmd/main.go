@@ -61,6 +61,12 @@ func main() {
 }
 
 func seedUniversities(svc service.UniversityService) {
+	existing, err := svc.GetAllUniversities()
+	if err == nil && len(existing) > 0 {
+		log.Printf("University seed skipped (%d universities already exist)", len(existing))
+		return
+	}
+
 	unis := []struct{ name, city, country, website string }{
 		{"Назарбаев Университет", "Астана", "Казахстан", "https://nu.edu.kz"},
 		{"Евразийский национальный университет им. Л.Н. Гумилёва", "Астана", "Казахстан", "https://enu.kz"},
@@ -75,10 +81,8 @@ func seedUniversities(svc service.UniversityService) {
 		{"Astana IT University", "Астана", "Казахстан", "https://astanait.edu.kz"},
 	}
 	for _, u := range unis {
-		_, err := svc.CreateUniversity(u.name, u.city, u.country, u.website)
-		if err != nil {
-			// already exists — skip silently
-			continue
+		if _, err := svc.CreateUniversity(u.name, u.city, u.country, u.website); err != nil {
+			log.Printf("seed: не удалось создать университет %q: %v", u.name, err)
 		}
 	}
 	log.Printf("University seed done (%d entries)", len(unis))
