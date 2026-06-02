@@ -172,6 +172,13 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	}
 
 	// ============================================
+	// COMPLIANCE - proxied to application-service HTTP
+	// Auth middleware injects X-User-ID/Role/University-ID; application-service
+	// enforces all role checks and per-university scoping downstream.
+	// ============================================
+	api.Any("/compliance/*path", middleware.AuthMiddleware(cfg.JWTSecret), proxy.NewServiceProxy(cfg.ApplicationServiceHttpUrl))
+
+	// ============================================
 	// CHAT - proxied to application-service HTTP
 	// ============================================
 	chatRoutes := api.Group("/chat", middleware.AuthMiddleware(cfg.JWTSecret))

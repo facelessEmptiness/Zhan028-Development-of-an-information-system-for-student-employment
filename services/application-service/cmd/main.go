@@ -1,15 +1,19 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 
+	"application-service/internal/config"
+	"application-service/internal/facts"
 	grpcserver "application-service/internal/grpc"
 	"application-service/internal/grpc/pb"
-	"application-service/internal/config"
 	httphandler "application-service/internal/http/handler"
 	httprouter "application-service/internal/http/router"
+	"application-service/internal/notify"
 	"application-service/internal/repository"
+	"application-service/internal/scheduler"
 	"application-service/internal/service"
 	"application-service/internal/ws"
 
@@ -37,6 +41,19 @@ func main() {
 	appSvc := service.NewApplicationService(appRepo)
 	grpcSrv := grpcserver.NewApplicationGRPCServer(appSvc, appRepo)
 
+	// Compliance state machine (Article 47). The nightly scheduler is off by
+	// default; until fact sourcing (step 5) is wired it uses a placeholder
+	// provider that changes no state.
+	complianceRepo := repository.NewComplianceRepository(db)
+	complianceNotifier := notify.NewHTTPNotifier(cfg.StudentServiceURL)
+	complianceSvc := service.NewComplianceService(complianceRepo, complianceNotifier)
+	if cfg.ComplianceSchedulerEnabled {
+		factProvider := facts.NewEmploymentFactProvider(employmentRepo, facts.Policy{})
+		sched := scheduler.NewComplianceScheduler(complianceSvc, factProvider, cfg.ComplianceSchedulerInterval)
+		go sched.Start(context.Background())
+		log.Printf("Compliance scheduler enabled (interval=%s)", cfg.ComplianceSchedulerInterval)
+	}
+
 	go func() {
 		chatRepo := repository.NewChatRepository(db)
 		hub := ws.NewHub()
@@ -44,7 +61,8 @@ func main() {
 		employmentHandler := httphandler.NewEmploymentHandler(employmentRepo)
 		chatHandler := httphandler.NewChatHandler(chatRepo, appRepo)
 		wsHandler := httphandler.NewWSChatHandler(hub, chatRepo, appRepo)
-		r := httprouter.SetupRouter(interviewHandler, employmentHandler, chatHandler, wsHandler)
+		complianceHandler := httphandler.NewComplianceHandler(complianceSvc)
+		r := httprouter.SetupRouter(interviewHandler, employmentHandler, chatHandler, wsHandler, complianceHandler)
 
 		httpPort := cfg.HTTPPort
 		if httpPort == "" {

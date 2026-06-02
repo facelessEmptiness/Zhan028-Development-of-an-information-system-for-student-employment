@@ -10,6 +10,8 @@ import { studentService, type BackendStudentProfile } from '../services/studentS
 import { EDUCATIONAL_PROGRAMS, PROGRAM_I18N_KEY, type EducationalProgram } from '../constants/programs';
 import { documentService, type Document, getTypeKey } from '../services/documentService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
+import { complianceService, type ComplianceRecord } from '../services/complianceService';
+import CompliancePanel from '../components/CompliancePanel';
 
 interface SpecializationCount { specialization: string; count: number; }
 interface StatusCount         { status: string; count: number; }
@@ -87,7 +89,7 @@ const UniversityAnalyticsPage = () => {
     rejected: { label: t('universityAnalytics.docStatus.rejected'), cls: 'bg-red-50 text-red-700' },
   };
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'employers' | 'statistics' | 'employment' | 'programs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'employers' | 'statistics' | 'employment' | 'programs' | 'compliance'>('overview');
   const [data, setData] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [myStudents, setMyStudents] = useState<BackendStudentProfile[]>([]);
@@ -102,6 +104,8 @@ const UniversityAnalyticsPage = () => {
   const [programSearch, setProgramSearch] = useState('');
   const [studentSearch, setStudentSearch] = useState('');
   const [pendingDocsCount, setPendingDocsCount] = useState(0);
+  const [complianceRecords, setComplianceRecords] = useState<ComplianceRecord[]>([]);
+  const [enrollingId, setEnrollingId] = useState<string | null>(null);
 
   // ── Rejection reason modal state ──
   const [rejectModal, setRejectModal] = useState<{ docId: string; userId: string } | null>(null);
@@ -131,10 +135,12 @@ const UniversityAnalyticsPage = () => {
       studentService.listByUniversity().then(r => r.students ?? []),
       employmentService.getAllRecords().catch(() => [] as EmploymentRecord[]),
       documentService.pendingCount().catch(() => 0),
-    ]).then(([students, records, count]) => {
+      complianceService.getForUniversity().catch(() => [] as ComplianceRecord[]),
+    ]).then(([students, records, count, compliance]) => {
       setMyStudents(students);
       setEmploymentRecords(records);
       setPendingDocsCount(count);
+      setComplianceRecords(compliance);
     }).catch(() => {});
   }, []);
 
@@ -240,6 +246,23 @@ const UniversityAnalyticsPage = () => {
     } catch { toast.error(t('universityAnalytics.autoVerify.error')); }
   };
 
+  const handleEnroll = async (student: BackendStudentProfile) => {
+    setEnrollingId(student.user_id);
+    const gradYear = student.graduation_year;
+    const dates = gradYear > 0
+      ? { graduation_date: `${gradYear}-06-01T00:00:00Z`, deadline: `${gradYear + 3}-06-01T00:00:00Z` }
+      : {};
+    try {
+      await complianceService.enroll({ student_id: student.user_id, grant_years: 3, ...dates });
+      setComplianceRecords(await complianceService.getForUniversity());
+      toast.success(t('universityAnalytics.compliance.enrolled', { defaultValue: 'Студент добавлен в отслеживание' }));
+    } catch {
+      toast.error(t('universityAnalytics.compliance.enrollError', { defaultValue: 'Не удалось добавить студента' }));
+    } finally {
+      setEnrollingId(null);
+    }
+  };
+
   // ── Computed: real employment rate from loaded data ──
   const employedIds = new Set(
     employmentRecords
@@ -303,10 +326,13 @@ const UniversityAnalyticsPage = () => {
       icon: <path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> },
   ] : [];
 
+  const complianceAtRisk = complianceRecords.filter(r => r.state === 'AtRisk' || r.state === 'NonCompliant').length;
+
   const tabs = [
     { key: 'overview'   as const, label: t('universityAnalytics.tabs.overview') },
     { key: 'programs'   as const, label: t('universityAnalytics.tabs.programs', { defaultValue: 'ОП' }), badge: !myStudentsLoading && myStudents.length > 0 ? myStudents.length : undefined },
     { key: 'employment' as const, label: t('universityAnalytics.tabs.employment') },
+    { key: 'compliance' as const, label: t('universityAnalytics.tabs.compliance', { defaultValue: 'Грант' }), badge: complianceAtRisk > 0 ? complianceAtRisk : undefined },
     { key: 'employers'  as const, label: t('universityAnalytics.tabs.employers') },
     { key: 'statistics' as const, label: t('universityAnalytics.tabs.statistics') },
   ];
@@ -564,6 +590,16 @@ const UniversityAnalyticsPage = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* ── Compliance / grant-obligation at-risk panel ── */}
+          {activeTab === 'compliance' && (
+            <CompliancePanel
+              records={complianceRecords}
+              myStudents={myStudents}
+              onEnroll={handleEnroll}
+              enrollingId={enrollingId}
+            />
           )}
 
           {/* ── Educational Programs (ОП) ── */}
