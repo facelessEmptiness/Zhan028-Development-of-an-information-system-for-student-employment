@@ -83,9 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const data = await authService.login(email, password);
     resetActivity();
     setUser(data.user);
-    pushService.registerForPushNotifications().then(token => {
-      if (token) pushService.syncTokenWithServer(token);
-    });
+    // Push token registration handled in App.tsx via useEffect on user change
   };
 
   const logout = async () => {

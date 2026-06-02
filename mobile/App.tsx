@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -11,12 +11,27 @@ import RegisterScreen       from './src/screens/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import VerifyEmailScreen    from './src/screens/VerifyEmailScreen';
 import { initI18n } from './src/i18n';
+import { pushService } from './src/services/pushService';
 
 type AuthScreen = 'login' | 'register' | 'forgot' | { verify: string };
 
 function AppContent() {
   const { user, loading } = useAuth();
   const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
+  const navigationRef = useRef<NavigationContainerRef<any>>(null);
+
+  // Register push token when user logs in
+  useEffect(() => {
+    if (user) {
+      pushService.setup();
+    }
+  }, [user]);
+
+  // Wire up push notification listeners (foreground + tap-to-navigate)
+  useEffect(() => {
+    const cleanup = pushService.addListeners(navigationRef);
+    return cleanup;
+  }, []);
 
   if (loading) {
     return (
@@ -56,7 +71,7 @@ function AppContent() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <StatusBar style="dark" />
       <MainNavigator />
     </NavigationContainer>

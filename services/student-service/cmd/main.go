@@ -45,6 +45,7 @@ func main() {
 	studentRepo := repository.NewStudentRepository(db)
 	docRepo := repository.NewDocumentRepository(db)
 	notifRepo := repository.NewNotificationRepository(db)
+	pushTokenRepo := repository.NewPushTokenRepository(db)
 
 	// Services
 	studentSvc := service.NewStudentService(studentRepo)
@@ -70,7 +71,7 @@ func main() {
 		sseHub := sse.NewHub()
 		studentHandler := handler.NewStudentHandler(studentSvc)
 		docHandler := handler.NewDocumentHandler(docRepo, notifRepo, minioStorage)
-		notifHandler := handler.NewNotificationHandler(notifRepo, sseHub)
+		notifHandler := handler.NewNotificationHandler(notifRepo, pushTokenRepo, sseHub)
 		r := router.SetupRouter(studentHandler, docHandler, notifHandler)
 
 		httpPort := cfg.ServerPort

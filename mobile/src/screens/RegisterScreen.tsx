@@ -3,10 +3,12 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ScrollView, ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE } from '../services/api';
 import Icon from '../components/Icon';
+import LanguageSelector from '../components/LanguageSelector';
 import type { IconName } from '../components/icons';
 
 type Role = 'student' | 'employer' | 'university';
@@ -15,6 +17,7 @@ interface University { id: string; name: string; city: string; }
 export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () => void; onVerify?: (email: string) => void }) {
   const { t } = useTranslation();
   const { register } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const [role,        setRole]        = useState<Role>('student');
   const [firstName,   setFirstName]   = useState('');
@@ -114,7 +117,11 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={styles.bg} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.bg} contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} keyboardShouldPersistTaps="handled">
+
+        <View style={styles.langRow}>
+          <LanguageSelector />
+        </View>
 
         <View style={styles.logoBox}>
           <View style={styles.logoIcon}><Icon name="graduation-cap" size={44} color="#1E3A8A" /></View>
@@ -248,7 +255,8 @@ export default function RegisterScreen({ onGoLogin, onVerify }: { onGoLogin: () 
 
 const styles = StyleSheet.create({
   bg:               { flex: 1, backgroundColor: '#F8FAFC' },
-  container:        { flexGrow: 1, padding: 20, paddingBottom: 40 },
+  langRow:          { alignItems: 'flex-end', marginBottom: 8 },
+  container:        { flexGrow: 1, paddingHorizontal: 20, paddingBottom: 40 },
   logoBox:          { alignItems: 'center', marginBottom: 24, marginTop: 20 },
   logoIcon:         { marginBottom: 6 },
   logoTitle:        { fontSize: 22, fontWeight: '700', color: '#1E3A8A' },
@@ -259,7 +267,7 @@ const styles = StyleSheet.create({
   roleChip:         { flex: 1, alignItems: 'center', padding: 10, borderRadius: 12, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#F9FAFB' },
   roleChipActive:   { borderColor: '#2563EB', backgroundColor: '#EFF6FF' },
   roleIcon:         { marginBottom: 4 },
-  roleLabel:        { fontSize: 11, fontWeight: '700', color: '#6B7280' },
+  roleLabel:        { fontSize: 11, fontWeight: '700', color: '#6B7280', textAlign: 'center' },
   roleLabelActive:  { color: '#2563EB' },
   roleDesc:         { fontSize: 10, color: '#9CA3AF', marginTop: 2, textAlign: 'center' },
   row:              { flexDirection: 'row', gap: 10, marginBottom: 12 },

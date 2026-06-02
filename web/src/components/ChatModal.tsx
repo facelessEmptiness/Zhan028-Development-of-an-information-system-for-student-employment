@@ -13,10 +13,10 @@ interface Props {
 const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
   const { t } = useTranslation();
   const { user, accessToken } = useAuth();
-  const [messages, setMessages]   = useState<ChatMessage[]>([]);
-  const [input, setInput]         = useState('');
-  const [sending, setSending]     = useState(false);
-  const [connected, setConnected] = useState(false);
+  const [messages, setMessages]     = useState<ChatMessage[]>([]);
+  const [input, setInput]           = useState('');
+  const [sending, setSending]         = useState(false);
+  const [otherOnline, setOtherOnline] = useState(false);
   const [modalHeight, setModalHeight] = useState<string>('92dvh');
   const bottomRef      = useRef<HTMLDivElement>(null);
   const wsRef          = useRef<WebSocket | null>(null);
@@ -46,17 +46,20 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
     );
     wsRef.current = ws;
 
-    ws.onopen = () => setConnected(true);
-
     ws.onmessage = (e) => {
       try {
-        const msg: ChatMessage = JSON.parse(e.data);
+        const data = JSON.parse(e.data);
+        if (data.type === 'presence') {
+          if (data.user_id !== user?.id) setOtherOnline(data.online);
+          return;
+        }
+        const msg: ChatMessage = data;
         setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
       } catch {}
     };
 
     ws.onclose = () => {
-      setConnected(false);
+      setOtherOnline(false);
       // Reconnect after 3 s
       reconnectRef.current = setTimeout(connect, 3000);
     };
@@ -121,9 +124,9 @@ const ChatModal = ({ applicationId, otherPartyName, onClose }: Props) => {
             <div>
               <p className="font-semibold text-gray-900 text-sm">{otherPartyName}</p>
               <div className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-green-500' : 'bg-gray-400'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${otherOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
                 <p className="text-xs text-gray-400">
-                  {connected ? t('chat.online') : t('chat.connecting')}
+                  {otherOnline ? t('chat.online') : t('chat.offline')}
                 </p>
               </div>
             </div>

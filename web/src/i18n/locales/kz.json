@@ -1044,6 +1044,7 @@
     "enterHint": "Enter — жіберу, Shift+Enter — жаңа жол",
     "empty": "Хабарламалар жоқ. Сөйлесуді бастаңыз!",
     "online": "Желіде",
+    "offline": "Желіде жоқ",
     "connecting": "Қосылуда...",
     "employer": "Жұмыс беруші",
     "student": "Студент"

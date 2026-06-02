@@ -4,8 +4,10 @@ import {
   StyleSheet, ActivityIndicator, KeyboardAvoidingView,
   Platform, ScrollView, Alert, Image,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import LanguageSelector from '../components/LanguageSelector';
 
 export default function LoginScreen({ onGoRegister, onGoForgot }: {
   onGoRegister?: () => void;
@@ -13,6 +15,7 @@ export default function LoginScreen({ onGoRegister, onGoForgot }: {
 }) {
   const { t } = useTranslation();
   const { login } = useAuth();
+  const insets = useSafeAreaInsets();
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
@@ -34,7 +37,11 @@ export default function LoginScreen({ onGoRegister, onGoForgot }: {
 
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} keyboardShouldPersistTaps="handled">
+
+        <View style={styles.langRow}>
+          <LanguageSelector />
+        </View>
 
         <View style={styles.logoBox}>
           <Image
@@ -103,7 +110,8 @@ export default function LoginScreen({ onGoRegister, onGoForgot }: {
 
 const styles = StyleSheet.create({
   flex:       { flex: 1, backgroundColor: '#F8FAFC' },
-  container:  { flexGrow: 1, justifyContent: 'center', padding: 24 },
+  container:  { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingBottom: 24 },
+  langRow:    { alignItems: 'flex-end', marginBottom: 8 },
   logoBox:    { alignItems: 'center', marginBottom: 36 },
   logoImage:  { width: 200, height: 100, marginBottom: 8 },
   logoSub:    { fontSize: 14, color: '#6B7280', marginTop: 2 },

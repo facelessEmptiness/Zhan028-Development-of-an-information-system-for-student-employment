@@ -70,7 +70,9 @@ export default function ChatScreen() {
     ws.onmessage = (e) => {
       if (!mountedRef.current) return;
       try {
-        const msg: ChatMessage = JSON.parse(e.data);
+        const data = JSON.parse(e.data);
+        if (data.type === 'presence') return; // ignore presence events
+        const msg: ChatMessage = data;
         setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
         setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50);
       } catch {}

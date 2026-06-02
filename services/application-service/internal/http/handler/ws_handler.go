@@ -75,7 +75,7 @@ func (h *WSChatHandler) ServeWS(c *gin.Context) {
 		return
 	}
 
-	cl := &ws.Client{AppID: appID, Send: make(chan []byte, 32)}
+	cl := &ws.Client{AppID: appID, UserID: userID, Send: make(chan []byte, 32)}
 	h.hub.Register(cl)
 	defer h.hub.Unregister(cl)
 
