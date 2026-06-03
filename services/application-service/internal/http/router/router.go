@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch *handler.ChatHandler, wsh *handler.WSChatHandler) *gin.Engine {
+func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch *handler.ChatHandler, wsh *handler.WSChatHandler, coh *handler.ComplianceHandler) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
@@ -29,6 +29,14 @@ func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch
 		employment.GET("/university", eh.GetForUniversity)
 		employment.GET("/employer", eh.GetForEmployer)
 		employment.PUT("/:id/end", eh.End)
+	}
+
+	compliance := r.Group("/api/compliance")
+	{
+		compliance.POST("/enroll", coh.Enroll)
+		compliance.GET("/student/:student_id", coh.GetForStudent)
+		compliance.POST("/student/:student_id/evidence", coh.ApplyEvidence)
+		compliance.GET("/university", coh.GetForUniversity)
 	}
 
 	// Internal endpoint: get application by ID (used by api-gateway for chat notifications)

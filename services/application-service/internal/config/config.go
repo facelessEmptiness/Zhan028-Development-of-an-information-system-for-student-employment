@@ -20,6 +20,15 @@ type Config struct {
 	DBPassword string
 	DBName     string
 	DBSSLMode  string
+
+	// ComplianceSchedulerEnabled gates the nightly compliance job. Off by
+	// default so production is unaffected until fact sourcing (step 5) is ready.
+	ComplianceSchedulerEnabled  bool
+	ComplianceSchedulerInterval time.Duration
+
+	// StudentServiceURL is the base URL of student-service HTTP, used to deliver
+	// student notifications (e.g. the AtRisk warning).
+	StudentServiceURL string
 }
 
 func LoadConfig() (*Config, error) {
@@ -34,7 +43,22 @@ func LoadConfig() (*Config, error) {
 		DBPassword: getEnv("DB_PASSWORD", "admin"),
 		DBName:     getEnv("DB_NAME", "application_db"),
 		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
+
+		ComplianceSchedulerEnabled:  getEnv("COMPLIANCE_SCHEDULER_ENABLED", "false") == "true",
+		ComplianceSchedulerInterval: getDurationEnv("COMPLIANCE_SCHEDULER_INTERVAL", 24*time.Hour),
+		StudentServiceURL:           getEnv("STUDENT_SERVICE_URL", "http://student-service:8082"),
 	}, nil
+}
+
+// getDurationEnv reads a Go duration string (e.g. "24h", "1m"); falls back to def.
+func getDurationEnv(key string, def time.Duration) time.Duration {
+	if value, exists := os.LookupEnv(key); exists {
+		if d, err := time.ParseDuration(value); err == nil {
+			return d
+		}
+		log.Printf("[config] invalid %s=%q, using default %s", key, value, def)
+	}
+	return def
 }
 
 func ConnectDatabase(cfg *Config) (*gorm.DB, error) {

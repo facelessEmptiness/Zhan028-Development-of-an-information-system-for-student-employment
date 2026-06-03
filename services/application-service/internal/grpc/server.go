@@ -1,12 +1,12 @@
 package grpc
 
 import (
-	"context"
-	"errors"
 	"application-service/internal/grpc/pb"
 	"application-service/internal/models"
 	"application-service/internal/repository"
 	"application-service/internal/service"
+	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
@@ -66,7 +66,7 @@ func (s *ApplicationGRPCServer) Apply(ctx context.Context, req *pb.ApplyRequest)
 	app, err := s.service.Apply(studentID, vacancyID, employerID, req.CoverLetter, req.MatchScore)
 	if err != nil {
 		if errors.Is(err, service.ErrAlreadyApplied) {
-			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to apply: %v", err)
 	}
@@ -124,10 +124,10 @@ func (s *ApplicationGRPCServer) UpdateStatus(ctx context.Context, req *pb.Update
 	app, err := s.service.UpdateStatus(id, employerID, req.Status)
 	if err != nil {
 		if errors.Is(err, service.ErrApplicationNotFound) {
-			return nil, status.Errorf(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		if errors.Is(err, service.ErrForbidden) {
-			return nil, status.Errorf(codes.PermissionDenied, err.Error())
+			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to update status: %v", err)
 	}
@@ -148,10 +148,10 @@ func (s *ApplicationGRPCServer) Withdraw(ctx context.Context, req *pb.WithdrawRe
 
 	if err := s.service.Withdraw(id, studentID); err != nil {
 		if errors.Is(err, service.ErrApplicationNotFound) {
-			return nil, status.Errorf(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		if errors.Is(err, service.ErrForbidden) {
-			return nil, status.Errorf(codes.PermissionDenied, err.Error())
+			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to withdraw application: %v", err)
 	}
