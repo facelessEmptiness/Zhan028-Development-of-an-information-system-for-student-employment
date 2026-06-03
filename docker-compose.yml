@@ -258,6 +258,8 @@ services:
       DB_NAME: application_db
       GRPC_PORT: 50054
       HTTP_PORT: 8083
+      COMPLIANCE_SCHEDULER_ENABLED: "true"
+      COMPLIANCE_SCHEDULER_INTERVAL: "1m"
     depends_on:
       application-db:
         condition: service_healthy
