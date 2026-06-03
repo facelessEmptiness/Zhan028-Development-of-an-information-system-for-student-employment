@@ -259,7 +259,7 @@ services:
       GRPC_PORT: 50054
       HTTP_PORT: 8083
       COMPLIANCE_SCHEDULER_ENABLED: "true"
-      COMPLIANCE_SCHEDULER_INTERVAL: "1m"
+      COMPLIANCE_SCHEDULER_INTERVAL: "24h"
     depends_on:
       application-db:
         condition: service_healthy
