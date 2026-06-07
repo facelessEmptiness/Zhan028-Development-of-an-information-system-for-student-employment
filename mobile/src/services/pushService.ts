@@ -53,9 +53,14 @@ export const pushService = {
         projectId: 'e9303542-cecc-4648-bf7d-d8d51641f643',
       });
       return tokenData.data;
-    } catch {
-      const native = await Notifications.getDevicePushTokenAsync();
-      return native.data as string;
+    } catch (e) {
+      // Don't fall back to getDevicePushTokenAsync(): that returns a raw FCM
+      // token, which the backend would push to the Expo API in Expo-token
+      // format and silently fail. A failure here almost always means FCM
+      // credentials aren't configured for this build (see google-services.json
+      // + EAS FCM V1 key).
+      console.error('[Push] getExpoPushTokenAsync failed — FCM not configured?', e);
+      return null;
     }
   },
 
