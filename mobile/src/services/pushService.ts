@@ -27,7 +27,10 @@ const SCREEN_MAP: Record<string, string> = {
 
 export const pushService = {
   async registerForPushNotifications(): Promise<string | null> {
-    if (!Device.isDevice) return null;
+    if (!Device.isDevice) {
+      console.warn('[Push] Not a physical device — push tokens unavailable');
+      return null;
+    }
 
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -37,7 +40,10 @@ export const pushService = {
       finalStatus = status;
     }
 
-    if (finalStatus !== 'granted') return null;
+    if (finalStatus !== 'granted') {
+      console.warn(`[Push] Notification permission not granted (status=${finalStatus})`);
+      return null;
+    }
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
@@ -52,6 +58,7 @@ export const pushService = {
       const tokenData = await Notifications.getExpoPushTokenAsync({
         projectId: 'e9303542-cecc-4648-bf7d-d8d51641f643',
       });
+      console.log(`[Push] Got Expo token: ${tokenData.data}`);
       return tokenData.data;
     } catch (e) {
       // Don't fall back to getDevicePushTokenAsync(): that returns a raw FCM
@@ -70,8 +77,10 @@ export const pushService = {
         method: 'POST',
         body: JSON.stringify({ push_token: expoPushToken, platform: Platform.OS }),
       });
-    } catch {
+      console.log('[Push] Token synced with server');
+    } catch (e) {
       // Non-critical — app works without push token sync
+      console.error('[Push] Failed to sync token with server', e);
     }
   },
 
@@ -80,6 +89,8 @@ export const pushService = {
     const token = await pushService.registerForPushNotifications();
     if (token) {
       await pushService.syncTokenWithServer(token);
+    } else {
+      console.warn('[Push] setup(): no token obtained — nothing synced');
     }
   },
 
