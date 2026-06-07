@@ -79,6 +79,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	api.GET("/notifications", notifAuth, notifProxy)
 	api.GET("/notifications/unread-count", notifAuth, notifProxy)
 	api.GET("/notifications/stream", notifAuth, notifStreamProxy)
+	api.POST("/notifications/push-token", notifAuth, notifProxy)
 	api.PUT("/notifications/read-all", notifAuth, notifProxy)
 	api.PUT("/notifications/:id/read", notifAuth, notifProxy)
 
