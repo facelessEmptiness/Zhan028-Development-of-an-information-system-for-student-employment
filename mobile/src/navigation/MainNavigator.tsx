@@ -315,7 +315,7 @@ export default function MainNavigator() {
         component={ChatScreen}
         options={({ route }) => ({
           headerShown: true,
-          title: route.params.title,
+          title: route.params?.title ?? 'Чат',
           headerStyle: { backgroundColor: '#fff' },
           headerTitleStyle: { fontWeight: '700' as const },
         })}

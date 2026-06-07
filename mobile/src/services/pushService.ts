@@ -99,11 +99,30 @@ export const pushService = {
   addListeners(
     navigationRef?: RefObject<NavigationContainerRef<any> | null>,
   ): () => void {
-    const navigate = (data: Record<string, string>) => {
+    const navigate = (data: Record<string, string>, title?: string) => {
+      if (!navigationRef?.current?.isReady()) return;
+      const nav = navigationRef.current;
       const screen = data?.screen ?? SCREEN_MAP[data?.type] ?? 'Notifications';
-      if (navigationRef?.current?.isReady()) {
-        navigationRef.current.navigate(screen as never);
+
+      if (screen === 'Chat') {
+        // related_id is "<applicationId>:<vacancyId>" — Chat needs applicationId + title.
+        // Navigating to Chat without params crashes the screen, so guard it.
+        const applicationId = (data?.related_id ?? '').split(':')[0];
+        if (!applicationId) {
+          nav.navigate('Notifications' as never);
+          return;
+        }
+        nav.navigate('Chat' as never, {
+          applicationId,
+          title: title ?? 'Чат',
+          standalone: true,
+        } as never);
+        return;
       }
+
+      // Other types: the in-app Notifications screen is always present at the root
+      // and needs no params, so it's the safe landing spot from a push tap.
+      nav.navigate('Notifications' as never);
     };
 
     // Foreground: notification received while app is open
@@ -117,8 +136,8 @@ export const pushService = {
     // Tap: app was backgrounded and user tapped notification
     const responseSub = Notifications.addNotificationResponseReceivedListener(
       response => {
-        const data = response.notification.request.content.data as Record<string, string>;
-        navigate(data);
+        const { data, title } = response.notification.request.content;
+        navigate(data as Record<string, string>, title ?? undefined);
       },
     );
 
@@ -126,9 +145,9 @@ export const pushService = {
     // the response is already consumed before the listener above fires
     Notifications.getLastNotificationResponseAsync().then(response => {
       if (!response) return;
-      const data = response.notification.request.content.data as Record<string, string>;
+      const { data, title } = response.notification.request.content;
       // Small delay to let NavigationContainer mount first
-      setTimeout(() => navigate(data), 500);
+      setTimeout(() => navigate(data as Record<string, string>, title ?? undefined), 500);
     });
 
     return () => {

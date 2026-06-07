@@ -16,7 +16,7 @@ import { API_BASE } from '../services/api';
 export default function ChatScreen() {
   const { t } = useTranslation();
   const route    = useRoute();
-  const { applicationId, standalone } = route.params as { applicationId: string; title: string; standalone?: boolean };
+  const { applicationId, standalone } = (route.params ?? {}) as { applicationId: string; title: string; standalone?: boolean };
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
 
