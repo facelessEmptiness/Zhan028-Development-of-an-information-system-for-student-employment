@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"api-gateway/internal/grpc/studentpb"
@@ -71,13 +72,18 @@ func (h *ChatHandler) SendMessage(c *gin.Context) {
 
 	// Fire notification asynchronously after successful send
 	if resp.StatusCode == http.StatusCreated {
-		go h.NotifyRecipient(applicationID, senderID, senderRole)
+		var payload struct {
+			Content string `json:"content"`
+		}
+		_ = json.Unmarshal(body, &payload)
+		go h.NotifyRecipient(applicationID, senderID, senderRole, payload.Content)
 	}
 }
 
 // NotifyRecipient fetches the application to find the other party and sends a notification.
-// Exported so ws_proxy can reuse it for WebSocket messages.
-func (h *ChatHandler) NotifyRecipient(applicationID, senderID, senderRole string) {
+// The notification title is the sender's name and the body is a preview of the message
+// text. Exported so ws_proxy can reuse it for WebSocket messages.
+func (h *ChatHandler) NotifyRecipient(applicationID, senderID, senderRole, messageText string) {
 	type appDetails struct {
 		StudentID string `json:"student_id"`
 		VacancyID string `json:"vacancy_id"`
@@ -95,21 +101,19 @@ func (h *ChatHandler) NotifyRecipient(applicationID, senderID, senderRole string
 	}
 
 	relatedID := applicationID + ":" + app.VacancyID
-	var recipientID, title, body string
+	var recipientID, senderName string
 
 	if senderRole == "employer" {
 		// recipientID is always known — don't block on vacancy fetch
 		recipientID = app.StudentID
-		companyName := "Работодатель"
+		senderName = "Работодатель"
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
 		if v, verr := h.vacancyCli.GetVacancyByID(ctx, &vacancypb.GetByIDRequest{Id: app.VacancyID}); verr == nil && v != nil {
 			if cn := v.GetCompanyName(); cn != "" {
-				companyName = cn
+				senderName = cn
 			}
 		}
-		title = "chat_message"
-		body = companyName
 	} else {
 		// Must fetch vacancy to get employer_id
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -121,14 +125,21 @@ func (h *ChatHandler) NotifyRecipient(applicationID, senderID, senderRole string
 		recipientID = v.GetEmployerId()
 
 		// Try to get student name — fallback to generic if it fails
-		studentName := ""
+		senderName = "Студент"
 		if sp, serr := h.studentCli.GetProfile(ctx, &studentpb.GetProfileRequest{UserId: senderID}); serr == nil && sp != nil {
 			if first, last := sp.GetFirstName(), sp.GetLastName(); first != "" || last != "" {
-				studentName = fmt.Sprintf("%s %s", first, last)
+				senderName = strings.TrimSpace(fmt.Sprintf("%s %s", first, last))
 			}
 		}
-		title = "chat_message"
-		body = studentName
+	}
+
+	// Title = sender name, body = message preview (fall back to a generic line).
+	title := senderName
+	body := strings.TrimSpace(messageText)
+	if body == "" {
+		body = "Отправил(а) вам сообщение"
+	} else if r := []rune(body); len(r) > 120 {
+		body = string(r[:120]) + "…"
 	}
 
 	if recipientID != "" && recipientID != senderID {

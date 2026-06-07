@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -25,10 +26,10 @@ type WSChatProxy struct {
 	jwtSecret string
 	// notifyFn is called after each message forwarded from client → backend,
 	// so that chat notifications are created for WS messages (same as HTTP POST).
-	notifyFn func(applicationID, senderID, senderRole string)
+	notifyFn func(applicationID, senderID, senderRole, messageText string)
 }
 
-func NewWSChatProxy(cfg *config.Config, notifyFn func(applicationID, senderID, senderRole string)) *WSChatProxy {
+func NewWSChatProxy(cfg *config.Config, notifyFn func(applicationID, senderID, senderRole, messageText string)) *WSChatProxy {
 	// Convert http:// to ws://
 	wsURL := strings.Replace(cfg.ApplicationServiceHttpUrl, "http://", "ws://", 1)
 	wsURL = strings.Replace(wsURL, "https://", "wss://", 1)
@@ -91,7 +92,11 @@ func (p *WSChatProxy) ProxyChat(c *gin.Context) {
 			}
 			// Notify the other party about the new message
 			if p.notifyFn != nil && mt == websocket.TextMessage {
-				go p.notifyFn(appID, userID, userRole)
+				var m struct {
+					Content string `json:"content"`
+				}
+				_ = json.Unmarshal(msg, &m)
+				go p.notifyFn(appID, userID, userRole, m.Content)
 			}
 		}
 	}()
@@ -131,4 +136,3 @@ func parseJWT(tokenStr, secret string) (userID, role string, err error) {
 	}
 	return userID, role, nil
 }
-
