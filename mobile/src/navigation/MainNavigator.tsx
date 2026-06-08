@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
 import { useAuth } from '../context/AuthContext';
@@ -199,8 +200,9 @@ const TAB_OPTS = {
 // ─── Role navigators ──────────────────────────────────────────────
 function StudentTabs() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
-    <Tab.Navigator screenOptions={TAB_OPTS}>
+    <Tab.Navigator screenOptions={{ ...TAB_OPTS, tabBarStyle: { paddingTop: 6, paddingBottom: insets.bottom || 8, borderTopColor: '#E5E7EB', height: 56 + (insets.bottom || 8) } }}>
       <Tab.Screen
         name="Home"
         component={HomeStackNav}
@@ -232,8 +234,9 @@ function StudentTabs() {
 
 function EmployerTabs() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
-    <Tab.Navigator screenOptions={{ ...TAB_OPTS, tabBarActiveTintColor: '#7C3AED' }}>
+    <Tab.Navigator screenOptions={{ ...TAB_OPTS, tabBarActiveTintColor: '#7C3AED', tabBarStyle: { paddingTop: 6, paddingBottom: insets.bottom || 8, borderTopColor: '#E5E7EB', height: 56 + (insets.bottom || 8) } }}>
       <Tab.Screen
         name="Vacancies"
         component={EmployerStackNav}
@@ -265,8 +268,9 @@ function EmployerTabs() {
 
 function UniversityTabs() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
-    <Tab.Navigator screenOptions={{ ...TAB_OPTS, tabBarActiveTintColor: '#059669' }}>
+    <Tab.Navigator screenOptions={{ ...TAB_OPTS, tabBarActiveTintColor: '#059669', tabBarStyle: { paddingTop: 6, paddingBottom: insets.bottom || 8, borderTopColor: '#E5E7EB', height: 56 + (insets.bottom || 8) } }}>
       <Tab.Screen
         name="Analytics"
         component={UniversityStackNav}
