@@ -106,6 +106,7 @@ const UniversityAnalyticsPage = () => {
   const [pendingDocsCount, setPendingDocsCount] = useState(0);
   const [complianceRecords, setComplianceRecords] = useState<ComplianceRecord[]>([]);
   const [enrollingId, setEnrollingId] = useState<string | null>(null);
+  const [enrollingIds, setEnrollingIds] = useState<Set<string>>(new Set());
 
   // ── Rejection reason modal state ──
   const [rejectModal, setRejectModal] = useState<{ docId: string; userId: string } | null>(null);
@@ -261,6 +262,34 @@ const UniversityAnalyticsPage = () => {
     } finally {
       setEnrollingId(null);
     }
+  };
+
+  const handleEnrollMany = async (students: BackendStudentProfile[]) => {
+    if (students.length === 0) return;
+    setEnrollingIds(new Set(students.map(s => s.user_id)));
+    let successCount = 0;
+    await Promise.all(
+      students.map(async student => {
+        const gradYear = student.graduation_year;
+        const dates = gradYear > 0
+          ? { graduation_date: `${gradYear}-06-01T00:00:00Z`, deadline: `${gradYear + 3}-06-01T00:00:00Z` }
+          : {};
+        try {
+          await complianceService.enroll({ student_id: student.user_id, grant_years: 3, ...dates });
+          successCount++;
+        } catch { /* skip individual failures */ } finally {
+          setEnrollingIds(prev => { const n = new Set(prev); n.delete(student.user_id); return n; });
+        }
+      })
+    );
+    setComplianceRecords(await complianceService.getForUniversity());
+    if (successCount > 0) {
+      toast.success(t('universityAnalytics.compliance.enrolledMany', { count: successCount, defaultValue: `Добавлено в отслеживание: ${successCount}` }));
+    }
+    if (successCount < students.length) {
+      toast.error(t('universityAnalytics.compliance.enrollError', { defaultValue: 'Не удалось добавить некоторых студентов' }));
+    }
+    setEnrollingIds(new Set());
   };
 
   // ── Computed: real employment rate from loaded data ──
@@ -598,7 +627,9 @@ const UniversityAnalyticsPage = () => {
               records={complianceRecords}
               myStudents={myStudents}
               onEnroll={handleEnroll}
+              onEnrollMany={handleEnrollMany}
               enrollingId={enrollingId}
+              enrollingIds={enrollingIds}
             />
           )}
 
