@@ -70,15 +70,15 @@ function SkillChip({ children, variant = 'blue' }: { children: React.ReactNode; 
 }
 
 /* ─── Data ──────────────────────────────────────────────────── */
-const jobCategories: { id: number; labelKey: string; count: string; icon: IconName }[] = [
-  { id: 1, labelKey: 'home.categories_list.it',           count: '2 340', icon: 'code'           },
-  { id: 2, labelKey: 'home.categories_list.sales',        count: '1 850', icon: 'chart-bar'      },
-  { id: 3, labelKey: 'home.categories_list.finance',      count: '1 250', icon: 'chart-line'     },
-  { id: 4, labelKey: 'home.categories_list.hr',           count: '890',   icon: 'user-circle'    },
-  { id: 5, labelKey: 'home.categories_list.engineering',  count: '1 560', icon: 'briefcase'      },
-  { id: 6, labelKey: 'home.categories_list.medicine',     count: '940',   icon: 'certificate'    },
-  { id: 7, labelKey: 'home.categories_list.education',    count: '720',   icon: 'graduation-cap' },
-  { id: 8, labelKey: 'home.categories_list.construction', count: '1 100', icon: 'building-2'     },
+const jobCategories: { id: number; labelKey: string; icon: IconName }[] = [
+  { id: 1, labelKey: 'home.categories_list.it',           icon: 'code'           },
+  { id: 2, labelKey: 'home.categories_list.sales',        icon: 'chart-bar'      },
+  { id: 3, labelKey: 'home.categories_list.finance',      icon: 'chart-line'     },
+  { id: 4, labelKey: 'home.categories_list.hr',           icon: 'user-circle'    },
+  { id: 5, labelKey: 'home.categories_list.engineering',  icon: 'briefcase'      },
+  { id: 6, labelKey: 'home.categories_list.medicine',     icon: 'certificate'    },
+  { id: 7, labelKey: 'home.categories_list.education',    icon: 'graduation-cap' },
+  { id: 8, labelKey: 'home.categories_list.construction', icon: 'building-2'     },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
@@ -134,19 +134,30 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ── Stats ── */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { n: '500+',    l: t('auth.login.stats.companies') },
-          { n: '10 000+', l: t('auth.login.stats.students')  },
-          { n: '2 000+',  l: t('auth.login.stats.vacancies') },
-          { n: '89%',     l: t('home.stats.offerRate')        },
-        ].map((s, i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 p-5">
-            <p className="text-2xl sm:text-3xl font-bold text-gray-900">{s.n}</p>
-            <p className="text-sm text-gray-500 mt-1">{s.l}</p>
-          </div>
-        ))}
+      {/* ── How it works ── */}
+      <section>
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">{t('home.how.title')}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('home.how.subtitle')}</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { icon: 'user-circle'    as IconName, n: 1, tk: 'step1' },
+            { icon: 'briefcase'      as IconName, n: 2, tk: 'step2' },
+            { icon: 'graduation-cap' as IconName, n: 3, tk: 'step3' },
+          ].map(s => (
+            <div key={s.n} className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Icon name={s.icon} size={22} />
+                </div>
+                <span className="text-sm font-semibold text-gray-300">0{s.n}</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1 text-sm">{t(`home.how.${s.tk}Title`)}</h3>
+              <p className="text-gray-500 text-sm">{t(`home.how.${s.tk}Text`)}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ── Categories ── */}
@@ -166,9 +177,7 @@ const LandingPage = () => {
             <button key={cat.id} onClick={() => navigate('/jobs')}
               className="text-left bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-blue-200 transition-all category-card">
               <div className="mb-3 text-blue-500"><Icon name={cat.icon} size={28} /></div>
-              <h3 className="font-semibold text-gray-900 mb-1 text-sm">{t(cat.labelKey)}</h3>
-              <p className="font-bold text-blue-600">{cat.count}</p>
-              <p className="text-gray-500 text-xs">{t('home.categories.openPositions')}</p>
+              <h3 className="font-semibold text-gray-900 text-sm">{t(cat.labelKey)}</h3>
             </button>
           ))}
         </div>

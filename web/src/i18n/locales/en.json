@@ -21,6 +21,17 @@
     "employees_count": "{{count}} employees",
     "notSpecified": "Not specified"
   },
+  "footer": {
+    "tagline": "A platform for student and graduate employment in Kazakhstan",
+    "sections": "Sections",
+    "home": "Home",
+    "jobs": "Jobs",
+    "login": "Log In",
+    "register": "Register",
+    "project": "Project",
+    "sourceCode": "Source code",
+    "rights": "All rights reserved."
+  },
   "nav": {
     "jobs": "Jobs",
     "myProfile": "My Profile",
@@ -45,15 +56,25 @@
   "home": {
     "hero": {
       "title": "Find your dream job",
-      "subtitle": "Thousands of vacancies for students and graduates of Kazakhstan",
+      "subtitle": "Vacancies for students and graduates of Kazakhstan",
       "searchPlaceholder": "Position, keywords",
       "searchBtn": "Search",
       "register": "Sign Up",
       "login": "Log In",
-      "onlineStudents": "10,720 active students online"
+      "onlineStudents": "Connecting students and employers"
     },
     "stats": {
       "offerRate": "Receive an offer"
+    },
+    "how": {
+      "title": "How it works",
+      "subtitle": "Three steps from profile to job",
+      "step1Title": "Create a profile",
+      "step1Text": "Add your skills, specialization and experience.",
+      "step2Title": "Find vacancies",
+      "step2Text": "Browse openings that match your profile.",
+      "step3Title": "Get hired",
+      "step3Text": "Apply and track responses from employers."
     },
     "categories": {
       "title": "Jobs by profession",

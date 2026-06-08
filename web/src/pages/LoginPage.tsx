@@ -56,18 +56,18 @@ const LoginPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { value: '500+', label: t('auth.login.stats.companies') },
-              { value: '10 000+', label: t('auth.login.stats.students') },
-              { value: '2 000+', label: t('auth.login.stats.vacancies') },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white/20 rounded-xl p-4 text-white text-center">
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <div className="text-blue-100 text-sm mt-1">{stat.label}</div>
-              </div>
+          <ul className="space-y-3">
+            {['step1', 'step2', 'step3'].map((s) => (
+              <li key={s} className="flex items-center gap-3 text-white">
+                <span className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-sm font-medium">{t(`home.how.${s}Title`)}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
         {/* Right — Form */}
