@@ -178,6 +178,7 @@
       "confirmPasswordPlaceholder": "Repeat password",
       "passwordsMismatch": "Passwords do not match",
       "iAccept": "I accept the",
+      "and": "and",
       "terms": "terms of service",
       "privacy": "privacy policy",
       "submitting": "Creating account...",
@@ -1237,5 +1238,80 @@
     "schoolIntelligentSystems":    "School of Intelligent Systems",
     "schoolCreativeIndustries":    "School of Creative Industries",
     "schoolDigitalGovernance":     "School of Digital Public Administration"
+  },
+  "legal": {
+    "understood": "Got it",
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: January 1, 2025",
+      "intro": "These Terms of Service govern your access to and use of CareerBond — an information system for student and graduate employment at Kazakhstani universities.",
+      "sections": [
+        {
+          "title": "Acceptance of Terms",
+          "text": "By registering on CareerBond, you agree to these Terms of Service. If you do not agree with any provision, please refrain from using the platform."
+        },
+        {
+          "title": "Description of Service",
+          "text": "CareerBond is a job and internship search platform for students and graduates of Kazakhstani educational institutions. Employers post vacancies, and students apply and track the status of their applications."
+        },
+        {
+          "title": "User Account",
+          "text": "You are responsible for the accuracy of information provided during registration. Creating multiple accounts or sharing account access with third parties is prohibited. Violation of these rules may result in account suspension."
+        },
+        {
+          "title": "Code of Conduct",
+          "text": "Users are prohibited from posting false, misleading, or offensive content. Using the platform for fraudulent or illegal purposes is strictly forbidden. Violations may result in account suspension."
+        },
+        {
+          "title": "Intellectual Property",
+          "text": "All materials and content on the CareerBond platform are protected by copyright. Copying or distributing materials without written permission from the administration is prohibited."
+        },
+        {
+          "title": "Limitation of Liability",
+          "text": "The platform is provided 'as is'. CareerBond is not responsible for employers' decisions regarding candidates, nor for any losses arising from the use of the platform."
+        },
+        {
+          "title": "Changes to Terms",
+          "text": "CareerBond reserves the right to modify these Terms. Users will be notified of significant changes by email or through in-app notifications."
+        }
+      ],
+      "contact": "For questions regarding these Terms of Service: support@careerbond.kz | CareerBond, Astana, Kazakhstan"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: January 1, 2025",
+      "intro": "This Privacy Policy describes what data CareerBond collects, how it is used and protected. We take the protection of users' personal data seriously.",
+      "sections": [
+        {
+          "title": "Data We Collect",
+          "text": "We collect: first and last name, email address, name of educational institution, role (student / employer / university), resume and application data, as well as technical session information (IP address, browser type)."
+        },
+        {
+          "title": "Purposes of Data Processing",
+          "text": "Personal data is used to: operate the platform, match relevant vacancies, send notifications and communications, conduct analytics to improve the service, and comply with the laws of the Republic of Kazakhstan."
+        },
+        {
+          "title": "Sharing Data with Third Parties",
+          "text": "We do not sell or share your data with third parties without your consent, except as required by law. Data is shared with employers only in the context of your job application."
+        },
+        {
+          "title": "Data Security",
+          "text": "We apply modern technical security measures: data encryption in transit (HTTPS/TLS), password storage in hashed form, access control, and regular security audits."
+        },
+        {
+          "title": "Data Retention",
+          "text": "Your data is stored for the duration of your account. After account deletion, data is removed within 30 days, unless otherwise required by law."
+        },
+        {
+          "title": "Your Rights",
+          "text": "You have the right to request access, correction, or deletion of your personal data. Please contact support. Requests will be processed within 10 business days."
+        },
+        {
+          "title": "Cookies",
+          "text": "The platform uses cookies for session management and analytics. You may disable cookies in your browser settings, but this may affect the functionality of some features."
+        }
+      ],
+      "contact": "For data protection inquiries: privacy@careerbond.kz | CareerBond, Astana, Kazakhstan"
+    }
   }
 }

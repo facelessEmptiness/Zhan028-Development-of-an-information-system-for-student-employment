@@ -7,6 +7,7 @@ import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
 import { getUniversities, type University } from '../services/universityService';
 import LanguageSelector from '../components/LanguageSelector';
+import LegalModal from '../components/LegalModal';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [legalModal, setLegalModal] = useState<'terms' | 'privacy' | null>(null);
 
   useEffect(() => {
     getUniversities().then(setUniversities);
@@ -132,6 +134,7 @@ const RegisterPage = () => {
   ] as const;
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Nav */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -411,9 +414,9 @@ const RegisterPage = () => {
                   />
                   <label htmlFor="terms" className="text-sm text-gray-600">
                     {t('auth.register.iAccept')}{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">{t('auth.register.terms')}</a>
-                    {' '}и{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">{t('auth.register.privacy')}</a>
+                    <button type="button" onClick={() => setLegalModal('terms')} className="text-blue-600 hover:text-blue-700 font-medium underline-offset-2 hover:underline">{t('auth.register.terms')}</button>
+                    {' '}{t('auth.register.and')}{' '}
+                    <button type="button" onClick={() => setLegalModal('privacy')} className="text-blue-600 hover:text-blue-700 font-medium underline-offset-2 hover:underline">{t('auth.register.privacy')}</button>
                   </label>
                 </div>
 
@@ -448,6 +451,9 @@ const RegisterPage = () => {
         </div>
       </div>
     </div>
+
+    {legalModal && <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />}
+    </>
   );
 };
 

@@ -12,3 +12,4 @@ export { default as JobCard } from './JobCard';
 export { default as CandidateCard } from './CandidateCard';
 export { default as RoleBasedRoute } from './RoleBasedRoute';
 export { default as ChatModal } from './ChatModal';
+export { default as LegalModal } from './LegalModal';
