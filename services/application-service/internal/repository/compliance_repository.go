@@ -23,6 +23,8 @@ type ComplianceRepository interface {
 	// ListNonTerminal returns records that may still transition — the working
 	// set for the nightly scheduler (everything except Compliant/Exempt).
 	ListNonTerminal() ([]models.ComplianceRecord, error)
+	// ListAll returns every compliance record across all universities — admin only.
+	ListAll() ([]models.ComplianceRecord, error)
 	Update(rec *models.ComplianceRecord) error
 }
 
@@ -71,6 +73,12 @@ func (r *complianceRepository) ListByUniversityID(universityID uuid.UUID) ([]mod
 func (r *complianceRepository) ListNonTerminal() ([]models.ComplianceRecord, error) {
 	var recs []models.ComplianceRecord
 	err := r.db.Where("state NOT IN ?", terminalStates).Find(&recs).Error
+	return recs, err
+}
+
+func (r *complianceRepository) ListAll() ([]models.ComplianceRecord, error) {
+	var recs []models.ComplianceRecord
+	err := r.db.Order("university_id, updated_at desc").Find(&recs).Error
 	return recs, err
 }
 

@@ -57,11 +57,20 @@ func (f *fakeComplianceSvc) ApplyEvidence(_ uuid.UUID, target compliance.State, 
 func (f *fakeComplianceSvc) EvaluateAll(time.Time, service.FactProvider) (service.EvaluationReport, error) {
 	return service.EvaluationReport{}, nil
 }
+func (f *fakeComplianceSvc) ListAll() ([]models.ComplianceRecord, error) {
+	return nil, nil
+}
+
+type fakeFactProvider struct{}
+
+func (fakeFactProvider) HasQualifyingOffer(*models.ComplianceRecord) (bool, error) {
+	return false, nil
+}
 
 func newRouter(svc service.ComplianceService) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-	h := NewComplianceHandler(svc)
+	h := NewComplianceHandler(svc, fakeFactProvider{})
 	r.POST("/api/compliance/enroll", h.Enroll)
 	r.GET("/api/compliance/student/:student_id", h.GetForStudent)
 	r.POST("/api/compliance/student/:student_id/evidence", h.ApplyEvidence)

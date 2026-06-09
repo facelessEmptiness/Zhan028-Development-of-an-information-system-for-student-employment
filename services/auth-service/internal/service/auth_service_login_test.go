@@ -35,9 +35,10 @@ func (s *stubUserRepo) FindByEmail(string) (*models.User, error) {
 	}
 	return s.user, nil
 }
-func (s *stubUserRepo) Update(u *models.User) error        { s.updated = u; return nil }
-func (s *stubUserRepo) Delete(uuid.UUID) error             { return nil }
-func (s *stubUserRepo) ExistsByEmail(string) (bool, error) { return false, nil }
+func (s *stubUserRepo) Update(u *models.User) error                  { s.updated = u; return nil }
+func (s *stubUserRepo) Delete(uuid.UUID) error                       { return nil }
+func (s *stubUserRepo) ExistsByEmail(string) (bool, error)           { return false, nil }
+func (s *stubUserRepo) ListAll(string) ([]models.User, error)        { return nil, nil }
 
 type stubCodeRepo struct {
 	findErr error

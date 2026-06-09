@@ -41,14 +41,12 @@ func main() {
 	appSvc := service.NewApplicationService(appRepo)
 	grpcSrv := grpcserver.NewApplicationGRPCServer(appSvc, appRepo)
 
-	// Compliance state machine (Article 47). The nightly scheduler is off by
-	// default; until fact sourcing (step 5) is wired it uses a placeholder
-	// provider that changes no state.
+	// Compliance state machine (Article 47).
 	complianceRepo := repository.NewComplianceRepository(db)
 	complianceNotifier := notify.NewHTTPNotifier(cfg.StudentServiceURL)
 	complianceSvc := service.NewComplianceService(complianceRepo, complianceNotifier)
+	factProvider := facts.NewEmploymentFactProvider(employmentRepo, facts.Policy{})
 	if cfg.ComplianceSchedulerEnabled {
-		factProvider := facts.NewEmploymentFactProvider(employmentRepo, facts.Policy{})
 		sched := scheduler.NewComplianceScheduler(complianceSvc, factProvider, cfg.ComplianceSchedulerInterval)
 		go sched.Start(context.Background())
 		log.Printf("Compliance scheduler enabled (interval=%s)", cfg.ComplianceSchedulerInterval)
@@ -61,7 +59,7 @@ func main() {
 		employmentHandler := httphandler.NewEmploymentHandler(employmentRepo)
 		chatHandler := httphandler.NewChatHandler(chatRepo, appRepo)
 		wsHandler := httphandler.NewWSChatHandler(hub, chatRepo, appRepo)
-		complianceHandler := httphandler.NewComplianceHandler(complianceSvc)
+		complianceHandler := httphandler.NewComplianceHandler(complianceSvc, factProvider)
 		r := httprouter.SetupRouter(interviewHandler, employmentHandler, chatHandler, wsHandler, complianceHandler)
 
 		httpPort := cfg.HTTPPort

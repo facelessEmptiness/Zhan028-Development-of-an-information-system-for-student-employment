@@ -37,6 +37,7 @@ func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch
 		compliance.GET("/student/:student_id", coh.GetForStudent)
 		compliance.POST("/student/:student_id/evidence", coh.ApplyEvidence)
 		compliance.GET("/university", coh.GetForUniversity)
+		compliance.GET("/admin/all", coh.GetAllForAdmin)
 	}
 
 	// Internal endpoint: get application by ID (used by api-gateway for chat notifications)

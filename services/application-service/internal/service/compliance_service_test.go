@@ -72,6 +72,14 @@ func (f *fakeComplianceRepo) ListNonTerminal() ([]models.ComplianceRecord, error
 	return out, nil
 }
 
+func (f *fakeComplianceRepo) ListAll() ([]models.ComplianceRecord, error) {
+	var out []models.ComplianceRecord
+	for _, r := range f.byStudent {
+		out = append(out, *r)
+	}
+	return out, nil
+}
+
 func (f *fakeComplianceRepo) Update(rec *models.ComplianceRecord) error {
 	f.updateN++
 	cp := *rec

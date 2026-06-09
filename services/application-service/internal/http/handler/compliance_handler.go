@@ -17,11 +17,12 @@ import (
 // ComplianceHandler exposes the university-facing compliance surface:
 // enrolling grant students and reading their records.
 type ComplianceHandler struct {
-	svc service.ComplianceService
+	svc   service.ComplianceService
+	facts service.FactProvider
 }
 
-func NewComplianceHandler(svc service.ComplianceService) *ComplianceHandler {
-	return &ComplianceHandler{svc: svc}
+func NewComplianceHandler(svc service.ComplianceService, facts service.FactProvider) *ComplianceHandler {
+	return &ComplianceHandler{svc: svc, facts: facts}
 }
 
 // Enroll registers a grant student for compliance tracking.
@@ -61,6 +62,15 @@ func (h *ComplianceHandler) Enroll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to enroll student"})
 		return
 	}
+
+	// Immediately evaluate the new record so the state reflects current reality
+	// (e.g. AtRisk for graduates with no offer who enrolled long after graduation)
+	// rather than waiting up to 24h for the nightly scheduler.
+	hasOffer, factErr := h.facts.HasQualifyingOffer(rec)
+	if factErr == nil {
+		h.svc.Evaluate(rec, time.Now(), hasOffer) //nolint:errcheck
+	}
+
 	c.JSON(http.StatusCreated, rec)
 }
 
@@ -154,6 +164,24 @@ func (h *ComplianceHandler) GetForUniversity(c *gin.Context) {
 	}
 
 	recs, err := h.svc.ListByUniversity(universityID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch records"})
+		return
+	}
+	if recs == nil {
+		recs = []models.ComplianceRecord{}
+	}
+	c.JSON(http.StatusOK, gin.H{"records": recs})
+}
+
+// GetAllForAdmin returns all compliance records across all universities.
+// GET /api/compliance/admin/all  (admin only)
+func (h *ComplianceHandler) GetAllForAdmin(c *gin.Context) {
+	if c.GetHeader("X-User-Role") != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+		return
+	}
+	recs, err := h.svc.ListAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch records"})
 		return

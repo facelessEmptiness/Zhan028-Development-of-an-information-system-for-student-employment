@@ -251,7 +251,7 @@ const UniversityAnalyticsPage = () => {
     setEnrollingId(student.user_id);
     const gradYear = student.graduation_year;
     const dates = gradYear > 0
-      ? { graduation_date: `${gradYear}-06-01T00:00:00Z`, deadline: `${gradYear + 3}-06-01T00:00:00Z` }
+      ? { graduation_date: `${gradYear}-09-01T00:00:00Z`, deadline: `${gradYear + 3}-09-01T00:00:00Z` }
       : {};
     try {
       await complianceService.enroll({ student_id: student.user_id, grant_years: 3, ...dates });
@@ -272,7 +272,7 @@ const UniversityAnalyticsPage = () => {
       students.map(async student => {
         const gradYear = student.graduation_year;
         const dates = gradYear > 0
-          ? { graduation_date: `${gradYear}-06-01T00:00:00Z`, deadline: `${gradYear + 3}-06-01T00:00:00Z` }
+          ? { graduation_date: `${gradYear}-09-01T00:00:00Z`, deadline: `${gradYear + 3}-09-01T00:00:00Z` }
           : {};
         try {
           await complianceService.enroll({ student_id: student.user_id, grant_years: 3, ...dates });

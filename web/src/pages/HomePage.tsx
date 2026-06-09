@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context';
 import Icon from '../components/Icon';
 import type { IconName } from '../components/icons';
@@ -532,8 +532,8 @@ const HomePage = () => {
   switch (user?.role) {
     case 'student':    return <StudentHome userEmail={user.email} />;
     case 'employer':   return <EmployerHome email={user.email} />;
-    case 'university':
-    case 'admin':      return <UniversityHome email={user.email} />;
+    case 'university': return <UniversityHome email={user.email} />;
+    case 'admin':      return <Navigate to="/admin" replace />;
     default:           return <LandingPage />;
   }
 };

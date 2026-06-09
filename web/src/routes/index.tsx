@@ -110,7 +110,7 @@ const router = createBrowserRouter([
         path: '/analytics',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['university', 'admin']}>
+            <RoleBasedRoute allowedRoles={['university']}>
               <UniversityAnalyticsPage />
             </RoleBasedRoute>
           </ProtectedRoute>

@@ -44,6 +44,12 @@ func SetupRouter(authHandler *handler.AuthHandler, jwtManager *jwt.JWTManager, a
 			protected.Use(authMiddleware(jwtManager))
 			{
 				protected.GET("/me", authHandler.GetProfile)
+
+			// Admin-only routes (role check is enforced in handler)
+			protected.GET("/admin/users", authHandler.ListUsers)
+			protected.DELETE("/admin/users/:id", authHandler.DeleteUser)
+			protected.PATCH("/admin/users/:id/role", authHandler.UpdateUserRole)
+			protected.PATCH("/admin/users/:id/active", authHandler.ToggleUserActive)
 			}
 		}
 	}

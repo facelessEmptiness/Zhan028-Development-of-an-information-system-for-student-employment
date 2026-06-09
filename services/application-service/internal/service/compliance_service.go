@@ -39,6 +39,8 @@ type ComplianceService interface {
 	// EvaluateAll applies the time-driven rules to every non-terminal record —
 	// the work the nightly scheduler performs on each pass.
 	EvaluateAll(now time.Time, facts FactProvider) (EvaluationReport, error)
+	// ListAll returns every compliance record — admin monitoring only.
+	ListAll() ([]models.ComplianceRecord, error)
 }
 
 type complianceService struct {
@@ -49,6 +51,10 @@ type complianceService struct {
 
 func NewComplianceService(repo repository.ComplianceRepository, notifier Notifier) ComplianceService {
 	return &complianceService{repo: repo, notifier: notifier, clock: time.Now}
+}
+
+func (s *complianceService) ListAll() ([]models.ComplianceRecord, error) {
+	return s.repo.ListAll()
 }
 
 func (s *complianceService) GetByStudent(studentID uuid.UUID) (*models.ComplianceRecord, error) {

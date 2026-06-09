@@ -50,6 +50,10 @@ type AuthService interface {
 	VerifyEmail(req *dto.VerifyEmailRequest) (*dto.AuthResponse, error)
 	ForgotPassword(req *dto.ForgotPasswordRequest) error
 	ResetPassword(req *dto.ResetPasswordRequest) error
+	ListUsers(role string) ([]dto.UserResponse, error)
+	DeleteUser(id uuid.UUID) error
+	UpdateUserRole(id uuid.UUID, role string) (*dto.UserResponse, error)
+	ToggleUserActive(id uuid.UUID, isActive bool) (*dto.UserResponse, error)
 }
 
 // authService реализует AuthService
@@ -371,6 +375,56 @@ func (s *authService) ResetPassword(req *dto.ResetPasswordRequest) error {
 	_ = s.codeRepo.InvalidateAll(req.Email, models.CodeTypePasswordReset)
 
 	return nil
+}
+
+// UpdateUserRole меняет роль пользователя
+func (s *authService) UpdateUserRole(id uuid.UUID, role string) (*dto.UserResponse, error) {
+	newRole := models.UserRole(role)
+	if !newRole.IsValid() {
+		return nil, ErrInvalidRole
+	}
+	user, err := s.userRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	user.Role = newRole
+	if err := s.userRepo.Update(user); err != nil {
+		return nil, err
+	}
+	resp := dto.ToUserResponse(user)
+	return &resp, nil
+}
+
+// ToggleUserActive активирует или деактивирует пользователя
+func (s *authService) ToggleUserActive(id uuid.UUID, isActive bool) (*dto.UserResponse, error) {
+	user, err := s.userRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	user.IsActive = isActive
+	if err := s.userRepo.Update(user); err != nil {
+		return nil, err
+	}
+	resp := dto.ToUserResponse(user)
+	return &resp, nil
+}
+
+// ListUsers возвращает всех пользователей, опционально фильтруя по роли
+func (s *authService) ListUsers(role string) ([]dto.UserResponse, error) {
+	users, err := s.userRepo.ListAll(role)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]dto.UserResponse, len(users))
+	for i, u := range users {
+		result[i] = dto.ToUserResponse(&u)
+	}
+	return result, nil
+}
+
+// DeleteUser удаляет пользователя по ID
+func (s *authService) DeleteUser(id uuid.UUID) error {
+	return s.userRepo.Delete(id)
 }
 
 // buildAuthResponse формирует ответ с токенами и сохраняет refresh JTI в Redis

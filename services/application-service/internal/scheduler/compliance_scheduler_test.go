@@ -38,6 +38,7 @@ func (f *fakeSvc) Evaluate(*models.ComplianceRecord, time.Time, bool) (bool, err
 func (f *fakeSvc) ApplyEvidence(uuid.UUID, compliance.State, string, uuid.UUID, *uuid.UUID, string, bool) (*models.ComplianceRecord, error) {
 	return nil, nil
 }
+func (f *fakeSvc) ListAll() ([]models.ComplianceRecord, error) { return nil, nil }
 
 type stubFacts struct{}
 
