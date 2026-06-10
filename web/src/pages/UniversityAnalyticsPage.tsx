@@ -1,7 +1,7 @@
 
 import { useState, useEffect, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import Icon from '../components/Icon';
 import { apiFetch } from '../utils/apiClient';
@@ -10,7 +10,7 @@ import { studentService, type BackendStudentProfile } from '../services/studentS
 import { EDUCATIONAL_PROGRAMS, PROGRAM_I18N_KEY, type EducationalProgram } from '../constants/programs';
 import { documentService, type Document, getTypeKey } from '../services/documentService';
 import { employmentService, type EmploymentRecord } from '../services/employmentService';
-import { complianceService, type ComplianceRecord } from '../services/complianceService';
+import { complianceService, type ComplianceRecord, type ComplianceState } from '../services/complianceService';
 import CompliancePanel from '../components/CompliancePanel';
 
 interface SpecializationCount { specialization: string; count: number; }
@@ -89,7 +89,13 @@ const UniversityAnalyticsPage = () => {
     rejected: { label: t('universityAnalytics.docStatus.rejected'), cls: 'bg-red-50 text-red-700' },
   };
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'employers' | 'statistics' | 'employment' | 'programs' | 'compliance'>('overview');
+  const [searchParams] = useSearchParams();
+  const VALID_TABS = ['overview', 'employers', 'statistics', 'employment', 'programs', 'compliance'] as const;
+  type TabKey = typeof VALID_TABS[number];
+  const initialTab = (VALID_TABS as readonly string[]).includes(searchParams.get('tab') ?? '')
+    ? (searchParams.get('tab') as TabKey) : 'overview';
+  const initialComplianceFilter = (searchParams.get('state') as ComplianceState | null) ?? null;
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [data, setData] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [myStudents, setMyStudents] = useState<BackendStudentProfile[]>([]);
@@ -630,6 +636,7 @@ const UniversityAnalyticsPage = () => {
               onEnrollMany={handleEnrollMany}
               enrollingId={enrollingId}
               enrollingIds={enrollingIds}
+              initialFilter={initialComplianceFilter}
             />
           )}
 

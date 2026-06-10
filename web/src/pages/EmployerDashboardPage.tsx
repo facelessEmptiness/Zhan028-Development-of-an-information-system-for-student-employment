@@ -189,6 +189,11 @@ const EmployerDashboardPage = () => {
     if (openChatId && vacancyId) {
       setActiveTab('applications');
       setSelectedVacancyId(vacancyId);
+      return;
+    }
+    const tab = searchParams.get('tab');
+    if (tab === 'jobs' || tab === 'applications' || tab === 'profile' || tab === 'overview') {
+      setActiveTab(tab);
     }
   }, [searchParams]);
 

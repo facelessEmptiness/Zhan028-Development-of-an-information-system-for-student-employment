@@ -114,19 +114,60 @@
       "viewAllJobs": "Смотреть все вакансии",
       "match": "совпадение",
       "grantTitle": "Моё трудоустройство",
-      "grantSubtitle": "Прогресс 3-летнего грантового обязательства"
+      "grantSubtitle": "Прогресс 3-летнего грантового обязательства",
+      "complianceLabel": "Мой статус по гранту",
+      "complianceDeadline": "Срок"
     },
     "employer": {
       "subtitle": "Управляйте вакансиями и находите лучших кандидатов",
       "title": "Панель работодателя",
       "description": "Публикуйте вакансии, просматривайте кандидатов и управляйте откликами",
-      "goToDashboard": "Перейти в панель"
+      "goToDashboard": "Перейти в панель",
+      "stats": {
+        "activeVacancies": "Активных вакансий",
+        "applications": "Всего откликов",
+        "newToday": "Новых сегодня",
+        "interviews": "Собеседований"
+      },
+      "recentTitle": "Последние отклики",
+      "recentSubtitle": "Кандидаты с процентом совпадения навыков",
+      "allApplications": "Все отклики",
+      "noVacancies": "У вас ещё нет вакансий — опубликуйте первую, чтобы получать отклики",
+      "noApplications": "Пока нет откликов на ваши вакансии",
+      "postVacancy": "Опубликовать вакансию →",
+      "toVacancies": "К вакансиям →",
+      "quickActions": "Быстрые действия",
+      "postVacancyAction": "Опубликовать вакансию",
+      "postVacancyHint": "Новая вакансия для кандидатов",
+      "reviewApplications": "Отклики кандидатов",
+      "applicationsCount": "{{count}} всего",
+      "myVacancies": "Мои вакансии",
+      "activeCount": "{{count}} активных"
     },
     "university": {
       "subtitle": "Отслеживайте статистику трудоустройства выпускников",
       "title": "Аналитика трудоустройства",
       "description": "Полная статистика по трудоустройству студентов и анализ востребованных навыков",
-      "goToAnalytics": "Перейти в аналитику"
+      "goToAnalytics": "Перейти в аналитику",
+      "stats": {
+        "students": "Студентов",
+        "employed": "Трудоустроено",
+        "tracked": "На контроле",
+        "atRisk": "В зоне риска"
+      },
+      "complianceTitle": "Грантовые обязательства",
+      "complianceSubtitle": "Распределение выпускников по статусам — нажмите для деталей",
+      "allDetails": "Подробнее",
+      "complianceEmpty": "Ни один выпускник ещё не на контроле грантовых обязательств",
+      "complianceEnroll": "Добавить выпускников →",
+      "donutTotal": "всего",
+      "quickActions": "Быстрые действия",
+      "verifyDocs": "Проверить справки",
+      "pendingDocs": "{{count}} ожидают",
+      "riskZone": "Зона риска",
+      "riskCount": "{{count}} требуют внимания",
+      "fullAnalytics": "Полная аналитика",
+      "fullAnalyticsHint": "Программы, трудоустройство, работодатели"
     }
   },
   "auth": {
@@ -701,6 +742,14 @@
   "employerDashboard": {
     "title": "Панель работодателя",
     "updatedNow": "обновлено сейчас",
+    "status": {
+      "applied": "Отклик",
+      "review": "На рассмотрении",
+      "shortlisted": "В шортлисте",
+      "interview": "Собеседование",
+      "offered": "Оффер",
+      "rejected": "Отклонён"
+    },
     "tabs": {
       "overview": "Обзор",
       "jobs": "Вакансии",

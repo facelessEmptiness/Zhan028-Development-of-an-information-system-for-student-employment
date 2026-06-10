@@ -104,19 +104,60 @@
       "viewAllJobs": "View all jobs",
       "match": "match",
       "grantTitle": "My Employment",
-      "grantSubtitle": "Progress of the 3-year grant obligation"
+      "grantSubtitle": "Progress of the 3-year grant obligation",
+      "complianceLabel": "My grant status",
+      "complianceDeadline": "Deadline"
     },
     "employer": {
       "subtitle": "Manage vacancies and find the best candidates",
       "title": "Employer Dashboard",
       "description": "Post jobs, browse candidates, and manage applications",
-      "goToDashboard": "Go to Dashboard"
+      "goToDashboard": "Go to Dashboard",
+      "stats": {
+        "activeVacancies": "Active vacancies",
+        "applications": "Total applications",
+        "newToday": "New today",
+        "interviews": "Interviews"
+      },
+      "recentTitle": "Recent applications",
+      "recentSubtitle": "Candidates with skill-match score",
+      "allApplications": "All applications",
+      "noVacancies": "You don't have any vacancies yet — post your first to start receiving applications",
+      "noApplications": "No applications to your vacancies yet",
+      "postVacancy": "Post a vacancy →",
+      "toVacancies": "To vacancies →",
+      "quickActions": "Quick actions",
+      "postVacancyAction": "Post a vacancy",
+      "postVacancyHint": "A new opening for candidates",
+      "reviewApplications": "Candidate applications",
+      "applicationsCount": "{{count}} total",
+      "myVacancies": "My vacancies",
+      "activeCount": "{{count}} active"
     },
     "university": {
       "subtitle": "Track graduate employment statistics",
       "title": "Employment Analytics",
       "description": "Full statistics on student employment and in-demand skills analysis",
-      "goToAnalytics": "Go to Analytics"
+      "goToAnalytics": "Go to Analytics",
+      "stats": {
+        "students": "Students",
+        "employed": "Employed",
+        "tracked": "Tracked",
+        "atRisk": "At risk"
+      },
+      "complianceTitle": "Grant obligations",
+      "complianceSubtitle": "Distribution of graduates by status — click for details",
+      "allDetails": "Details",
+      "complianceEmpty": "No graduate is being tracked for grant obligations yet",
+      "complianceEnroll": "Add graduates →",
+      "donutTotal": "total",
+      "quickActions": "Quick actions",
+      "verifyDocs": "Verify documents",
+      "pendingDocs": "{{count}} pending",
+      "riskZone": "Risk zone",
+      "riskCount": "{{count}} need attention",
+      "fullAnalytics": "Full analytics",
+      "fullAnalyticsHint": "Programs, employment, employers"
     },
     "categories_list": {
       "it": "IT & Development",
@@ -701,6 +742,14 @@
   "employerDashboard": {
     "title": "Employer Dashboard",
     "updatedNow": "updated just now",
+    "status": {
+      "applied": "Applied",
+      "review": "In review",
+      "shortlisted": "Shortlisted",
+      "interview": "Interview",
+      "offered": "Offered",
+      "rejected": "Rejected"
+    },
     "tabs": {
       "overview": "Overview",
       "jobs": "Jobs",

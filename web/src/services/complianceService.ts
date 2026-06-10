@@ -41,6 +41,14 @@ export const complianceService = {
     return data.records ?? [];
   },
 
+  // Student: own compliance record (null if not enrolled / not accessible)
+  async getForStudent(studentId: string): Promise<ComplianceRecord | null> {
+    const res = await apiFetch(`/api/compliance/student/${studentId}`);
+    if (res.status === 404 || res.status === 403) return null;
+    if (!res.ok) throw new Error(`Failed to load compliance record: ${res.status}`);
+    return res.json();
+  },
+
   // University/admin: enroll a grant student into compliance tracking
   async enroll(input: EnrollInput): Promise<ComplianceRecord> {
     const res = await apiFetch('/api/compliance/enroll', {
