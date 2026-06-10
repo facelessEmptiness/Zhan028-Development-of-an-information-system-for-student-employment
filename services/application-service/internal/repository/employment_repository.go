@@ -19,6 +19,7 @@ type EmploymentRepository interface {
 	GetByUniversityID(universityID uuid.UUID) ([]models.EmploymentRecord, error)
 	UpdateStatus(id uuid.UUID, status string) error
 	End(id uuid.UUID) error
+	EndByApplicationID(applicationID uuid.UUID) error
 }
 
 type employmentRepository struct {
@@ -91,4 +92,14 @@ func (r *employmentRepository) End(id uuid.UUID) error {
 		"ended_at": now,
 		"status":   "terminated_early",
 	}).Error
+}
+
+func (r *employmentRepository) EndByApplicationID(applicationID uuid.UUID) error {
+	now := time.Now()
+	return r.db.Model(&models.EmploymentRecord{}).
+		Where("application_id = ? AND status = 'active'", applicationID).
+		Updates(map[string]interface{}{
+			"ended_at": now,
+			"status":   "terminated_early",
+		}).Error
 }

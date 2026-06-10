@@ -342,6 +342,10 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 		go h.notif.Send(resp.GetStudentId(), "application_status", title, body, id+"|"+req.Status)
 	}
 
+	if req.Status == "rejected" && h.appHTTPURL != "" {
+		go EndEmploymentByApplicationID(h.appHTTPURL, id)
+	}
+
 	if req.Status == "offered" && h.appHTTPURL != "" {
 		go func() {
 			companyName := ""
@@ -355,21 +359,24 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 			}
 
 			universityID := ""
+			graduationYear := 0
 			sCtx, sCancel := context.WithTimeout(context.Background(), 3*time.Second)
 			studentResp, sErr := h.studentClient.GetProfile(sCtx, &studentpb.GetProfileRequest{UserId: resp.GetStudentId()})
 			sCancel()
 			if sErr == nil && studentResp != nil {
 				universityID = studentResp.GetUniversityId()
+				graduationYear = int(studentResp.GetGraduationYear())
 			}
 
 			payload := map[string]any{
-				"student_id":     resp.GetStudentId(),
-				"employer_id":    employerID,
-				"application_id": id,
-				"vacancy_id":     resp.GetVacancyId(),
-				"company_name":   companyName,
-				"job_title":      jobTitle,
-				"university_id":  universityID,
+				"student_id":      resp.GetStudentId(),
+				"employer_id":     employerID,
+				"application_id":  id,
+				"vacancy_id":      resp.GetVacancyId(),
+				"company_name":    companyName,
+				"job_title":       jobTitle,
+				"university_id":   universityID,
+				"graduation_year": graduationYear,
 			}
 			CreateEmploymentRecord(h.appHTTPURL, payload)
 		}()

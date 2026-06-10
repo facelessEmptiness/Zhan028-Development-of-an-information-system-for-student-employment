@@ -65,6 +65,17 @@ func (h *EmploymentHandler) End(c *gin.Context) {
 	h.proxy(c, "PUT", fmt.Sprintf("/api/employment/%s/end", id), nil)
 }
 
+// PUT /api/employment/end-by-application/:application_id — employer fires a student
+func (h *EmploymentHandler) EndByApplicationID(c *gin.Context) {
+	role := c.GetHeader("X-User-Role")
+	if role != "employer" && role != "university" && role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+		return
+	}
+	applicationID := c.Param("application_id")
+	h.proxy(c, "PUT", fmt.Sprintf("/api/employment/internal/end-by-application/%s", applicationID), nil)
+}
+
 // CreateInternal is called internally by UpdateStatus when status → "offered".
 // It is NOT exposed as a public route — called directly from UpdateStatus handler.
 func CreateEmploymentRecord(appServiceURL string, payload map[string]any) {
@@ -84,6 +95,25 @@ func CreateEmploymentRecord(appServiceURL string, payload map[string]any) {
 	defer resp.Body.Close()
 	if resp.StatusCode >= 400 {
 		log.Printf("[employment] unexpected status %d for student %v", resp.StatusCode, payload["student_id"])
+	}
+}
+
+// EndEmploymentByApplicationID is called internally when application is rejected.
+func EndEmploymentByApplicationID(appServiceURL string, applicationID string) {
+	client := &http.Client{Timeout: 5 * time.Second}
+	req, err := http.NewRequest("PUT", appServiceURL+"/api/employment/internal/end-by-application/"+applicationID, nil)
+	if err != nil {
+		log.Printf("[employment] failed to build end-by-application request: %v", err)
+		return
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("[employment] failed to end employment for application %s: %v", applicationID, err)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		log.Printf("[employment] end-by-application returned status %d for application %s", resp.StatusCode, applicationID)
 	}
 }
 

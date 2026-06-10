@@ -69,7 +69,7 @@ const DOC_STATUS_CLASSES: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-700', verified: 'bg-green-100 text-green-700', rejected: 'bg-red-100 text-red-700',
 };
 
-const StudentProfilePage = () => {
+const StudentProfilePage = ({ initialTab }: { initialTab?: TabType } = {}) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
@@ -91,7 +91,7 @@ const StudentProfilePage = () => {
     return <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cfg.cls}`}>{cfg.label}</span>;
   };
 
-  const [activeTab, setActiveTab] = useState<TabType>('profile');
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab ?? 'profile');
   const [profile, setProfile] = useState<BackendStudentProfile | null>(null);
   const [profileExists, setProfileExists] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);

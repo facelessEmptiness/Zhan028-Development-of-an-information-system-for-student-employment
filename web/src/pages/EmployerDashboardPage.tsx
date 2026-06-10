@@ -8,8 +8,8 @@ import type { IconName } from '../components/icons';
 import { employerService, type JobPosting } from '../services/employerService';
 import { parseSkills } from '../utils';
 import { applicationService, type Application } from '../services/applicationService';
+import { employmentService } from '../services/employmentService';
 import { employerProfileService, type EmployerProfile } from '../services/employerProfileService';
-import { employmentService, type EmploymentRecord } from '../services/employmentService';
 
 interface FormData {
   title: string;
@@ -86,7 +86,7 @@ const EmployerDashboardPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const openedFromUrl = useRef(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'applications' | 'profile' | 'employment'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'jobs' | 'applications' | 'profile'>('overview');
   const [showJobForm, setShowJobForm] = useState(false);
   const [formData, setFormData] = useState<FormData>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
@@ -113,8 +113,6 @@ const EmployerDashboardPage = () => {
   const [profileError, setProfileError] = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
 
-  const [employmentRecords, setEmploymentRecords] = useState<EmploymentRecord[]>([]);
-  const [employmentLoading, setEmploymentLoading] = useState(false);
 
   const fetchMyJobs = async () => {
     setJobsLoading(true);
@@ -192,7 +190,7 @@ const EmployerDashboardPage = () => {
       setActiveTab('applications');
       setSelectedVacancyId(vacancyId);
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (openedFromUrl.current) return;
@@ -210,29 +208,6 @@ const EmployerDashboardPage = () => {
     }
   }, [applications]);
 
-  const fetchEmploymentRecords = async () => {
-    setEmploymentLoading(true);
-    try {
-      const recs = await employmentService.getForEmployer();
-      setEmploymentRecords(recs);
-    } catch {
-      // silent
-    } finally {
-      setEmploymentLoading(false);
-    }
-  };
-
-  const handleEndEmployment = async (id: string) => {
-    if (!window.confirm(t('employment.endConfirm'))) return;
-    try {
-      await employmentService.endEmployment(id);
-      setEmploymentRecords(prev =>
-        prev.map(r => r.id === id ? { ...r, status: 'terminated_early' as const, ended_at: new Date().toISOString() } : r)
-      );
-    } catch {
-      // silent
-    }
-  };
 
   useEffect(() => {
     if (activeTab === 'jobs') {
@@ -256,7 +231,6 @@ const EmployerDashboardPage = () => {
         fetchAllApplicationsForOverview(jobs);
       }).catch(() => {});
     }
-    if (activeTab === 'employment') fetchEmploymentRecords();
   }, [activeTab]);
 
   useEffect(() => {
@@ -340,6 +314,19 @@ const EmployerDashboardPage = () => {
     finally { setStatusUpdating(null); }
   };
 
+  const [fireConfirmId, setFireConfirmId] = useState<string | null>(null);
+
+  const handleFireEmployee = async (appId: string) => {
+    setFireConfirmId(null);
+    setStatusUpdating(appId);
+    try {
+      await employmentService.fireByApplicationID(appId);
+      await applicationService.updateStatus(appId, 'rejected');
+      if (selectedVacancyId) await fetchApplications(selectedVacancyId);
+    } catch { /* ignore */ }
+    finally { setStatusUpdating(null); }
+  };
+
   const activeJobsCount = myJobs.filter(j => j.status === 'active').length;
   const companyName = profileExists && profile.company_name ? profile.company_name : 'Компания';
   const companyColor = getCompanyColor(companyName);
@@ -354,7 +341,6 @@ const EmployerDashboardPage = () => {
     { key: 'overview' as const,      label: t('employerDashboard.tabs.overview') },
     { key: 'jobs' as const,          label: t('employerDashboard.tabs.jobs'),         badge: myJobs.length || undefined },
     { key: 'applications' as const,  label: t('employerDashboard.tabs.applications'), badge: applications.length || undefined },
-    { key: 'employment' as const,    label: t('employment.title') },
     { key: 'profile' as const,       label: t('employerDashboard.tabs.profile') },
   ];
 
@@ -688,6 +674,28 @@ const EmployerDashboardPage = () => {
                   >
                     <Icon name="x" size={12} className="inline mr-1" />{t('employerDashboard.applications.reject')}
                   </button>
+                  {app.status === 'offered' && fireConfirmId !== app.id && (
+                    <button
+                      onClick={() => setFireConfirmId(app.id)}
+                      disabled={statusUpdating === app.id}
+                      className="px-2.5 py-1.5 text-xs font-semibold rounded-lg disabled:opacity-50"
+                      style={{ background: '#FFF7ED', color: '#C2410C' }}
+                    >
+                      <Icon name="x" size={12} className="inline mr-1" />{t('employerDashboard.applications.fire')}
+                    </button>
+                  )}
+                  {fireConfirmId === app.id && (
+                    <span className="flex items-center gap-1.5 text-xs font-semibold rounded-lg px-2.5 py-1.5" style={{ background: '#FFF7ED', color: '#C2410C' }}>
+                      {t('employerDashboard.applications.fireConfirm')}
+                      <button
+                        onClick={() => handleFireEmployee(app.id)}
+                        disabled={statusUpdating === app.id}
+                        className="underline hover:no-underline disabled:opacity-50"
+                      >{t('employerDashboard.applications.yes')}</button>
+                      <span className="text-gray-400">/</span>
+                      <button onClick={() => setFireConfirmId(null)} className="text-gray-500 hover:text-gray-700">{t('employerDashboard.applications.no')}</button>
+                    </span>
+                  )}
                   <button
                     onClick={() => setChatApp({
                       id: app.id,
@@ -830,89 +838,6 @@ const EmployerDashboardPage = () => {
         </div>
       )}
 
-      {/* ── Employment Monitoring ── */}
-      {activeTab === 'employment' && (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">{t('employment.title')}</h2>
-            <p className="text-xs text-gray-400 mt-0.5">{t('employment.subtitle')}</p>
-          </div>
-          {employmentLoading && <div className="p-10 text-center text-gray-400">{t('employment.loading')}</div>}
-          {!employmentLoading && employmentRecords.length === 0 && (
-            <div className="p-16 text-center">
-              <p className="font-medium text-gray-500">{t('employment.noRecords')}</p>
-              <p className="text-sm text-gray-400 mt-1">{t('employment.noRecordsHint')}</p>
-            </div>
-          )}
-          {!employmentLoading && employmentRecords.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.company')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.position')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.startDate')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.daysWorked')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.progress')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.status')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('employment.table.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {employmentRecords.map(rec => {
-                    const statusColors: Record<string, string> = {
-                      active: 'bg-green-50 text-green-700',
-                      completed: 'bg-blue-50 text-blue-700',
-                      terminated_early: 'bg-red-50 text-red-700',
-                    };
-                    const statusCls = statusColors[rec.status] ?? 'bg-gray-100 text-gray-600';
-                    const startDate = new Date(rec.started_at).toLocaleDateString('ru-RU');
-                    return (
-                      <tr key={rec.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-5 py-4 font-medium text-gray-900 text-sm">{rec.company_name || '—'}</td>
-                        <td className="px-5 py-4 text-gray-600 text-sm">
-                          <button onClick={() => navigate(`/candidate/${rec.student_id}`)} className="hover:text-blue-600">
-                            {rec.job_title || '—'}
-                          </button>
-                        </td>
-                        <td className="px-5 py-4 text-gray-500 text-sm">{startDate}</td>
-                        <td className="px-5 py-4 text-gray-700 font-semibold text-sm">{rec.days_worked}</td>
-                        <td className="px-5 py-4 min-w-[160px]">
-                          {rec.grant_fulfilled ? (
-                            <span className="text-green-600 font-semibold text-sm">{t('employment.grantFulfilled')}</span>
-                          ) : (
-                            <div>
-                              <div className="flex justify-between text-xs text-gray-400 mb-1">
-                                <span>{rec.progress}%</span>
-                                <span>{t('employment.remaining', { days: rec.remaining_days })}</span>
-                              </div>
-                              <div className="w-full bg-gray-100 rounded-full h-1.5">
-                                <div className="bg-blue-500 h-1.5 rounded-full transition-all" style={{ width: `${rec.progress}%` }} />
-                              </div>
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-5 py-4">
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusCls}`}>
-                            {t(`employment.status.${rec.status}` as const, rec.status)}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4">
-                          {rec.status === 'active' && (
-                            <button onClick={() => handleEndEmployment(rec.id)} className="px-3 py-1 border border-red-200 text-red-700 rounded-lg text-xs font-semibold hover:bg-red-50">
-                              {t('employment.endEmployment')}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Job Posting Modal */}
       {showJobForm && (

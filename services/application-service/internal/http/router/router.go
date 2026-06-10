@@ -25,6 +25,7 @@ func SetupRouter(ih *handler.InterviewHandler, eh *handler.EmploymentHandler, ch
 	employment := r.Group("/api/employment")
 	{
 		employment.POST("/internal", eh.CreateInternal)
+		employment.PUT("/internal/end-by-application/:application_id", eh.EndByApplicationID)
 		employment.GET("/student", eh.GetForStudent)
 		employment.GET("/university", eh.GetForUniversity)
 		employment.GET("/employer", eh.GetForEmployer)

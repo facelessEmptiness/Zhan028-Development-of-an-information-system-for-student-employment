@@ -148,7 +148,7 @@ func (s *VacancyGRPCServer) UpdateVacancy(ctx context.Context, req *pb.UpdateVac
 		Status:      req.Status,
 	})
 	if err != nil {
-		if errors.Is(err, errors.New("доступ запрещён")) {
+		if errors.Is(err, service.ErrAccessDenied) {
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to update vacancy: %v", err)

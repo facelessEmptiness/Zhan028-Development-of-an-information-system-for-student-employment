@@ -754,7 +754,11 @@
       "viewProfile": "Profile →",
       "toInterview": "Invite to Interview",
       "accept": "Accept",
-      "reject": "Reject"
+      "reject": "Reject",
+      "fire": "Dismiss",
+      "fireConfirm": "Dismiss?",
+      "yes": "Yes",
+      "no": "No"
     },
     "companyProfile": {
       "title": "Company Profile",
@@ -1197,6 +1201,10 @@
     "document_rejected": {
       "title": "Document rejected ❌",
       "body": "Your document has been rejected."
+    },
+    "compliance_at_risk": {
+      "title": "Grant obligation at risk ⚠️",
+      "body": "More than 3 months have passed since graduation without qualifying employment. Find a qualifying job before the deadline — otherwise repayment of tuition may be required under Article 47."
     },
     "time": {
       "justNow": "just now",

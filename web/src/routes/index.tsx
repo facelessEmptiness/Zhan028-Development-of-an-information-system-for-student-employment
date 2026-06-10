@@ -77,7 +77,7 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <RoleBasedRoute allowedRoles={['student']}>
-              <StudentProfilePage />
+              <StudentProfilePage initialTab="applications" />
             </RoleBasedRoute>
           </ProtectedRoute>
         ),

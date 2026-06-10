@@ -1204,9 +1204,13 @@ const UniversityAnalyticsPage = () => {
                             <td className="px-5 py-4 font-medium text-gray-900 text-sm">{rec.company_name || '—'}</td>
                             <td className="px-5 py-4 text-gray-600 text-sm">{rec.job_title || '—'}</td>
                             <td className="px-5 py-4 text-gray-500 text-sm">{startDate}</td>
-                            <td className="px-5 py-4 text-gray-700 font-semibold text-sm">{rec.days_worked}</td>
+                            <td className="px-5 py-4 text-gray-700 font-semibold text-sm">
+                              {rec.not_started ? '—' : rec.days_worked}
+                            </td>
                             <td className="px-5 py-4 min-w-[160px]">
-                              {rec.grant_fulfilled ? (
+                              {rec.not_started ? (
+                                <span className="text-gray-400 text-sm">—</span>
+                              ) : rec.grant_fulfilled ? (
                                 <span className="text-green-600 font-semibold text-sm">{t('employment.grantFulfilled')}</span>
                               ) : (
                                 <div>
@@ -1221,9 +1225,15 @@ const UniversityAnalyticsPage = () => {
                               )}
                             </td>
                             <td className="px-5 py-4">
-                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColors[rec.status] ?? 'bg-gray-100 text-gray-600'}`}>
-                                {t(`employment.status.${rec.status}` as const, rec.status)}
-                              </span>
+                              {rec.not_started ? (
+                                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-500">
+                                  Срок не наступил
+                                </span>
+                              ) : (
+                                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColors[rec.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                                  {t(`employment.status.${rec.status}` as const, rec.status)}
+                                </span>
+                              )}
                             </td>
                           </tr>
                         );

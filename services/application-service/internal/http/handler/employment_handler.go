@@ -23,13 +23,14 @@ func NewEmploymentHandler(repo repository.EmploymentRepository) *EmploymentHandl
 // POST /api/employment/internal — called by api-gateway when offer is made
 func (h *EmploymentHandler) CreateInternal(c *gin.Context) {
 	var req struct {
-		StudentID     string `json:"student_id" binding:"required"`
-		EmployerID    string `json:"employer_id" binding:"required"`
-		ApplicationID string `json:"application_id" binding:"required"`
-		VacancyID     string `json:"vacancy_id" binding:"required"`
-		CompanyName   string `json:"company_name"`
-		JobTitle      string `json:"job_title"`
-		UniversityID  string `json:"university_id"`
+		StudentID      string `json:"student_id" binding:"required"`
+		EmployerID     string `json:"employer_id" binding:"required"`
+		ApplicationID  string `json:"application_id" binding:"required"`
+		VacancyID      string `json:"vacancy_id" binding:"required"`
+		CompanyName    string `json:"company_name"`
+		JobTitle       string `json:"job_title"`
+		UniversityID   string `json:"university_id"`
+		GraduationYear int    `json:"graduation_year"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -79,7 +80,7 @@ func (h *EmploymentHandler) CreateInternal(c *gin.Context) {
 		UniversityID:  universityID,
 		CompanyName:   req.CompanyName,
 		JobTitle:      req.JobTitle,
-		StartedAt:     time.Now(),
+		StartedAt:     grantStartDate(req.GraduationYear),
 		Status:        "active",
 	}
 
@@ -173,6 +174,54 @@ func (h *EmploymentHandler) GetForEmployer(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"records": enrichWithDuration(recs)})
 }
 
+// PUT /api/employment/internal/end-by-application/:application_id
+// Called by api-gateway: either from internal goroutine (no role header) or user-facing proxy (role header present).
+// When X-User-Role is present, ownership is enforced. When absent (internal goroutine call), no check needed.
+func (h *EmploymentHandler) EndByApplicationID(c *gin.Context) {
+	applicationID, err := uuid.Parse(c.Param("application_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid application_id"})
+		return
+	}
+
+	// Ownership check only when a user role is present (user-facing call via proxy).
+	// Internal goroutine calls (auto-terminate on rejection) carry no role header.
+	role := c.GetHeader("X-User-Role")
+	if role != "" {
+		rec, fetchErr := h.repo.GetByApplicationID(applicationID)
+		if fetchErr != nil {
+			// No active record — nothing to terminate, return success.
+			c.JSON(http.StatusOK, gin.H{"message": "no active employment record"})
+			return
+		}
+		switch role {
+		case "employer":
+			callerID, parseErr := uuid.Parse(c.GetHeader("X-User-ID"))
+			if parseErr != nil || rec.EmployerID != callerID {
+				c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+				return
+			}
+		case "university":
+			callerUniID, parseErr := uuid.Parse(c.GetHeader("X-University-ID"))
+			if parseErr != nil || rec.UniversityID == nil || *rec.UniversityID != callerUniID {
+				c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+				return
+			}
+		case "admin":
+			// admin may terminate any record
+		default:
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+			return
+		}
+	}
+
+	if err := h.repo.EndByApplicationID(applicationID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to end employment"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "employment terminated"})
+}
+
 // PUT /api/employment/:id/end — mark employment as ended
 func (h *EmploymentHandler) End(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
@@ -218,19 +267,35 @@ func (h *EmploymentHandler) End(c *gin.Context) {
 // EmploymentRecordWithDuration wraps EmploymentRecord with computed fields
 type EmploymentRecordWithDuration struct {
 	models.EmploymentRecord
-	DaysWorked     int    `json:"days_worked"`
-	MonthsWorked   int    `json:"months_worked"`
-	GrantFulfilled bool   `json:"grant_fulfilled"`
-	RemainingDays  int    `json:"remaining_days"`
-	Progress       int    `json:"progress"` // 0-100%
+	DaysWorked     int  `json:"days_worked"`
+	MonthsWorked   int  `json:"months_worked"`
+	GrantFulfilled bool `json:"grant_fulfilled"`
+	RemainingDays  int  `json:"remaining_days"`
+	Progress       int  `json:"progress"`    // 0-100%
+	NotStarted     bool `json:"not_started"` // true if grant period hasn't begun yet
 }
 
 func enrichWithDuration(recs []models.EmploymentRecord) []EmploymentRecordWithDuration {
 	result := make([]EmploymentRecordWithDuration, 0, len(recs))
 	grantDays := models.GrantYears * 365
+	now := time.Now()
 
 	for _, r := range recs {
-		end := time.Now()
+		// Grant period hasn't started yet (e.g. graduation year is in the future)
+		if r.StartedAt.After(now) {
+			result = append(result, EmploymentRecordWithDuration{
+				EmploymentRecord: r,
+				DaysWorked:       0,
+				MonthsWorked:     0,
+				GrantFulfilled:   false,
+				RemainingDays:    grantDays,
+				Progress:         0,
+				NotStarted:       true,
+			})
+			continue
+		}
+
+		end := now
 		if r.EndedAt != nil {
 			end = *r.EndedAt
 		}
@@ -252,6 +317,7 @@ func enrichWithDuration(recs []models.EmploymentRecord) []EmploymentRecordWithDu
 			GrantFulfilled:   fulfilled,
 			RemainingDays:    remaining,
 			Progress:         progress,
+			NotStarted:       false,
 		})
 	}
 	return result
@@ -259,4 +325,18 @@ func enrichWithDuration(recs []models.EmploymentRecord) []EmploymentRecordWithDu
 
 func splitCSV(s string) []string {
 	return strings.Split(s, ",")
+}
+
+// grantStartDate returns September 1 of the student's graduation year.
+// If graduation_year is 0 or unknown, falls back to the nearest past September 1.
+func grantStartDate(graduationYear int) time.Time {
+	if graduationYear > 0 {
+		return time.Date(graduationYear, time.September, 1, 0, 0, 0, 0, time.UTC)
+	}
+	now := time.Now()
+	sep1 := time.Date(now.Year(), time.September, 1, 0, 0, 0, 0, time.UTC)
+	if now.Before(sep1) {
+		sep1 = sep1.AddDate(-1, 0, 0)
+	}
+	return sep1
 }

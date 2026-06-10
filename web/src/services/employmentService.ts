@@ -19,6 +19,7 @@ export interface EmploymentRecord {
   grant_fulfilled: boolean;
   remaining_days: number;
   progress: number; // 0-100
+  not_started: boolean; // true if grant period hasn't begun yet (started_at is in the future)
 }
 
 export const employmentService = {
@@ -54,5 +55,11 @@ export const employmentService = {
   async endEmployment(id: string): Promise<void> {
     const res = await apiFetch(`/api/employment/${id}/end`, { method: 'PUT' });
     if (!res.ok) throw new Error(`Failed to end employment: ${res.status}`);
+  },
+
+  // Employer: fire a student by application ID (terminates the employment record)
+  async fireByApplicationID(applicationId: string): Promise<void> {
+    const res = await apiFetch(`/api/employment/end-by-application/${applicationId}`, { method: 'PUT' });
+    if (!res.ok) throw new Error(`Failed to terminate employment: ${res.status}`);
   },
 };

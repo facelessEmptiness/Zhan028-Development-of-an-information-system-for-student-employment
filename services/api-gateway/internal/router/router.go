@@ -170,6 +170,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		employment.GET("/university", employmentHandler.GetForUniversity)
 		employment.GET("/employer", employmentHandler.GetForEmployer)
 		employment.PUT("/:id/end", employmentHandler.End)
+		employment.PUT("/end-by-application/:application_id", employmentHandler.EndByApplicationID)
 	}
 
 	// ============================================

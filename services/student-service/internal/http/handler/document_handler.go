@@ -318,6 +318,10 @@ func (h *DocumentHandler) Delete(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "document not found"})
 		return
 	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch document"})
+		return
+	}
 
 	if doc.UserID.String() != c.GetHeader("X-User-ID") {
 		c.JSON(http.StatusForbidden, gin.H{"error": "cannot delete another user's document"})

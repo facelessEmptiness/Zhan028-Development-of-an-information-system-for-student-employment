@@ -474,6 +474,8 @@ function useNotifTexts(notification: Notification, userRole?: string) {
       return { title: t('notifications.document_verified.title'), body: t('notifications.document_verified.body') };
     case 'document_rejected':
       return { title: t('notifications.document_rejected.title'), body: t('notifications.document_rejected.body') };
+    case 'compliance_at_risk':
+      return { title: t('notifications.compliance_at_risk.title'), body: t('notifications.compliance_at_risk.body') };
     default:
       return { title: notification.title, body: notification.body };
   }
