@@ -57,11 +57,12 @@ interface Props {
   onEnrollMany?: (students: BackendStudentProfile[]) => void;
   enrollingId?: string | null;
   enrollingIds?: Set<string>;
+  initialFilter?: ComplianceState | null;
 }
 
-const CompliancePanel = ({ records, myStudents, onEnroll, onEnrollMany, enrollingId, enrollingIds }: Props) => {
+const CompliancePanel = ({ records, myStudents, onEnroll, onEnrollMany, enrollingId, enrollingIds, initialFilter }: Props) => {
   const { t } = useTranslation();
-  const [activeFilter, setActiveFilter] = useState<ComplianceState | null>(null);
+  const [activeFilter, setActiveFilter] = useState<ComplianceState | null>(initialFilter ?? null);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const indeterminateRef = useRef<HTMLInputElement>(null);
