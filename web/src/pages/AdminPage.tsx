@@ -74,7 +74,7 @@ const STATE_CFG: Record<string, { label: string; bg: string; text: string }> = {
   Exempt:        { label: 'Освобождён',         bg: '#F5F3FF', text: '#6D28D9' },
 };
 
-const ALL_ROLES = ['student', 'employer', 'university', 'admin'] as const;
+const ALL_ROLES = ['student', 'employer', 'university'] as const;
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();

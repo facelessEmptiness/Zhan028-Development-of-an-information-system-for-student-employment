@@ -34,6 +34,7 @@ var (
 	ErrInvalidCredentials   = errors.New("неверный email или пароль")
 	ErrUserNotActive        = errors.New("учётная запись деактивирована")
 	ErrInvalidRole          = errors.New("недопустимая роль пользователя")
+	ErrAdminRoleForbidden   = errors.New("роль администратора нельзя назначать через API")
 	ErrEmailNotVerified     = errors.New("email не подтверждён")
 	ErrInvalidCode          = errors.New("неверный или просроченный код")
 	ErrEmailAlreadyVerified = errors.New("email уже подтверждён")
@@ -382,6 +383,9 @@ func (s *authService) UpdateUserRole(id uuid.UUID, role string) (*dto.UserRespon
 	newRole := models.UserRole(role)
 	if !newRole.IsValid() {
 		return nil, ErrInvalidRole
+	}
+	if newRole == models.RoleAdmin {
+		return nil, ErrAdminRoleForbidden
 	}
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {

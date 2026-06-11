@@ -334,6 +334,11 @@ func handleServiceError(c *gin.Context, err error) {
 			Error:   "Ошибка валидации",
 			Message: "Недопустимая роль пользователя",
 		})
+	case errors.Is(err, service.ErrAdminRoleForbidden):
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{
+			Error:   "Доступ запрещён",
+			Message: "Роль администратора нельзя назначать через API",
+		})
 	case errors.Is(err, service.ErrEmailNotVerified):
 		c.JSON(http.StatusForbidden, dto.ErrorResponse{
 			Error:   "Email не подтверждён",
