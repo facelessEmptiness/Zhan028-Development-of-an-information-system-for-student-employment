@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -60,6 +61,28 @@ func toVacancyResp(v *vacancypb.VacancyMessage) vacancyResp {
 	}
 }
 
+// skills accepts the "skills" JSON field as either a comma-separated string
+// ("React, Go") or an array (["React","Go"]) and normalizes it to the
+// comma-separated string the vacancy service stores. This keeps the API
+// tolerant of both the web and mobile clients.
+type skills string
+
+func (s *skills) UnmarshalJSON(data []byte) error {
+	// Try array first.
+	var arr []string
+	if err := json.Unmarshal(data, &arr); err == nil {
+		*s = skills(strings.Join(arr, ","))
+		return nil
+	}
+	// Fall back to a plain string.
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*s = skills(str)
+	return nil
+}
+
 func splitSkills(s string) []string {
 	if s == "" {
 		return []string{}
@@ -80,13 +103,13 @@ func (h *VacancyHandler) CreateVacancy(c *gin.Context) {
 	employerRole := c.GetHeader("X-User-Role")
 
 	var req struct {
-		Title       string   `json:"title"`
-		Description string   `json:"description"`
-		Location    string   `json:"location"`
-		SalaryMin   float64  `json:"salary_min"`
-		SalaryMax   float64  `json:"salary_max"`
-		JobType     string   `json:"job_type"`
-		Skills      []string `json:"skills"`
+		Title       string  `json:"title"`
+		Description string  `json:"description"`
+		Location    string  `json:"location"`
+		SalaryMin   float64 `json:"salary_min"`
+		SalaryMax   float64 `json:"salary_max"`
+		JobType     string  `json:"job_type"`
+		Skills      skills  `json:"skills"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -105,7 +128,7 @@ func (h *VacancyHandler) CreateVacancy(c *gin.Context) {
 		SalaryMin:    req.SalaryMin,
 		SalaryMax:    req.SalaryMax,
 		JobType:      req.JobType,
-		Skills:       strings.Join(req.Skills, ","),
+		Skills:       string(req.Skills),
 	})
 	if err != nil {
 		handleGRPCError(c, err)
@@ -227,14 +250,14 @@ func (h *VacancyHandler) UpdateVacancy(c *gin.Context) {
 	employerID := c.GetHeader("X-User-ID")
 
 	var req struct {
-		Title       string   `json:"title"`
-		Description string   `json:"description"`
-		Location    string   `json:"location"`
-		SalaryMin   float64  `json:"salary_min"`
-		SalaryMax   float64  `json:"salary_max"`
-		JobType     string   `json:"job_type"`
-		Skills      []string `json:"skills"`
-		Status      string   `json:"status"`
+		Title       string  `json:"title"`
+		Description string  `json:"description"`
+		Location    string  `json:"location"`
+		SalaryMin   float64 `json:"salary_min"`
+		SalaryMax   float64 `json:"salary_max"`
+		JobType     string  `json:"job_type"`
+		Skills      skills  `json:"skills"`
+		Status      string  `json:"status"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -253,7 +276,7 @@ func (h *VacancyHandler) UpdateVacancy(c *gin.Context) {
 		SalaryMin:   req.SalaryMin,
 		SalaryMax:   req.SalaryMax,
 		JobType:     req.JobType,
-		Skills:      strings.Join(req.Skills, ","),
+		Skills:      string(req.Skills),
 		Status:      req.Status,
 	})
 	if err != nil {
