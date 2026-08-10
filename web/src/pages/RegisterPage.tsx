@@ -3,8 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context';
+import Icon from '../components/Icon';
+import type { IconName } from '../components/icons';
 import { getUniversities, type University } from '../services/universityService';
 import LanguageSelector from '../components/LanguageSelector';
+import LegalModal from '../components/LegalModal';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -25,6 +28,7 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [legalModal, setLegalModal] = useState<'terms' | 'privacy' | null>(null);
 
   useEffect(() => {
     getUniversities().then(setUniversities);
@@ -82,6 +86,11 @@ const RegisterPage = () => {
         role: formData.role,
         university_id: formData.university || undefined,
       });
+      if (formData.role === 'student') {
+        localStorage.setItem('reg_first_name', formData.firstName);
+        localStorage.setItem('reg_last_name', formData.lastName);
+        if (formData.university) localStorage.setItem('reg_university_id', formData.university);
+      }
       toast.success(t('auth.register.success'));
       navigate(`/verify-email?email=${encodeURIComponent(response.email)}`);
     } catch (err) {
@@ -125,6 +134,7 @@ const RegisterPage = () => {
   ] as const;
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Nav */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -153,12 +163,12 @@ const RegisterPage = () => {
 
           <div className="space-y-3">
             {[
-              { icon: '🎓', text: t('auth.register.feature1') },
-              { icon: '💼', text: t('auth.register.feature2') },
-              { icon: '🏛️', text: t('auth.register.feature3') },
+              { icon: 'graduation-cap' as IconName, text: t('auth.register.feature1') },
+              { icon: 'briefcase'      as IconName, text: t('auth.register.feature2') },
+              { icon: 'building'       as IconName, text: t('auth.register.feature3') },
             ].map((item) => (
               <div key={item.text} className="flex items-start space-x-3 bg-white/20 rounded-xl p-4">
-                <span className="text-xl">{item.icon}</span>
+                <Icon name={item.icon} size={20} className="shrink-0 text-white" />
                 <p className="text-white text-sm leading-relaxed">{item.text}</p>
               </div>
             ))}
@@ -179,7 +189,7 @@ const RegisterPage = () => {
             </div>
 
             {/* Form Card */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('auth.register.title')}</h2>
               <p className="text-gray-500 text-sm mb-6">{t('auth.register.subtitle')}</p>
 
@@ -187,11 +197,11 @@ const RegisterPage = () => {
                 {/* Role selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.register.iAm')}</label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {roles.map((r) => (
                       <label
                         key={r.value}
-                        className={`flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`flex sm:flex-col items-center gap-3 sm:gap-0 p-3 rounded-lg border-2 cursor-pointer transition-all ${
                           formData.role === r.value
                             ? 'border-blue-500 bg-blue-50 text-blue-700'
                             : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
@@ -205,11 +215,13 @@ const RegisterPage = () => {
                           onChange={handleChange}
                           className="sr-only"
                         />
-                        <span className={`mb-1 ${formData.role === r.value ? 'text-blue-600' : 'text-gray-400'}`}>
+                        <span className={`sm:mb-1 ${formData.role === r.value ? 'text-blue-600' : 'text-gray-400'}`}>
                           {r.icon}
                         </span>
-                        <span className="text-xs font-semibold">{r.label}</span>
-                        <span className="text-xs text-gray-400">{r.desc}</span>
+                        <div className="sm:text-center">
+                          <span className="text-xs font-semibold block">{r.label}</span>
+                          <span className="text-xs text-gray-400 hidden sm:block">{r.desc}</span>
+                        </div>
                       </label>
                     ))}
                   </div>
@@ -262,7 +274,7 @@ const RegisterPage = () => {
                     >
                       <option value="">{t('auth.register.selectUniversity')}</option>
                       {Object.entries(groupedByCity).map(([city, unis]) => (
-                        <optgroup key={city} label={`📍 ${city}`}>
+                        <optgroup key={city} label={city}>
                           {unis
                             .sort((a, b) => a.name.localeCompare(b.name, 'ru'))
                             .map((uni) => (
@@ -402,9 +414,9 @@ const RegisterPage = () => {
                   />
                   <label htmlFor="terms" className="text-sm text-gray-600">
                     {t('auth.register.iAccept')}{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">{t('auth.register.terms')}</a>
-                    {' '}и{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">{t('auth.register.privacy')}</a>
+                    <button type="button" onClick={() => setLegalModal('terms')} className="text-blue-600 hover:text-blue-700 font-medium underline-offset-2 hover:underline">{t('auth.register.terms')}</button>
+                    {' '}{t('auth.register.and')}{' '}
+                    <button type="button" onClick={() => setLegalModal('privacy')} className="text-blue-600 hover:text-blue-700 font-medium underline-offset-2 hover:underline">{t('auth.register.privacy')}</button>
                   </label>
                 </div>
 
@@ -439,6 +451,9 @@ const RegisterPage = () => {
         </div>
       </div>
     </div>
+
+    {legalModal && <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />}
+    </>
   );
 };
 

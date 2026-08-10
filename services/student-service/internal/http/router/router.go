@@ -29,6 +29,7 @@ func SetupRouter(sh *handler.StudentHandler, dh *handler.DocumentHandler, nh *ha
 		docs.GET("/my", dh.ListMy)
 		docs.GET("/student/:user_id", dh.ListByStudent)
 		docs.GET("/:id/download", dh.Download)
+		docs.GET("/pending-count", dh.PendingCount)
 		docs.PUT("/auto-verify/:user_id", dh.AutoVerify)
 		docs.PUT("/:id/verify", dh.Verify)
 		docs.PUT("/:id/reject", dh.Reject)
@@ -40,8 +41,10 @@ func SetupRouter(sh *handler.StudentHandler, dh *handler.DocumentHandler, nh *ha
 	{
 		notifs.GET("", nh.ListMy)
 		notifs.GET("/unread-count", nh.UnreadCount)
+		notifs.GET("/stream", nh.Stream)
 		notifs.PUT("/read-all", nh.MarkAllRead)
 		notifs.PUT("/:id/read", nh.MarkRead)
+		notifs.POST("/push-token", nh.SavePushToken)
 		// Internal endpoint called by API Gateway — no JWT check here (gateway already validated)
 		notifs.POST("/internal", nh.CreateInternal)
 	}

@@ -21,6 +21,17 @@
     "employees_count": "{{count}} employees",
     "notSpecified": "Not specified"
   },
+  "footer": {
+    "tagline": "A platform for student and graduate employment in Kazakhstan",
+    "sections": "Sections",
+    "home": "Home",
+    "jobs": "Jobs",
+    "login": "Log In",
+    "register": "Register",
+    "project": "Project",
+    "sourceCode": "Source code",
+    "rights": "All rights reserved."
+  },
   "nav": {
     "jobs": "Jobs",
     "myProfile": "My Profile",
@@ -32,6 +43,7 @@
     "notifications": "Notifications",
     "noNotifications": "No notifications",
     "markAllRead": "Mark all read",
+    "showAllNotifications": "Show all notifications",
     "loggedInAs": "Logged in as",
     "language": "Language"
   },
@@ -44,15 +56,31 @@
   "home": {
     "hero": {
       "title": "Find your dream job",
-      "subtitle": "Thousands of vacancies for students and graduates of Kazakhstan",
+      "subtitle": "Vacancies for students and graduates of Kazakhstan",
       "searchPlaceholder": "Position, keywords",
       "searchBtn": "Search",
       "register": "Sign Up",
-      "login": "Log In"
+      "login": "Log In",
+      "onlineStudents": "Connecting students and employers"
+    },
+    "stats": {
+      "offerRate": "Receive an offer"
+    },
+    "how": {
+      "title": "How it works",
+      "subtitle": "Three steps from profile to job",
+      "step1Title": "Create a profile",
+      "step1Text": "Add your skills, specialization and experience.",
+      "step2Title": "Find vacancies",
+      "step2Text": "Browse openings that match your profile.",
+      "step3Title": "Get hired",
+      "step3Text": "Apply and track responses from employers."
     },
     "categories": {
       "title": "Jobs by profession",
-      "openPositions": "open positions"
+      "openPositions": "open positions",
+      "subtitle": "Choose a field and explore fresh opportunities",
+      "all": "All categories"
     },
     "welcome": {
       "greeting": "Welcome, {{name}}!",
@@ -64,7 +92,7 @@
       "profileCompletion": "Profile completion",
       "fillProfile": "Fill in profile →",
       "myApplications": "My Applications",
-      "viewAll": "View all →",
+      "viewAll": "View all",
       "profileCard": "My Profile",
       "profileDesc": "Fill in your resume and info",
       "jobsCard": "Jobs",
@@ -74,19 +102,62 @@
       "recommended": "Recommended Jobs",
       "fillProfileForRec": "Fill in your profile to get personalized recommendations",
       "viewAllJobs": "View all jobs",
-      "match": "match"
+      "match": "match",
+      "grantTitle": "My Employment",
+      "grantSubtitle": "Progress of the 3-year grant obligation",
+      "complianceLabel": "My grant status",
+      "complianceDeadline": "Deadline"
     },
     "employer": {
       "subtitle": "Manage vacancies and find the best candidates",
       "title": "Employer Dashboard",
       "description": "Post jobs, browse candidates, and manage applications",
-      "goToDashboard": "Go to Dashboard"
+      "goToDashboard": "Go to Dashboard",
+      "stats": {
+        "activeVacancies": "Active vacancies",
+        "applications": "Total applications",
+        "newToday": "New today",
+        "interviews": "Interviews"
+      },
+      "recentTitle": "Recent applications",
+      "recentSubtitle": "Candidates with skill-match score",
+      "allApplications": "All applications",
+      "noVacancies": "You don't have any vacancies yet — post your first to start receiving applications",
+      "noApplications": "No applications to your vacancies yet",
+      "postVacancy": "Post a vacancy →",
+      "toVacancies": "To vacancies →",
+      "quickActions": "Quick actions",
+      "postVacancyAction": "Post a vacancy",
+      "postVacancyHint": "A new opening for candidates",
+      "reviewApplications": "Candidate applications",
+      "applicationsCount": "{{count}} total",
+      "myVacancies": "My vacancies",
+      "activeCount": "{{count}} active"
     },
     "university": {
       "subtitle": "Track graduate employment statistics",
       "title": "Employment Analytics",
       "description": "Full statistics on student employment and in-demand skills analysis",
-      "goToAnalytics": "Go to Analytics"
+      "goToAnalytics": "Go to Analytics",
+      "stats": {
+        "students": "Students",
+        "employed": "Employed",
+        "tracked": "Tracked",
+        "atRisk": "At risk"
+      },
+      "complianceTitle": "Grant obligations",
+      "complianceSubtitle": "Distribution of graduates by status — click for details",
+      "allDetails": "Details",
+      "complianceEmpty": "No graduate is being tracked for grant obligations yet",
+      "complianceEnroll": "Add graduates →",
+      "donutTotal": "total",
+      "quickActions": "Quick actions",
+      "verifyDocs": "Verify documents",
+      "pendingDocs": "{{count}} pending",
+      "riskZone": "Risk zone",
+      "riskCount": "{{count}} need attention",
+      "fullAnalytics": "Full analytics",
+      "fullAnalyticsHint": "Programs, employment, employers"
     },
     "categories_list": {
       "it": "IT & Development",
@@ -148,6 +219,7 @@
       "confirmPasswordPlaceholder": "Repeat password",
       "passwordsMismatch": "Passwords do not match",
       "iAccept": "I accept the",
+      "and": "and",
       "terms": "terms of service",
       "privacy": "privacy policy",
       "submitting": "Creating account...",
@@ -262,8 +334,8 @@
       "iin": "IIN",
       "graduationYear": "Graduation Year",
       "gpa": "GPA",
-      "diplomaVerified": "Diploma Verified ✅",
-      "diplomaNotVerified": "Diploma Not Verified",
+      "diplomaVerified": "Reference Confirmed ✅",
+      "diplomaNotVerified": "Reference Not Confirmed",
       "diplomaVerifiedHint": "Automatically verified on {{date}}",
       "diplomaNotVerifiedHint": "Fill in university, specialization and graduation year for automatic verification"
     },
@@ -305,6 +377,10 @@
       "errorSaving": "Error saving",
       "saveError": "Error saving profile. Please try again.",
       "tryUpdate": " — try updating the profile"
+    },
+    "stats": {
+      "completion": "Completion",
+      "diploma": "Reference"
     },
     "loading": "Loading profile...",
     "iinError": {
@@ -533,13 +609,25 @@
       "partTime": "Part-time",
       "internship": "Internship",
       "contract": "Contract",
+      "remote": "Remote",
       "location": "Location",
       "locationPlaceholder": "City...",
+      "city": "City",
+      "anyCity": "Any city",
       "salary": "Salary (₸)",
+      "salaryThousands": "Salary, k ₸",
       "salaryFrom": "from",
       "salaryTo": "to",
-      "resetFilters": "Reset Filters",
+      "skills": "Skills",
+      "applyFilters": "Apply Filters",
+      "resetFilters": "Reset",
+      "sortLabel": "Sort by:",
+      "sortRelevance": "Relevance",
+      "sortDate": "Date",
+      "sortSalaryDesc": "Salary ↓",
+      "sortSalaryAsc": "Salary ↑",
       "loading": "Loading jobs...",
+      "updatedRecently": "updated just now",
       "found": "Found",
       "vacanciesCount": "vacancies",
       "page": "Page {{page}} of {{total}}",
@@ -607,6 +695,7 @@
     "docsLoading": "Loading...",
     "noDocs": "No documents",
     "docVerifiedByUniversity": "Verified by University",
+    "docUploaded": "Uploaded",
     "docRejected": "Rejected",
     "docPending": "Pending",
     "identification": "Identification",
@@ -626,25 +715,9 @@
     "employerDashboard": "Employer Dashboard",
     "analytics": "Analytics"
   },
-  "sessions": {
-    "titles": {
-      "student": "Complete Your Student Profile",
-      "employer": "Complete Your Employer Profile",
-      "university": "Complete Your University Profile",
-      "default": "Complete Your Profile"
-    },
-    "descriptions": {
-      "student": "Provide your personal information to get started with finding opportunities",
-      "employer": "Enter your company details to start posting job opportunities",
-      "university": "Provide your university information to manage campus activities",
-      "default": "Complete your profile information"
-    },
-    "loggedInAs": "Logged in as",
-    "logout": "Logout",
-    "skip": "Skip for now"
-  },
   "docTypes": {
-    "cv": "CV / Resume",
+    "cv": "CV",
+    "diploma": "Reference",
     "certificate": "Certificate"
   },
   "industries": {
@@ -668,6 +741,15 @@
   },
   "employerDashboard": {
     "title": "Employer Dashboard",
+    "updatedNow": "updated just now",
+    "status": {
+      "applied": "Applied",
+      "review": "In review",
+      "shortlisted": "Shortlisted",
+      "interview": "Interview",
+      "offered": "Offered",
+      "rejected": "Rejected"
+    },
     "tabs": {
       "overview": "Overview",
       "jobs": "Jobs",
@@ -688,10 +770,17 @@
       "quickActions": "Quick Actions",
       "postJob": "Post a Job",
       "viewApplications": "View Applications",
-      "editProfile": "Edit Profile"
+      "editProfile": "Edit Profile",
+      "hiringFunnel": "Hiring Funnel"
+    },
+    "funnel": {
+      "submitted": "Submitted",
+      "review": "In Review",
+      "interview": "Interview",
+      "offered": "Offered"
     },
     "jobs": {
-      "postNew": "+ Post New Job",
+      "postNew": "Post New Job",
       "loading": "Loading jobs...",
       "empty": "You have no vacancies yet",
       "emptyHint": "Click the button above to publish your first vacancy",
@@ -714,7 +803,11 @@
       "viewProfile": "Profile →",
       "toInterview": "Invite to Interview",
       "accept": "Accept",
-      "reject": "Reject"
+      "reject": "Reject",
+      "fire": "Dismiss",
+      "fireConfirm": "Dismiss?",
+      "yes": "Yes",
+      "no": "No"
     },
     "companyProfile": {
       "title": "Company Profile",
@@ -800,6 +893,7 @@
     },
     "loggedInAs": "Logged in as",
     "logout": "Logout",
+    "skip": "Skip for now",
     "successMessage": "Profile created successfully!",
     "loading": "Loading..."
   },
@@ -809,12 +903,58 @@
     "loading": "Loading analytics...",
     "tabs": {
       "overview": "Overview",
+      "programs": "Programs",
       "myStudents": "My Students",
       "docReview": "Documents",
       "employment": "Employment",
+      "compliance": "Grant",
       "students": "Students",
       "employers": "Employers",
       "statistics": "Statistics"
+    },
+    "compliance": {
+      "states": {
+        "NotYetDue": "Not Yet Due",
+        "InProgress": "In Progress",
+        "Compliant": "Compliant",
+        "AtRisk": "At Risk",
+        "NonCompliant": "Non-Compliant",
+        "Exempt": "Exempt"
+      },
+      "atRiskTitle": "Require Attention",
+      "noAtRisk": "No students at risk",
+      "allTitle": "Grant Obligations",
+      "empty": "No tracked students yet",
+      "cols": {
+        "student": "Student",
+        "state": "Status",
+        "graduation": "Graduation",
+        "deadline": "Deadline",
+        "remaining": "Remaining",
+        "years": "Term"
+      },
+      "yearsShort": "yr.",
+      "untrackedTitle": "Not Tracked",
+      "untrackedHint": "Add grant students to track their obligation progress",
+      "enroll": "Track",
+      "enrolled": "Student added to tracking",
+      "enrolledMany": "Added to tracking: {{count}}",
+      "enrollSelected": "Track selected",
+      "selectAll": "Select all",
+      "searchPlaceholder": "Search by name...",
+      "noSearchResults": "No students found",
+      "allTracked": "All students are already tracked",
+      "noFilterResults": "No students with this status",
+      "filterActive": "filter",
+      "filterBanner": "Filter by status",
+      "filterCount": "records",
+      "clearFilter": "Clear",
+      "ofTotal": "of total",
+      "chartTitle": "Status Distribution",
+      "exportCsv": "CSV",
+      "overdue": "Overdue",
+      "today": "Today",
+      "daysShort": "d."
     },
     "stats": {
       "studentsTotal": "Students in system",
@@ -825,7 +965,9 @@
     "overview": {
       "applicationStatuses": "Student application statuses",
       "noApplicationData": "No application data yet",
-      "conversionRate": "Offer conversion rate",
+      "conversionRate": "Application-to-offer conversion rate",
+      "realEmploymentRate": "Actual employment rate",
+      "employedStudents": "{{employed}} of {{total}} students",
       "offersFromApplications": "{{offers}} offers from {{total}} applications",
       "vacanciesByLocation": "Vacancies by location",
       "noVacancies": "No vacancies yet"
@@ -854,8 +996,19 @@
       "download": "Download",
       "verify": "Verify",
       "reject": "Reject",
-      "specializationNotSet": "Specialization not specified"
+      "specializationNotSet": "Specialization not specified",
+      "verifiedAt": "Confirmed {{date}}",
+      "rejectedAt": "Rejected {{date}}",
+      "comment": "Reason: {{text}}"
     },
+    "rejectModal": {
+      "title": "Reason for rejection",
+      "placeholder": "Specify the reason (optional)...",
+      "confirm": "Reject",
+      "cancel": "Cancel"
+    },
+    "pendingAlert": "{{count}} students are awaiting reference verification",
+    "pendingAlertSingle": "{{count}} student is awaiting reference verification",
     "students": {
       "bySpecialization": "Students by specialization",
       "totalStudents": "({{total}} total)",
@@ -864,7 +1017,17 @@
     },
     "employers": {
       "vacanciesByType": "Vacancy distribution by type",
-      "percentageOfTotal": "{{percentage}}% of all vacancies"
+      "percentageOfTotal": "{{percentage}}% of all vacancies",
+      "companiesTitle": "Companies that hired students",
+      "companiesHint": "Based on employment monitoring data",
+      "noHires": "No employment data available",
+      "noHiresHint": "Go to 'Employment' tab to load the data",
+      "studentsHired": "{{count}} students",
+      "active": "currently working",
+      "completed": "completed",
+      "companyIndustry": "Industry",
+      "companyStudents": "Students",
+      "companyPositions": "Positions"
     },
     "statistics": {
       "demandedSkills": "Most demanded skills",
@@ -879,7 +1042,17 @@
         "offersReceived": "Received offers",
         "conversionRate": "Offer conversion rate",
         "uniqueSkills": "Unique skills in vacancies"
-      }
+      },
+      "employmentByProgram": "Employment by Program",
+      "employmentByProgramHint": "% of employed graduates per educational program",
+      "yearDynamics": "Dynamics by Graduation Year",
+      "yearDynamicsHint": "Number of students and % employed by graduation year",
+      "gpaDistribution": "GPA Distribution",
+      "gpaDistributionHint": "Number of students by academic performance ranges",
+      "noStudentData": "No student data available. Students will appear after registration.",
+      "employed": "employed",
+      "students": "students",
+      "paginationNote": "Known limitation: all students are loaded in a single request. For 500+ students, server-side pagination is recommended."
     },
     "status": {
       "applied": "Applied",
@@ -906,10 +1079,63 @@
       "docRejected": "Document rejected"
     },
     "autoVerify": {
-      "button": "Auto-verify diploma",
+      "button": "Auto-confirm reference",
       "success": "{{count}} document(s) verified automatically",
       "noPending": "No pending documents to verify",
       "error": "Failed to auto-verify documents"
+    },
+    "programs": {
+      "title": "Educational Programs",
+      "searchPlaceholder": "Search programs...",
+      "exportPdf": "PDF Report",
+      "exportCsv": "CSV",
+      "noData": "No data",
+      "noDataHint": "Students have not filled in their program in their profile yet",
+      "donutTotal": "total",
+      "cards": {
+        "totalStudents": "Total students",
+        "activePrograms": "Active programs",
+        "employed": "Employed",
+        "avgGpa": "Average GPA"
+      },
+      "columns": {
+        "students": "students",
+        "avgGpa": "avg. GPA",
+        "employed": "employed"
+      },
+      "table": {
+        "student": "Student",
+        "graduation": "Graduation",
+        "skills": "Skills",
+        "status": "Status",
+        "graduationYear": "Graduation Year"
+      },
+      "employedBadge": "✓ Employed",
+      "seekingBadge": "Job Seeking",
+      "unassignedWarning": "Students without program — {{count}} (needs to be filled)",
+      "allPrograms": "All available programs in the system",
+      "popupBlocked": "Please allow popups in your browser",
+      "studentSearchPlaceholder": "Search student...",
+      "noStudentsFound": "No students found",
+      "pendingDocsCount": "{{count}} pending review",
+      "pdf": {
+        "title": "University Student Report",
+        "generated": "Report generated:",
+        "totalStudents": "Total students",
+        "activePrograms": "Active programs",
+        "employed": "Employed",
+        "employmentRate": "Employment rate",
+        "avgGpa": "Average GPA",
+        "colStudent": "Student",
+        "colProgram": "Educational Program",
+        "colGpa": "GPA",
+        "colGraduation": "Graduation",
+        "colSkills": "Skills",
+        "colStatus": "Status",
+        "employedStatus": "✓ Employed",
+        "seekingStatus": "Job Seeking",
+        "footer": "Generated by student employment system"
+      }
     }
   },
   "interview": {
@@ -968,6 +1194,181 @@
     "endError": "Failed to end employment record",
     "errors": {
       "loadRecords": "Failed to load employment data"
+    }
+  },
+  "chat": {
+    "open": "Chat",
+    "send": "Send",
+    "placeholder": "Type a message...",
+    "enterHint": "Enter to send, Shift+Enter for new line",
+    "empty": "No messages yet. Start the conversation!",
+    "online": "Online",
+    "offline": "Offline",
+    "connecting": "Connecting...",
+    "employer": "Employer",
+    "student": "Student"
+  },
+  "notifications": {
+    "application_submitted": {
+      "title": "Application submitted ✅",
+      "body": "Your application has been successfully sent."
+    },
+    "application_status": {
+      "interview": {
+        "title": "Interview invitation 🎯",
+        "body": "The employer has invited you for an interview."
+      },
+      "shortlisted": {
+        "title": "You are shortlisted 📋",
+        "body": "Your candidacy has been added to the shortlist."
+      },
+      "offered": {
+        "title": "Job offer received! 🎉",
+        "body": "The employer has made you a job offer."
+      },
+      "rejected": {
+        "title": "Application rejected",
+        "body": "Unfortunately, your application was rejected."
+      }
+    },
+    "interview_scheduled": {
+      "title": "Interview invitation 📅",
+      "date": "Date:",
+      "location": "Location:",
+      "notes": "Notes:"
+    },
+    "chat_message": {
+      "title": "💬 New message",
+      "bodySender": "{{name}} wrote to you in chat",
+      "bodyForStudent": "The employer wrote to you in chat",
+      "bodyForEmployer": "The student replied to your message"
+    },
+    "document_verified": {
+      "title": "Document verified ✅",
+      "body": "Your document has been confirmed by the university."
+    },
+    "document_rejected": {
+      "title": "Document rejected ❌",
+      "body": "Your document has been rejected."
+    },
+    "compliance_at_risk": {
+      "title": "Grant obligation at risk ⚠️",
+      "body": "More than 3 months have passed since graduation without qualifying employment. Find a qualifying job before the deadline — otherwise repayment of tuition may be required under Article 47."
+    },
+    "time": {
+      "justNow": "just now",
+      "minutesAgo": "{{min}} min ago",
+      "hoursAgo": "{{h}} h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "{{d}} days ago"
+    }
+  },
+  "programNames": {
+    "softwareEngineering":         "Software Engineering",
+    "computerScience":             "Computer Science",
+    "bigDataAnalysis":             "Big Data Analysis",
+    "mathComputationalScience":    "Mathematical and Computational Science",
+    "cybersecurity":               "Cybersecurity",
+    "smartSecurityTechnologies":   "Smart Security Technologies",
+    "industrialIoT":               "Industrial Internet of Things",
+    "electronicEngineering":       "Electronic Engineering",
+    "smartTechnologies":           "Smart Technologies",
+    "digitalTechNuclearPower":     "Digital Technologies in Nuclear Power Engineering",
+    "itManagement":                "IT Management",
+    "itEntrepreneurship":          "IT Entrepreneurship",
+    "aiBusiness":                  "AI Business",
+    "mediaTechnologies":           "Media Technologies",
+    "digitalJournalism":           "Digital Journalism",
+    "digitalPublicAdministration": "Digital Public Administration",
+    "dataScience":                 "Data Science",
+    "informationSystems":          "Information Systems",
+    "mobileDevelopment":           "Mobile Development",
+    "artificialIntelligence":      "Artificial Intelligence",
+    "computerEngineering":         "Computer Engineering",
+    "webDevelopment":              "Web Development",
+    "appliedMathematics":          "Applied Mathematics"
+  },
+  "programSchools": {
+    "schoolSoftwareEngineering":   "School of Software Engineering",
+    "schoolAIDataScience":         "School of AI and Data Science",
+    "schoolCybersecurity":         "School of Cybersecurity",
+    "schoolIntelligentSystems":    "School of Intelligent Systems",
+    "schoolCreativeIndustries":    "School of Creative Industries",
+    "schoolDigitalGovernance":     "School of Digital Public Administration"
+  },
+  "legal": {
+    "understood": "Got it",
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: January 1, 2025",
+      "intro": "These Terms of Service govern your access to and use of CareerBond — an information system for student and graduate employment at Kazakhstani universities.",
+      "sections": [
+        {
+          "title": "Acceptance of Terms",
+          "text": "By registering on CareerBond, you agree to these Terms of Service. If you do not agree with any provision, please refrain from using the platform."
+        },
+        {
+          "title": "Description of Service",
+          "text": "CareerBond is a job and internship search platform for students and graduates of Kazakhstani educational institutions. Employers post vacancies, and students apply and track the status of their applications."
+        },
+        {
+          "title": "User Account",
+          "text": "You are responsible for the accuracy of information provided during registration. Creating multiple accounts or sharing account access with third parties is prohibited. Violation of these rules may result in account suspension."
+        },
+        {
+          "title": "Code of Conduct",
+          "text": "Users are prohibited from posting false, misleading, or offensive content. Using the platform for fraudulent or illegal purposes is strictly forbidden. Violations may result in account suspension."
+        },
+        {
+          "title": "Intellectual Property",
+          "text": "All materials and content on the CareerBond platform are protected by copyright. Copying or distributing materials without written permission from the administration is prohibited."
+        },
+        {
+          "title": "Limitation of Liability",
+          "text": "The platform is provided 'as is'. CareerBond is not responsible for employers' decisions regarding candidates, nor for any losses arising from the use of the platform."
+        },
+        {
+          "title": "Changes to Terms",
+          "text": "CareerBond reserves the right to modify these Terms. Users will be notified of significant changes by email or through in-app notifications."
+        }
+      ],
+      "contact": "For questions regarding these Terms of Service: support@careerbond.kz | CareerBond, Astana, Kazakhstan"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: January 1, 2025",
+      "intro": "This Privacy Policy describes what data CareerBond collects, how it is used and protected. We take the protection of users' personal data seriously.",
+      "sections": [
+        {
+          "title": "Data We Collect",
+          "text": "We collect: first and last name, email address, name of educational institution, role (student / employer / university), resume and application data, as well as technical session information (IP address, browser type)."
+        },
+        {
+          "title": "Purposes of Data Processing",
+          "text": "Personal data is used to: operate the platform, match relevant vacancies, send notifications and communications, conduct analytics to improve the service, and comply with the laws of the Republic of Kazakhstan."
+        },
+        {
+          "title": "Sharing Data with Third Parties",
+          "text": "We do not sell or share your data with third parties without your consent, except as required by law. Data is shared with employers only in the context of your job application."
+        },
+        {
+          "title": "Data Security",
+          "text": "We apply modern technical security measures: data encryption in transit (HTTPS/TLS), password storage in hashed form, access control, and regular security audits."
+        },
+        {
+          "title": "Data Retention",
+          "text": "Your data is stored for the duration of your account. After account deletion, data is removed within 30 days, unless otherwise required by law."
+        },
+        {
+          "title": "Your Rights",
+          "text": "You have the right to request access, correction, or deletion of your personal data. Please contact support. Requests will be processed within 10 business days."
+        },
+        {
+          "title": "Cookies",
+          "text": "The platform uses cookies for session management and analytics. You may disable cookies in your browser settings, but this may affect the functionality of some features."
+        }
+      ],
+      "contact": "For data protection inquiries: privacy@careerbond.kz | CareerBond, Astana, Kazakhstan"
     }
   }
 }

@@ -1,14 +1,21 @@
 package config
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"student-service/internal/models"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
+
+//go:embed migrations/*.sql
+var migrationsFS embed.FS
 
 func ConnectDatabase(cfg *Config) (*gorm.DB, error) {
 	gormConfig := &gorm.Config{
@@ -28,11 +35,35 @@ func ConnectDatabase(cfg *Config) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 
-	// Миграция моделей
-	if err := db.AutoMigrate(&models.Student{}, &models.Document{}, &models.Notification{}); err != nil {
+	if err := runMigrations(cfg.GetMigrateURL()); err != nil {
 		return nil, fmt.Errorf("ошибка миграции: %w", err)
 	}
 
+	// Keep AutoMigrate only for GORM internal schema tracking (no table creation)
+	_ = models.Student{}
+	_ = models.Document{}
+	_ = models.Notification{}
+
 	log.Println("✅ Подключение к student_db успешно")
 	return db, nil
+}
+
+func runMigrations(dsn string) error {
+	d, err := iofs.New(migrationsFS, "migrations")
+	if err != nil {
+		return fmt.Errorf("iofs: %w", err)
+	}
+
+	m, err := migrate.NewWithSourceInstance("iofs", d, dsn)
+	if err != nil {
+		return fmt.Errorf("migrate.New: %w", err)
+	}
+	defer m.Close()
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return fmt.Errorf("m.Up: %w", err)
+	}
+
+	log.Println("Миграции student-service выполнены успешно")
+	return nil
 }

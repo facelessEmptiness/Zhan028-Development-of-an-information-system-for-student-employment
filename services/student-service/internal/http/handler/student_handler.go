@@ -161,7 +161,7 @@ func toStudentResponse(s *models.Student) dto.StudentResponse {
 		FirstName:         s.FirstName,
 		LastName:          s.LastName,
 		IIN:               s.IIN,
-		Skills:            s.Skills,
+		Skills:            []string(s.Skills),
 		GPA:               s.GPA,
 		Specialization:    s.Specialization,
 		GraduationYear:    s.GraduationYear,

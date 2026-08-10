@@ -7,7 +7,6 @@ import (
 	"university-service/internal/config"
 	grpcserver "university-service/internal/grpc"
 	"university-service/internal/grpc/pb"
-	"university-service/internal/models"
 	"university-service/internal/repository"
 	"university-service/internal/service"
 
@@ -27,8 +26,8 @@ func main() {
 		log.Fatalf("db error: %v", err)
 	}
 
-	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.University{}); err != nil {
+	// 3. Run SQL migrations
+	if err := config.RunMigrations(cfg); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 
@@ -62,6 +61,12 @@ func main() {
 }
 
 func seedUniversities(svc service.UniversityService) {
+	existing, err := svc.GetAllUniversities()
+	if err == nil && len(existing) > 0 {
+		log.Printf("University seed skipped (%d universities already exist)", len(existing))
+		return
+	}
+
 	unis := []struct{ name, city, country, website string }{
 		{"Назарбаев Университет", "Астана", "Казахстан", "https://nu.edu.kz"},
 		{"Евразийский национальный университет им. Л.Н. Гумилёва", "Астана", "Казахстан", "https://enu.kz"},
@@ -73,12 +78,11 @@ func seedUniversities(svc service.UniversityService) {
 		{"Университет КИМЭП", "Алматы", "Казахстан", "https://kimep.kz"},
 		{"Университет Туран", "Алматы", "Казахстан", "https://turan-edu.kz"},
 		{"Карагандинский технический университет им. А. Сагинова", "Караганда", "Казахстан", "https://kstu.kz"},
+		{"Astana IT University", "Астана", "Казахстан", "https://astanait.edu.kz"},
 	}
 	for _, u := range unis {
-		_, err := svc.CreateUniversity(u.name, u.city, u.country, u.website)
-		if err != nil {
-			// already exists — skip silently
-			continue
+		if _, err := svc.CreateUniversity(u.name, u.city, u.country, u.website); err != nil {
+			log.Printf("seed: не удалось создать университет %q: %v", u.name, err)
 		}
 	}
 	log.Printf("University seed done (%d entries)", len(unis))

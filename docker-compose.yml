@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # =============== DATABASES ===============
   users-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: users-db
     environment:
       POSTGRES_DB: postgres
@@ -22,7 +22,7 @@ services:
       retries: 5
 
   employer-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: employer-db
     environment:
       POSTGRES_DB: employer_db
@@ -41,7 +41,7 @@ services:
       retries: 5
 
   student-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: student-db
     environment:
       POSTGRES_DB: student_db
@@ -60,7 +60,7 @@ services:
       retries: 5
 
   university-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: university-db
     environment:
       POSTGRES_DB: university_db
@@ -79,7 +79,7 @@ services:
       retries: 5
 
   application-db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: application-db
     environment:
       POSTGRES_DB: application_db
@@ -97,6 +97,41 @@ services:
       timeout: 5s
       retries: 5
 
+  # =============== OBJECT STORAGE ===============
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============== CACHE ===============
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - diploma-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # =============== MICROSERVICES ===============
   auth-service:
     build:
@@ -104,7 +139,7 @@ services:
       dockerfile: Dockerfile
     container_name: auth-service
     ports:
-      - "8081:8080"
+      - "8081:8081"
     environment:
       DB_HOST: users-db
       DB_PORT: 5432
@@ -112,14 +147,18 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: postgres
       JWT_SECRET: ${JWT_SECRET}
-      SERVICE_PORT: 8080
+      SERVER_PORT: 8081
       SMTP_HOST: smtp.gmail.com
       SMTP_PORT: "587"
       SMTP_USER: ${SMTP_USER}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_FROM: ${SMTP_FROM}
+      REDIS_URL: redis://redis:6379/0
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
       users-db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - diploma-network
@@ -142,11 +181,18 @@ services:
       GRPC_PORT: 50051
       SERVER_PORT: 8082
       JWT_SECRET: ${JWT_SECRET}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      MINIO_BUCKET: documents
+      MINIO_USE_SSL: "false"
     depends_on:
       student-db:
         condition: service_healthy
       auth-service:
         condition: service_started
+      minio:
+        condition: service_healthy
     networks:
       - diploma-network
     restart: unless-stopped
@@ -165,8 +211,11 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: employer_db
       GRPC_PORT: 50052
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       employer-db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - diploma-network
@@ -209,6 +258,8 @@ services:
       DB_NAME: application_db
       GRPC_PORT: 50054
       HTTP_PORT: 8083
+      COMPLIANCE_SCHEDULER_ENABLED: "true"
+      COMPLIANCE_SCHEDULER_INTERVAL: "24h"
     depends_on:
       application-db:
         condition: service_healthy
@@ -233,6 +284,7 @@ services:
       EMPLOYER_GRPC_URL: employer-service:50052
       UNIVERSITY_GRPC_URL: university-service:50053
       APPLICATION_GRPC_URL: application-service:50054
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
       - auth-service
       - student-service
@@ -267,3 +319,4 @@ volumes:
   employer-db-data:
   university-db-data:
   application-db-data:
+  minio-data:

@@ -24,7 +24,7 @@ type Document struct {
 	FileName   string     `gorm:"type:varchar(255);not null" json:"file_name"`
 	FileSize   int64      `gorm:"not null" json:"file_size"`
 	MimeType   string     `gorm:"type:varchar(100)" json:"mime_type"`
-	FileData   []byte     `gorm:"type:bytea;not null" json:"-"`
+	StorageKey string     `gorm:"type:varchar(500);not null" json:"-"` // MinIO object key
 	Status     string     `gorm:"type:varchar(20);default:'pending'" json:"status"`
 	VerifiedBy *uuid.UUID `gorm:"type:uuid" json:"verified_by,omitempty"`
 	VerifiedAt *time.Time `json:"verified_at,omitempty"`

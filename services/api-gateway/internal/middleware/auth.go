@@ -10,6 +10,13 @@ import (
 // AuthMiddleware - проверяет JWT токен
 func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Strip any client-supplied X-User-* headers before processing.
+		// This prevents header injection if a request bypasses JWT validation
+		// or reaches a downstream service directly.
+		c.Request.Header.Del("X-User-ID")
+		c.Request.Header.Del("X-User-Role")
+		c.Request.Header.Del("X-University-ID")
+
 		// 1. Получаем header Authorization
 		authHeader := c.GetHeader("Authorization")
 
@@ -63,6 +70,8 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 		role, ok := claims["role"].(string)
 		if !ok {
 			c.JSON(401, gin.H{"error": "Role not found in token"})
+			c.Abort()
+			return
 		}
 
 		// Extract optional university_id (only present for university-role users)

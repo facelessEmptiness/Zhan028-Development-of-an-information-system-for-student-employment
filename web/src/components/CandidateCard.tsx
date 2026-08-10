@@ -1,6 +1,8 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import MatchIndex from './MatchIndex';
+import Icon from './Icon';
 
 interface CandidateCardProps {
   id: number;
@@ -41,10 +43,16 @@ const CandidateCard = ({
   };
 
   const statusLabels = {
-    applied: `📝 ${t('candidate.status.applied')}`,
-    interview: `📅 ${t('candidate.status.interview')}`,
-    shortlisted: `⭐ ${t('candidate.status.shortlisted')}`,
-    rejected: `❌ ${t('candidate.status.rejected')}`,
+    applied: t('candidate.status.applied'),
+    interview: t('candidate.status.interview'),
+    shortlisted: t('candidate.status.shortlisted'),
+    rejected: t('candidate.status.rejected'),
+  };
+  const statusIcons: Record<string, React.ReactElement> = {
+    applied: <Icon name="clipboard-list" size={14} />,
+    interview: <Icon name="calendar" size={14} />,
+    shortlisted: <Icon name="check-circle" size={14} />,
+    rejected: <Icon name="x-circle" size={14} />,
   };
 
   return (
@@ -100,13 +108,13 @@ const CandidateCard = ({
           onClick={(e) => e.stopPropagation()}
           className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors text-center"
         >
-          📄 {t('common.download')}
+          <Icon name="document" size={14} className="inline-block mr-1" />{t('common.download')}
         </a>
         {status && (
           <div
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium border text-center ${statusColors[status]}`}
           >
-            {statusLabels[status]}
+            <span className="inline-flex items-center gap-1">{statusIcons[status]}{statusLabels[status]}</span>
           </div>
         )}
       </div>

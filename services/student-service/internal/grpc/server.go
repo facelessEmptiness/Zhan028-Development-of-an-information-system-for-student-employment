@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 	"errors"
+	"strings"
+
 	"student-service/internal/dto"
 	"student-service/internal/grpc/pb"
 	"student-service/internal/models"
@@ -45,10 +47,10 @@ func (s *StudentGRPCServer) CreateProfile(ctx context.Context, req *pb.CreatePro
 	})
 	if err != nil {
 		if errors.Is(err, service.ErrProfileAlreadyExists) {
-			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
 		if errors.Is(err, service.ErrIINAlreadyTaken) {
-			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create profile: %v", err)
 	}
@@ -207,7 +209,7 @@ func toProtoStudent(s *models.Student) *pb.StudentResponse {
 		LastName:       s.LastName,
 		Iin:            s.IIN,
 		UniversityId:   uniID,
-		Skills:         s.Skills,
+		Skills:         strings.Join([]string(s.Skills), ","),
 		CreatedAt:      s.CreatedAt.String(),
 		UpdatedAt:      s.UpdatedAt.String(),
 		Gpa:            s.GPA,

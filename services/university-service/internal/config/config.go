@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -47,8 +48,23 @@ func ConnectDatabase(cfg *Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("ошибка подключения к БД: %w", err)
 	}
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения SQL DB: %w", err)
+	}
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
 	log.Println("Подключение к базе данных установлено")
 	return db, nil
+}
+
+func (c *Config) GetMigrateURL() string {
+	return fmt.Sprintf(
+		"pgx5://%s:%s@%s:%s/%s?sslmode=%s",
+		c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName, c.DBSSLMode,
+	)
 }
 
 func getEnv(key, defaultValue string) string {

@@ -20,14 +20,8 @@ export interface Document {
   updated_at: string;
 }
 
-const TYPE_LABELS: Record<DocumentType, string> = {
-  cv: 'CV / Резюме',
-  diploma: 'Диплом',
-  certificate: 'Сертификат',
-};
-
-export const getTypeLabel = (type: string) =>
-  TYPE_LABELS[type as DocumentType] ?? type;
+export const getTypeKey = (type: string) =>
+  `docTypes.${type}`;
 
 export const documentService = {
   /** Student: upload a document */
@@ -99,6 +93,14 @@ export const documentService = {
     const res = await apiFetch(`${BASE}/auto-verify/${userId}`, { method: 'PUT' });
     if (!res.ok) throw new Error(`Ошибка ${res.status}`);
     return res.json();
+  },
+
+  /** University: count pending diploma docs for all university students */
+  pendingCount: async (): Promise<number> => {
+    const res = await apiFetch(`${BASE}/pending-count`);
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.count ?? 0;
   },
 
   /** Student: delete own document */

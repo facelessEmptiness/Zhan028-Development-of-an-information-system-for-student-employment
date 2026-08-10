@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"employer-service/internal/dto"
 	"employer-service/internal/service"
@@ -119,7 +120,7 @@ func (h *VacancyHandler) UpdateVacancy(c *gin.Context) {
 
 	vacancy, err := h.service.UpdateVacancy(id, employerID, &req)
 	if err != nil {
-		if err.Error() == "доступ запрещён" {
+		if errors.Is(err, service.ErrAccessDenied) {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
@@ -152,7 +153,7 @@ func (h *VacancyHandler) DeleteVacancy(c *gin.Context) {
 	}
 
 	if err := h.service.DeleteVacancy(id, employerID); err != nil {
-		if err.Error() == "доступ запрещён" {
+		if errors.Is(err, service.ErrAccessDenied) {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}

@@ -6,6 +6,8 @@ import (
 	"university-service/internal/repository"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
+	"gorm.io/gorm"
 )
 
 var (
@@ -38,7 +40,10 @@ func (s *universityService) CreateUniversity(name, city, country, website string
 	}
 
 	if err := s.repo.Create(university); err != nil {
-		return nil, ErrNameAlreadyTaken
+		if errors.Is(err, gorm.ErrDuplicatedKey) || isDuplicateKeyError(err) {
+			return nil, ErrNameAlreadyTaken
+		}
+		return nil, err
 	}
 	return university, nil
 }
@@ -50,7 +55,10 @@ func (s *universityService) GetAllUniversities() ([]models.University, error) {
 func (s *universityService) GetUniversityByID(id uuid.UUID) (*models.University, error) {
 	university, err := s.repo.GetByID(id)
 	if err != nil {
-		return nil, ErrUniversityNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrUniversityNotFound
+		}
+		return nil, err
 	}
 	return university, nil
 }
@@ -78,6 +86,13 @@ func (s *universityService) UpdateUniversity(id uuid.UUID, name, city, country, 
 		return nil, err
 	}
 	return university, nil
+}
+
+// isDuplicateKeyError detects Postgres unique-constraint violations (code 23505).
+// gorm.ErrDuplicatedKey is only set by some GORM dialects; pgconn covers Postgres.
+func isDuplicateKeyError(err error) bool {
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && pgErr.Code == "23505"
 }
 
 func (s *universityService) DeleteUniversity(id uuid.UUID) error {

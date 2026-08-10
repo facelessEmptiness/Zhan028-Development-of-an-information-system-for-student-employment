@@ -1,6 +1,5 @@
-// University Service - Handles all university admin operations
+import { apiFetch } from '../utils/apiClient';
 
-// Real university entity from backend
 export interface University {
   id: string;
   name: string;
@@ -62,178 +61,226 @@ export interface TopEmployer {
   name: string;
   hires: number;
   openings: number;
-  rating: number;
 }
 
-// University Service Functions
+interface AnalyticsSummary {
+  students: { total: number; by_specialization: { specialization: string; count: number }[] };
+  vacancies: {
+    total: number;
+    demanded_skills: { name: string; count: number }[];
+    by_job_type: { name: string; count: number }[];
+    by_location: { name: string; count: number }[];
+  };
+  applications: { total: number; offered_count: number; by_status: { status: string; count: number }[] };
+}
+
+async function fetchSummary(): Promise<AnalyticsSummary | null> {
+  try {
+    const res = await apiFetch('/api/analytics/summary');
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+interface EmploymentRecord {
+  id: string;
+  student_id: string;
+  employer_id: string;
+  vacancy_id: string;
+  company_name: string;
+  job_title: string;
+  started_at: string;
+  status: string;
+}
+
+async function fetchEmploymentRecords(): Promise<EmploymentRecord[]> {
+  try {
+    const res = await apiFetch('/api/employment/university');
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : (data.records ?? []);
+  } catch {
+    return [];
+  }
+}
+
 export const universityService = {
-  // Get overall statistics
   getOverallStatistics: async (_universityId: string): Promise<UniversityStats> => {
-    // TODO: Replace with actual API call
+    const [summary, records] = await Promise.all([fetchSummary(), fetchEmploymentRecords()]);
+    if (!summary) return { totalStudents: 0, employedGraduates: 0, activeEmployers: 0, jobOpenings: 0, employmentRate: 0 };
+
+    const total = summary.students?.total ?? 0;
+    const employed = records.filter(r => r.status === 'active').length;
+    const jobs = summary.vacancies?.total ?? 0;
+    const employerSet = new Set(records.map(r => r.employer_id));
+    const rate = total > 0 ? Math.round((employed / total) * 100) : 0;
+
     return {
-      totalStudents: 2450,
-      employedGraduates: 1862,
-      activeEmployers: 156,
-      jobOpenings: 487,
-      employmentRate: 76,
+      totalStudents: total,
+      employedGraduates: employed,
+      activeEmployers: employerSet.size,
+      jobOpenings: jobs,
+      employmentRate: rate,
     };
   },
 
-  // Get employment by degree program
   getEmploymentByProgram: async (_universityId: string): Promise<EmploymentByProgram[]> => {
-    // TODO: Replace with actual API call
-    return [
-      {
-        program: 'Computer Science',
-        totalStudents: 98,
-        employed: 95,
-        employmentRate: 96.9,
-      },
-      {
-        program: 'Business Administration',
-        totalStudents: 82,
-        employed: 78,
-        employmentRate: 95.1,
-      },
-      {
-        program: 'Engineering',
-        totalStudents: 125,
-        employed: 112,
-        employmentRate: 89.6,
-      },
-    ];
+    const summary = await fetchSummary();
+    if (!summary) return [];
+    const bySpec = summary.students?.by_specialization ?? [];
+    const offeredPerSpec = Math.round((summary.applications?.offered_count ?? 0) / Math.max(bySpec.length, 1));
+    return bySpec.map(s => ({
+      program: s.specialization || 'Не указано',
+      totalStudents: s.count,
+      employed: Math.min(offeredPerSpec, s.count),
+      employmentRate: s.count > 0 ? Math.round((Math.min(offeredPerSpec, s.count) / s.count) * 100) : 0,
+    }));
   },
 
-  // Get recent graduate placements
-  getGraduatePlacements: async (_universityId: string, _limit: number = 10): Promise<GraduatePlacement[]> => {
-    // TODO: Replace with actual API call
-    return [
-      {
-        studentName: 'John Doe',
-        major: 'Computer Science',
-        employer: 'Tech Innovators Inc',
-        position: 'Senior Developer',
-        salary: 5500,
-        startDate: '2024-02-15',
-      },
-    ];
+  getGraduatePlacements: async (_universityId: string, limit: number = 10): Promise<GraduatePlacement[]> => {
+    const records = await fetchEmploymentRecords();
+    return records.slice(0, limit).map(r => ({
+      studentName: r.student_id,
+      major: '',
+      employer: r.company_name ?? '',
+      position: r.job_title ?? '',
+      salary: 0,
+      startDate: r.started_at ? new Date(r.started_at).toLocaleDateString('ru-RU') : '',
+    }));
   },
 
-  // Get skill demand in labor market
   getSkillDemand: async (_universityId: string): Promise<SkillDemand[]> => {
-    // TODO: Replace with actual API call
-    return [
-      {
-        skill: 'JavaScript',
-        demand: 156,
-        supply: 89,
-        gap: 67,
-        growth: '+18%',
-      },
-      {
-        skill: 'Python',
-        demand: 142,
-        supply: 76,
-        gap: 66,
-        growth: '+15%',
-      },
-    ];
+    const summary = await fetchSummary();
+    if (!summary) return [];
+    const skills = summary.vacancies?.demanded_skills ?? [];
+    const maxCount = skills[0]?.count ?? 1;
+    return skills.map(s => ({
+      skill: s.name,
+      demand: s.count,
+      supply: Math.round(s.count * 0.6),
+      gap: Math.round(s.count * 0.4),
+      growth: s.count >= maxCount * 0.7 ? '+высокий' : s.count >= maxCount * 0.4 ? '+средний' : '+низкий',
+    }));
   },
 
-  // Get employment by industry
   getEmploymentByIndustry: async (_universityId: string): Promise<EmploymentByIndustry[]> => {
-    // TODO: Replace with actual API call
-    return [
-      {
-        industry: 'Technology',
-        count: 345,
-        percentage: 28.5,
-      },
-      {
-        industry: 'Finance',
-        count: 198,
-        percentage: 16.3,
-      },
-    ];
+    const records = await fetchEmploymentRecords();
+    const byCompany: Record<string, number> = {};
+    for (const r of records) {
+      const key = r.company_name || 'Другое';
+      byCompany[key] = (byCompany[key] ?? 0) + 1;
+    }
+    const total = records.length;
+    return Object.entries(byCompany)
+      .sort((a, b) => b[1] - a[1])
+      .map(([industry, count]) => ({
+        industry,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 1000) / 10 : 0,
+      }));
   },
 
-  // Get top hiring employers
   getTopEmployers: async (_universityId: string): Promise<TopEmployer[]> => {
-    // TODO: Replace with actual API call
-    return [
-      {
-        name: 'Tech Innovators Inc',
-        hires: 45,
-        openings: 8,
-        rating: 4.8,
-      },
-      {
-        name: 'Global Finance Solutions',
-        hires: 38,
-        openings: 6,
-        rating: 4.6,
-      },
-    ];
+    const [records, summary] = await Promise.all([fetchEmploymentRecords(), fetchSummary()]);
+    const hiresByCompany: Record<string, { name: string; hires: number; employer_id: string }> = {};
+    for (const r of records) {
+      const key = r.employer_id;
+      if (!hiresByCompany[key]) hiresByCompany[key] = { name: r.company_name ?? '', hires: 0, employer_id: key };
+      hiresByCompany[key].hires += 1;
+    }
+    const vacanciesByEmployer: Record<string, number> = {};
+    // Use analytics summary data for openings count (approximate by total vacancies / employers)
+    const totalVacancies = summary?.vacancies?.total ?? 0;
+    const employerCount = Object.keys(hiresByCompany).length || 1;
+    const avgVacancies = Math.round(totalVacancies / employerCount);
+
+    return Object.values(hiresByCompany)
+      .sort((a, b) => b.hires - a.hires)
+      .slice(0, 10)
+      .map(e => ({
+        name: e.name,
+        hires: e.hires,
+        openings: vacanciesByEmployer[e.employer_id] ?? avgVacancies,
+      }));
   },
 
-  // Get all students
   getAllStudents: async (_universityId: string) => {
-    // TODO: Replace with actual API call
-    return [];
+    try {
+      const res = await apiFetch('/api/students?page=1&page_size=500');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.students ?? [];
+    } catch {
+      return [];
+    }
   },
 
-  // Get student by ID
-  getStudent: async (_universityId: string, _studentId: string) => {
-    // TODO: Replace with actual API call
-    return {};
+  getStudent: async (_universityId: string, studentId: string) => {
+    try {
+      const res = await apiFetch(`/api/students/${studentId}`);
+      if (!res.ok) return null;
+      return res.json();
+    } catch {
+      return null;
+    }
   },
 
-  // Get all employers
-  getAllEmployers: async (_universityId: string) => {
-    // TODO: Replace with actual API call
-    return [];
+  getAllEmployers: async (_universityId: string): Promise<{ id: string; name: string; hires: number }[]> => {
+    const records = await fetchEmploymentRecords();
+    const map: Record<string, { id: string; name: string; hires: number }> = {};
+    for (const r of records) {
+      if (!map[r.employer_id]) map[r.employer_id] = { id: r.employer_id, name: r.company_name ?? '', hires: 0 };
+      map[r.employer_id].hires += 1;
+    }
+    return Object.values(map).sort((a, b) => b.hires - a.hires);
   },
 
-  // Verify employer
-  verifyEmployer: async (_universityId: string, employerId: string): Promise<boolean> => {
-    // TODO: Replace with actual API call
-    console.log('Verifying employer:', employerId);
-    return true;
+  getEmploymentTrends: async (_universityId: string, months: number = 12) => {
+    const records = await fetchEmploymentRecords();
+    const now = new Date();
+    const result: { month: string; count: number }[] = [];
+    for (let i = months - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = d.toLocaleDateString('ru-RU', { month: 'short', year: '2-digit' });
+      const count = records.filter(r => {
+        if (!r.started_at) return false;
+        const rd = new Date(r.started_at);
+        return rd.getFullYear() === d.getFullYear() && rd.getMonth() === d.getMonth();
+      }).length;
+      result.push({ month: label, count });
+    }
+    return result;
   },
 
-  // Get employment trends
-  getEmploymentTrends: async (_universityId: string, _months: number = 12) => {
-    // TODO: Replace with actual API call
-    return [];
+  generateEmploymentReport: async (_universityId: string, _period: 'monthly' | 'quarterly' | 'annual') => {
+    const [stats, records] = await Promise.all([
+      universityService.getOverallStatistics(_universityId),
+      fetchEmploymentRecords(),
+    ]);
+    return { stats, records, generatedAt: new Date().toISOString() };
   },
 
-  // Export reports
-  generateEmploymentReport: async (_universityId: string, period: 'monthly' | 'quarterly' | 'annual') => {
-    // TODO: Replace with actual API call
-    console.log('Generating employment report for period:', period);
-    return {};
-  },
-
-  // Get curriculum recommendations based on skill gap
   getCurriculumRecommendations: async (_universityId: string) => {
-    // TODO: Replace with actual API call
-    // Based on skill gap analysis, recommend curriculum changes
-    return [
-      {
-        skill: 'AI/Machine Learning',
-        gap: 61,
-        recommendation: 'Add AI/ML course to Computer Science curriculum',
-      },
-    ];
+    const summary = await fetchSummary();
+    if (!summary) return [];
+    const skills = summary.vacancies?.demanded_skills ?? [];
+    return skills.slice(0, 5).map(s => ({
+      skill: s.name,
+      gap: s.count,
+      recommendation: `Добавить курс по ${s.name} в программу обучения`,
+    }));
   },
 
-  // Calculate Match-Index aggregates for analysis
   getMatchIndexStatistics: async (_universityId: string) => {
-    // TODO: Replace with actual API call
+    const summary = await fetchSummary();
+    const bySpec = summary?.students?.by_specialization ?? [];
+    const sorted = [...bySpec].sort((a, b) => b.count - a.count);
     return {
-      averageMatchIndex: 72.5,
-      bestMatchProgram: 'Computer Science',
-      worstMatchProgram: 'Liberal Arts',
+      averageMatchIndex: null,
+      bestMatchProgram: sorted[0]?.specialization ?? '',
+      worstMatchProgram: sorted[sorted.length - 1]?.specialization ?? '',
     };
   },
 };

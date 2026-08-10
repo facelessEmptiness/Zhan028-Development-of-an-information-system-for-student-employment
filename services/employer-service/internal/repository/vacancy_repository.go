@@ -4,15 +4,19 @@ import (
 	"employer-service/internal/models"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
 type SearchParams struct {
-	Search   string
-	JobType  string
-	Location string
-	Page     int
-	PageSize int
+	Search    string
+	JobType   string
+	Location  string
+	Skills    []string
+	SalaryMin int
+	SalaryMax int
+	Page      int
+	PageSize  int
 }
 
 type VacancyRepository interface {
@@ -41,13 +45,26 @@ func (r *vacancyRepository) Search(params SearchParams) ([]models.Vacancy, int64
 
 	if params.Search != "" {
 		like := "%" + params.Search + "%"
-		query = query.Where("title ILIKE ? OR description ILIKE ? OR skills ILIKE ?", like, like, like)
+		query = query.Where(
+			"title ILIKE ? OR description ILIKE ? OR EXISTS (SELECT 1 FROM unnest(skills) s WHERE s ILIKE ?)",
+			like, like, like,
+		)
 	}
 	if params.JobType != "" {
 		query = query.Where("job_type = ?", params.JobType)
 	}
 	if params.Location != "" {
 		query = query.Where("location ILIKE ?", "%"+params.Location+"%")
+	}
+	if len(params.Skills) > 0 {
+		// All requested skills must be present in the vacancy's skills array
+		query = query.Where("skills @> ?", pq.Array(params.Skills))
+	}
+	if params.SalaryMin > 0 {
+		query = query.Where("salary_min >= ?", params.SalaryMin)
+	}
+	if params.SalaryMax > 0 {
+		query = query.Where("salary_max > 0 AND salary_max <= ?", params.SalaryMax)
 	}
 
 	var total int64

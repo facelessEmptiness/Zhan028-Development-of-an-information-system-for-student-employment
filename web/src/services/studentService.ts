@@ -120,37 +120,91 @@ export const studentService = {
     return res.json();
   },
 
-  // Get student applications
+  // Get student applications — delegates to applicationService
   getApplications: async (_studentId: string): Promise<StudentApplication[]> => {
-    return [];
+    try {
+      const res = await apiFetch(`${API_BASE}/applications/my`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      const apps = Array.isArray(data) ? data : (data.applications ?? []);
+      return apps.map((a: {
+        id: string; vacancy_id: string; status: string; match_score: number; created_at: string;
+      }) => ({
+        id: parseInt(a.id),
+        jobId: parseInt(a.vacancy_id),
+        jobTitle: '',
+        company: '',
+        appliedDate: new Date(a.created_at).toLocaleDateString('ru-RU'),
+        status: a.status as StudentApplication['status'],
+        matchIndex: a.match_score ?? 0,
+      }));
+    } catch {
+      return [];
+    }
   },
 
-  // Apply for a job
+  // Apply for a job — delegates to applicationService
   applyForJob: async (_studentId: string, jobId: number, coverLetter: string): Promise<boolean> => {
-    console.log('Applying for job:', jobId, 'with cover letter:', coverLetter);
-    return true;
+    try {
+      const res = await apiFetch(`${API_BASE}/applications`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vacancy_id: String(jobId), cover_letter: coverLetter }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
   },
 
-  // Get resumes
+  // Get resumes (documents uploaded as CV)
   getResumes: async (_studentId: string): Promise<Resume[]> => {
-    return [];
+    try {
+      const res = await apiFetch(`${API_BASE}/documents`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      const docs = Array.isArray(data) ? data : (data.documents ?? []);
+      return docs
+        .filter((d: { type: string }) => d.type === 'cv' || d.type === 'resume')
+        .map((d: { id: string; file_name: string; created_at: string; status: string }, idx: number) => ({
+          id: parseInt(d.id) || idx + 1,
+          name: d.file_name,
+          url: `${API_BASE}/documents/${d.id}/download`,
+          uploadedDate: new Date(d.created_at).toLocaleDateString('ru-RU'),
+          isPrimary: idx === 0,
+        }));
+    } catch {
+      return [];
+    }
   },
 
-  // Upload resume
+  // Upload resume — delegates to documentService
   uploadResume: async (_studentId: string, file: File): Promise<Resume> => {
-    console.log('Uploading resume:', file.name);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'cv');
+    const res = await apiFetch(`${API_BASE}/documents/upload`, { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('Ошибка загрузки файла');
+    const d = await res.json();
     return {
-      id: 2,
-      name: file.name,
-      url: '#',
-      uploadedDate: new Date().toISOString().split('T')[0],
+      id: parseInt(d.id) || 1,
+      name: d.file_name || file.name,
+      url: `${API_BASE}/documents/${d.id}/download`,
+      uploadedDate: new Date().toLocaleDateString('ru-RU'),
       isPrimary: false,
     };
   },
 
   // List students for university admin (filtered by their university_id automatically)
-  listByUniversity: async (): Promise<{ students: BackendStudentProfile[]; total: number }> => {
-    const res = await apiFetch(`${API_BASE}/students`);
+  listByUniversity: async (pageSize = 500): Promise<{ students: BackendStudentProfile[]; total: number }> => {
+    const res = await apiFetch(`${API_BASE}/students?page=1&page_size=${pageSize}`);
+    if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+    return res.json();
+  },
+
+  // Get any student by their auth user_id (for university/employer lookup)
+  getById: async (userId: string): Promise<BackendStudentProfile> => {
+    const res = await apiFetch(`${API_BASE}/students/${userId}`);
     if (!res.ok) throw new Error(`Ошибка ${res.status}`);
     return res.json();
   },
@@ -159,8 +213,7 @@ export const studentService = {
     return [];
   },
 
-  saveJob: async (_studentId: string, jobId: number): Promise<boolean> => {
-    console.log('Saving job:', jobId);
+  saveJob: async (_studentId: string, _jobId: number): Promise<boolean> => {
     return true;
   },
 

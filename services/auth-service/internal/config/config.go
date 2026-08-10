@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -31,6 +32,12 @@ type Config struct {
 	SMTPUser     string
 	SMTPPassword string
 	SMTPFrom     string
+
+	// Redis
+	RedisURL string
+
+	// CORS
+	AllowedOrigins []string
 }
 
 // LoadConfig загружает конфигурацию из переменных окружения
@@ -46,7 +53,9 @@ func LoadConfig() (*Config, error) {
 		DBPassword: getEnv("DB_PASSWORD", "admin"),
 		DBName:     getEnv("DB_NAME", "postgres"),
 		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
-		JWTSecret:    getEnv("JWT_SECRET", "some_jwt_secret"),
+		JWTSecret:      getEnv("JWT_SECRET", "some_jwt_secret"),
+		RedisURL:       getEnv("REDIS_URL", "redis://localhost:6379/0"),
+		AllowedOrigins: strings.Split(getEnv("ALLOWED_ORIGINS", "http://localhost:3000"), ","),
 		SMTPHost:     getEnv("SMTP_HOST", "smtp.gmail.com"),
 		SMTPPort:     getEnv("SMTP_PORT", "587"),
 		SMTPUser:     getEnv("SMTP_USER", ""),
@@ -74,6 +83,14 @@ func (c *Config) GetDSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName, c.DBSSLMode,
+	)
+}
+
+// GetMigrateURL возвращает URL для golang-migrate
+func (c *Config) GetMigrateURL() string {
+	return fmt.Sprintf(
+		"pgx5://%s:%s@%s:%s/%s?sslmode=%s",
+		c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName, c.DBSSLMode,
 	)
 }
 

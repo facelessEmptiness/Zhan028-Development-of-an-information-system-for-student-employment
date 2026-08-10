@@ -43,7 +43,7 @@ func (h *InterviewHandler) Schedule(c *gin.Context) {
 	}
 
 	// Decode to get student_id for notification
-	var reqData map[string]interface{}
+	var reqData map[string]any
 	if err := json.Unmarshal(body, &reqData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON"})
 		return
@@ -76,18 +76,15 @@ func (h *InterviewHandler) Schedule(c *gin.Context) {
 		location, _ := reqData["location"].(string)
 
 		if studentID != "" {
-			// Parse scheduled_at to a human-readable format
-			notifBody := "Дата: " + formatScheduledAt(scheduledAt)
-			if location != "" {
-				notifBody += ", Место: " + location
-			}
+			// Store as pipe-separated locale-neutral format: "date|location|notes"
+			notifBody := formatScheduledAt(scheduledAt) + "|" + location
 			notes, _ := reqData["notes"].(string)
 			if notes != "" {
-				notifBody += ". " + notes
+				notifBody += "|" + notes
 			}
 
 			// Parse the created interview ID for related_id
-			var createdInterview map[string]interface{}
+			var createdInterview map[string]any
 			relatedID := ""
 			if json.Unmarshal(respBody, &createdInterview) == nil {
 				if id, ok := createdInterview["id"].(string); ok {
@@ -127,11 +124,6 @@ func (h *InterviewHandler) GetByApplication(c *gin.Context) {
 // DELETE /api/interviews/:id - employer cancels an interview
 func (h *InterviewHandler) Cancel(c *gin.Context) {
 	id := c.Param("id")
-
-	// Get the interview first to find student_id for notification
-	getURL := fmt.Sprintf("%s/api/interviews/application/placeholder", h.appServiceURL)
-	_ = getURL // We'll notify after cancel
-
 	h.proxyToAppService(c, "DELETE", "/api/interviews/"+id)
 }
 

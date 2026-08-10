@@ -31,7 +31,7 @@ export default function NotFoundPage() {
 
         {/* Big 404 */}
         <div className="relative mb-8">
-          <span className="text-[160px] font-black text-blue-100 leading-none select-none">
+          <span className="text-[90px] sm:text-[140px] font-black text-blue-100 leading-none select-none">
             404
           </span>
           <div className="absolute inset-0 flex items-center justify-center">

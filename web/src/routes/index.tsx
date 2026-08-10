@@ -15,6 +15,7 @@ import {
   VerifyEmailPage,
   ForgotPasswordPage,
   ResetPasswordPage,
+  AdminPage,
 } from '../pages';
 import { AuthProvider } from '../context';
 import { ProtectedRoute } from '../components';
@@ -76,7 +77,7 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <RoleBasedRoute allowedRoles={['student']}>
-              <StudentProfilePage />
+              <StudentProfilePage initialTab="applications" />
             </RoleBasedRoute>
           </ProtectedRoute>
         ),
@@ -109,8 +110,19 @@ const router = createBrowserRouter([
         path: '/analytics',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['university', 'admin']}>
+            <RoleBasedRoute allowedRoles={['university']}>
               <UniversityAnalyticsPage />
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      // System admin route
+      {
+        path: '/admin',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminPage />
             </RoleBasedRoute>
           </ProtectedRoute>
         ),

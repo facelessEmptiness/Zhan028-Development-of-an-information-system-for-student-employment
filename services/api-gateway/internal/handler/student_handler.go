@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"api-gateway/internal/grpc/studentpb"
@@ -126,12 +127,21 @@ func (h *StudentHandler) proxyToStudentHTTP(c *gin.Context, method, path string,
 	c.Data(resp.StatusCode, "application/json", respBody)
 }
 
-// GET /api/students — university users see their own students only
+// GET /api/students — university users see their own students (paginated)
 func (h *StudentHandler) ListStudentsByUniversity(c *gin.Context) {
 	universityID := c.GetHeader("X-University-ID")
 	if universityID == "" {
 		c.JSON(http.StatusForbidden, gin.H{"error": "university_id required"})
 		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "100"))
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 500 {
+		pageSize = 100
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -146,7 +156,7 @@ func (h *StudentHandler) ListStudentsByUniversity(c *gin.Context) {
 		return
 	}
 
-	var students []interface{}
+	var all []any
 	for {
 		student, err := stream.Recv()
 		if err == io.EOF {
@@ -156,13 +166,29 @@ func (h *StudentHandler) ListStudentsByUniversity(c *gin.Context) {
 			handleGRPCError(c, err)
 			return
 		}
-		students = append(students, student)
+		all = append(all, student)
 	}
 
-	if students == nil {
-		students = []interface{}{}
+	total := len(all)
+	start := (page - 1) * pageSize
+	end := start + pageSize
+	if start > total {
+		start = total
 	}
-	c.JSON(http.StatusOK, gin.H{"students": students, "total": len(students)})
+	if end > total {
+		end = total
+	}
+
+	pageData := all[start:end]
+	if pageData == nil {
+		pageData = []any{}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"students":  pageData,
+		"total":     total,
+		"page":      page,
+		"page_size": pageSize,
+	})
 }
 
 func handleGRPCError(c *gin.Context, err error) {

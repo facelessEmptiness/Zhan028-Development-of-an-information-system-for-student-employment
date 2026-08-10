@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "160123192142",
+    "project_id": "careerbond",
+    "storage_bucket": "careerbond.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:160123192142:android:0b5422c0e661283f25941f",
+        "android_client_info": {
+          "package_name": "kz.careerbond.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCihpiIw1Qh9Lt4qWD2sTfva5XYF-ysZwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

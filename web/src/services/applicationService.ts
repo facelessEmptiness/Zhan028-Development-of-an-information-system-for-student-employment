@@ -6,7 +6,7 @@ export interface Application {
   id: string;
   student_id: string;
   vacancy_id: string;
-  status: 'applied' | 'interview' | 'shortlisted' | 'rejected' | 'offered';
+  status: 'applied' | 'review' | 'shortlisted' | 'interview' | 'offered' | 'rejected';
   cover_letter: string;
   match_score: number;
   created_at: string;

@@ -184,7 +184,11 @@ func (h *InterviewHandler) Cancel(c *gin.Context) {
 		return
 	}
 
-	empID, _ := uuid.Parse(employerID)
+	empID, err := uuid.Parse(employerID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user id"})
+		return
+	}
 	if interview.EmployerID != empID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "you can only cancel your own interviews"})
 		return

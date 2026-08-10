@@ -9,8 +9,10 @@ import (
 	"api-gateway/internal/handler"
 	"api-gateway/internal/middleware"
 	"api-gateway/internal/proxy"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -43,20 +45,23 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	notifClient := handler.NewNotificationClient(cfg.DocumentServiceUrl)
 
 	studentHandler := handler.NewStudentHandler(studentClient, cfg.DocumentServiceUrl)
-	vacancyHandler := handler.NewVacancyHandler(vacancyClient)
+	vacancyHandler := handler.NewVacancyHandler(vacancyClient, studentClient)
 	universityHandler := handler.NewUniversityHandler(universityClient)
 	applicationHandler := handler.NewApplicationHandler(applicationClient, studentClient, vacancyClient, notifClient, cfg.ApplicationServiceHttpUrl)
 	employerProfileHandler := handler.NewEmployerProfileHandler(vacancyClient)
 	analyticsHandler := handler.NewAnalyticsHandler(studentClient, vacancyClient, applicationClient)
 	interviewHandler := handler.NewInterviewHandler(cfg.ApplicationServiceHttpUrl, notifClient)
 	employmentHandler := handler.NewEmploymentHandler(cfg.ApplicationServiceHttpUrl)
+	chatHandler := handler.NewChatHandler(cfg.ApplicationServiceHttpUrl, notifClient, vacancyClient, studentClient)
+	wsChatProxy := handler.NewWSChatProxy(cfg, chatHandler.NotifyRecipient)
 
 	api := r.Group("/api")
 
 	// ============================================
-	// AUTH SERVICE - REST proxy
+	// AUTH SERVICE - REST proxy (rate-limited: 10 req/min per IP)
 	// ============================================
-	api.Any("/auth/*path", proxy.NewServiceProxy(cfg.AuthServiceUrl))
+	authLimiter := middleware.NewRateLimiter(rate.Every(6*time.Second), 10)
+	api.Any("/auth/*path", authLimiter.Middleware(), proxy.NewServiceProxy(cfg.AuthServiceUrl))
 
 	// ============================================
 	// DOCUMENT SERVICE - REST proxy
@@ -70,8 +75,11 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	// ============================================
 	notifAuth := middleware.AuthMiddleware(cfg.JWTSecret)
 	notifProxy := proxy.NewServiceProxy(cfg.DocumentServiceUrl)
+	notifStreamProxy := proxy.NewStreamingProxy(cfg.DocumentServiceUrl)
 	api.GET("/notifications", notifAuth, notifProxy)
 	api.GET("/notifications/unread-count", notifAuth, notifProxy)
+	api.GET("/notifications/stream", notifAuth, notifStreamProxy)
+	api.POST("/notifications/push-token", notifAuth, notifProxy)
 	api.PUT("/notifications/read-all", notifAuth, notifProxy)
 	api.PUT("/notifications/:id/read", notifAuth, notifProxy)
 
@@ -136,6 +144,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		applications.POST("", applicationHandler.Apply)
 		applications.GET("/my", applicationHandler.GetMyApplications)
 		applications.GET("/vacancy/:vacancy_id", applicationHandler.GetVacancyApplications)
+		applications.GET("/:id", applicationHandler.GetByID)
 		applications.PUT("/:id/status", applicationHandler.UpdateStatus)
 		applications.DELETE("/:id", applicationHandler.Withdraw)
 	}
@@ -159,7 +168,25 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	{
 		employment.GET("/student", employmentHandler.GetForStudent)
 		employment.GET("/university", employmentHandler.GetForUniversity)
+		employment.GET("/employer", employmentHandler.GetForEmployer)
 		employment.PUT("/:id/end", employmentHandler.End)
+		employment.PUT("/end-by-application/:application_id", employmentHandler.EndByApplicationID)
+	}
+
+	// ============================================
+	// COMPLIANCE - proxied to application-service HTTP
+	// Auth middleware injects X-User-ID/Role/University-ID; application-service
+	// enforces all role checks and per-university scoping downstream.
+	// ============================================
+	api.Any("/compliance/*path", middleware.AuthMiddleware(cfg.JWTSecret), proxy.NewServiceProxy(cfg.ApplicationServiceHttpUrl))
+
+	// ============================================
+	// CHAT - proxied to application-service HTTP
+	// ============================================
+	chatRoutes := api.Group("/chat", middleware.AuthMiddleware(cfg.JWTSecret))
+	{
+		chatRoutes.GET("/:application_id", chatHandler.GetMessages)
+		chatRoutes.POST("/:application_id", chatHandler.SendMessage)
 	}
 
 	// ============================================
@@ -169,6 +196,11 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 	{
 		analytics.GET("/summary", analyticsHandler.GetSummary)
 	}
+
+	// ============================================
+	// WebSocket chat (auth via ?token=<jwt> query param)
+	// ============================================
+	r.GET("/ws/chat/:application_id", wsChatProxy.ProxyChat)
 
 	// ============================================
 	// Health check

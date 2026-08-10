@@ -215,7 +215,7 @@ export const StudentProfileForm = ({ onSubmit, isLoading = false }: StudentProfi
           >
             <option value="" className="bg-slate-800 text-gray-400">{t('auth.register.selectUniversity')}</option>
             {Object.entries(groupedByCity).map(([city, unis]) => (
-              <optgroup key={city} label={`📍 ${city}`} className="bg-slate-800">
+              <optgroup key={city} label={city} className="bg-slate-800">
                 {unis.sort((a, b) => a.name.localeCompare(b.name, 'ru')).map((uni) => (
                   <option key={uni.id} value={uni.id} className="bg-slate-800 text-white">
                     {uni.name}

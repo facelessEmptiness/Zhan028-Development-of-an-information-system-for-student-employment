@@ -1,0 +1,51 @@
+// CareerBond icons — paste-ready module
+export const STROKE_ICONS = {
+  "home": "<path d=\"M3.5 10.5 12 3l8.5 7.5\"/><path d=\"M5.5 9.7V19a1.5 1.5 0 0 0 1.5 1.5h3.5v-5h3v5H17a1.5 1.5 0 0 0 1.5-1.5V9.7\"/>",
+  "briefcase": "<rect x=\"3\" y=\"7.5\" width=\"18\" height=\"13\" rx=\"2\"/><path d=\"M8 7.5V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1.5\"/><path d=\"M3 13.5h18\"/><path d=\"M11 12.5v2h2v-2\"/>",
+  "clipboard-list": "<path d=\"M9 4.5h6a1 1 0 0 1 1 1v1.5H8V5.5a1 1 0 0 1 1-1Z\"/><path d=\"M8 6H6.5A1.5 1.5 0 0 0 5 7.5V20a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 20V7.5A1.5 1.5 0 0 0 17.5 6H16\"/><path d=\"M9 11.5h6\"/><path d=\"M9 15.5h4\"/>",
+  "chat": "<path d=\"M20.5 11.5c0 4-3.8 7.2-8.5 7.2-1.2 0-2.3-.2-3.4-.6L4 19.5l1.3-3.6A7 7 0 0 1 3.5 11.5C3.5 7.5 7.3 4.3 12 4.3s8.5 3.2 8.5 7.2Z\"/><path d=\"M9 11.5h.01\"/><path d=\"M12 11.5h.01\"/><path d=\"M15 11.5h.01\"/>",
+  "user": "<circle cx=\"12\" cy=\"8.5\" r=\"3.5\"/><path d=\"M5 20c.5-3.5 3.5-5.5 7-5.5s6.5 2 7 5.5\"/>",
+  "calendar": "<rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15.5\" rx=\"2\"/><path d=\"M3.5 9.8h17\"/><path d=\"M8 3.5v3\"/><path d=\"M16 3.5v3\"/><path d=\"M12 14.5h.01\"/><path d=\"M8 14.5h.01\"/><path d=\"M16 14.5h.01\"/><path d=\"M12 17.5h.01\"/><path d=\"M8 17.5h.01\"/>",
+  "building": "<path d=\"M5 20.5V5.5A2 2 0 0 1 7 3.5h10a2 2 0 0 1 2 2v15\"/><path d=\"M3.5 20.5h17\"/><path d=\"M9.5 7.5h1\"/><path d=\"M13.5 7.5h1\"/><path d=\"M9.5 11h1\"/><path d=\"M13.5 11h1\"/><path d=\"M9.5 14.5h1\"/><path d=\"M13.5 14.5h1\"/><path d=\"M10.5 20.5v-3a1.5 1.5 0 0 1 3 0v3\"/>",
+  "chart-bar": "<path d=\"M3.5 20.5h17\"/><rect x=\"5.5\" y=\"13\" width=\"3\" height=\"6.5\" rx=\".5\"/><rect x=\"10.5\" y=\"8.5\" width=\"3\" height=\"11\" rx=\".5\"/><rect x=\"15.5\" y=\"4.5\" width=\"3\" height=\"15\" rx=\".5\"/>",
+  "graduation-cap": "<path d=\"m2.5 9.5 9.5-4 9.5 4-9.5 4-9.5-4Z\"/><path d=\"M6.5 11.2v4.3c0 1.2 2.5 2.5 5.5 2.5s5.5-1.3 5.5-2.5v-4.3\"/><path d=\"M21.5 9.5v5.5\"/><path d=\"M21.5 17.5a1.5 1.5 0 0 1-1.5-1.5\"/>",
+  "document": "<path d=\"M14 3.5H7.5A2 2 0 0 0 5.5 5.5v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8.5L14 3.5Z\"/><path d=\"M14 3.5v5h5\"/><path d=\"M9 13h6\"/><path d=\"M9 16.5h4\"/>",
+  "diploma": "<rect x=\"4\" y=\"6\" width=\"16\" height=\"11\" rx=\"1\"/><path d=\"M4 8.5h16\"/><path d=\"M7 11.5h4\"/><path d=\"M7 14h6\"/><circle cx=\"16.5\" cy=\"13\" r=\"1.7\"/><path d=\"m15.3 14.3-.8 3.7 2-1 2 1-.8-3.7\"/>",
+  "certificate": "<rect x=\"3.5\" y=\"4\" width=\"17\" height=\"12\" rx=\"1.5\"/><circle cx=\"12\" cy=\"10\" r=\"2.2\"/><path d=\"m10 12 .5 3.5L12 14.5l1.5 1L14 12\"/><path d=\"M6 7h5\"/><path d=\"M6 9.5h3\"/>",
+  "check": "<path d=\"m5.5 12 4.5 4.5 8.5-10\"/>",
+  "check-circle": "<circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"m8.5 12 2.5 2.5 4.5-5\"/>",
+  "clipboard-check": "<path d=\"M9 4.5h6a1 1 0 0 1 1 1v1.5H8V5.5a1 1 0 0 1 1-1Z\"/><path d=\"M8 6H6.5A1.5 1.5 0 0 0 5 7.5V20a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 20V7.5A1.5 1.5 0 0 0 17.5 6H16\"/><path d=\"m9 14 2.2 2.2 4.3-4.7\"/>",
+  "calendar-event": "<rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15.5\" rx=\"2\"/><path d=\"M3.5 9.8h17\"/><path d=\"M8 3.5v3\"/><path d=\"M16 3.5v3\"/><path d=\"m9 15 2 2 4-4\"/>",
+  "x": "<path d=\"M6 6 18 18\"/><path d=\"M18 6 6 18\"/>",
+  "x-circle": "<circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"m9 9 6 6\"/><path d=\"m15 9-6 6\"/>",
+  "bell": "<path d=\"M12 3a6 6 0 0 0-6 6v3.8a3 3 0 0 1-.5 1.7L4 17h16l-1.5-2.5a3 3 0 0 1-.5-1.7V9a6 6 0 0 0-6-6Z\"/><path d=\"M10 19.5a2 2 0 0 0 4 0\"/>",
+  "user-circle": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M6.5 19c.7-2.3 2.8-3.7 5.5-3.7s4.8 1.4 5.5 3.7\"/>",
+  "trash": "<path d=\"M3.5 6.5h17\"/><path d=\"M9 6.5V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v1.5\"/><path d=\"m5.5 6.5 1 13a2 2 0 0 0 2 1.8h7a2 2 0 0 0 2-1.8l1-13\"/><path d=\"M10 10.5v6.5\"/><path d=\"M14 10.5v6.5\"/>",
+  "lightbulb": "<path d=\"M9 18h6\"/><path d=\"M10 20.5h4\"/><path d=\"M12 3.5a6 6 0 0 0-3.5 10.8c.7.5 1.1 1.3 1.1 2.2V16.5h4.8v-.0c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3.5Z\"/>",
+  "send": "<path d=\"M21.5 3 11 13.5\"/><path d=\"M21.5 3 14.5 22l-3.5-8.5L2.5 10 21.5 3Z\"/>",
+  "hourglass": "<path d=\"M6.5 3.5h11\"/><path d=\"M6.5 20.5h11\"/><path d=\"M7 3.5v3.5c0 2 5 4 5 5s-5 3-5 5v3\"/><path d=\"M17 3.5v3.5c0 2-5 4-5 5s5 3 5 5v3\"/>",
+  "plus": "<path d=\"M12 5v14\"/><path d=\"M5 12h14\"/>",
+  "pin": "<path d=\"M12 3.5a7 7 0 0 0-7 7c0 4.5 5.6 9.4 6.7 10.3a.5.5 0 0 0 .6 0c1.1-.9 6.7-5.8 6.7-10.3a7 7 0 0 0-7-7Z\"/><circle cx=\"12\" cy=\"10.5\" r=\"2.5\"/>",
+  "phone": "<path d=\"M21 16.5v2.7a1.7 1.7 0 0 1-1.9 1.8 17 17 0 0 1-7.4-2.7 17 17 0 0 1-5.2-5.2 17 17 0 0 1-2.7-7.5A1.7 1.7 0 0 1 5.5 3.5h2.7a1.7 1.7 0 0 1 1.8 1.5 11 11 0 0 0 .6 2.5 1.7 1.7 0 0 1-.4 1.8L9 10.5a13 13 0 0 0 5 5l1.2-1.2a1.7 1.7 0 0 1 1.8-.4 11 11 0 0 0 2.5.6 1.7 1.7 0 0 1 1.5 1.8Z\"/>",
+  "chart-line": "<path d=\"M3.5 20.5h17\"/><path d=\"m4.5 16.5 4-4.5 4 3 7-7.5\"/><circle cx=\"4.5\" cy=\"16.5\" r=\"1.2\" fill=\"currentColor\"/><circle cx=\"8.5\" cy=\"12\" r=\"1.2\" fill=\"currentColor\"/><circle cx=\"12.5\" cy=\"15\" r=\"1.2\" fill=\"currentColor\"/><circle cx=\"19.5\" cy=\"7.5\" r=\"1.2\" fill=\"currentColor\"/>",
+  "code": "<path d=\"m9.5 5-3 14\"/><path d=\"M14.5 7 19 12l-4.5 5\"/><path d=\"M9.5 7 5 12l4.5 5\"/>",
+  "github": "<path d=\"M9 19c-3.5 1-3.5-1.5-5-2m10 5v-3.5a3 3 0 0 0-.7-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.5 0C5.1 3.6 4 3.9 4 3.9a4.3 4.3 0 0 0-.1 3.2A4.7 4.7 0 0 0 2.5 10.3c0 4.7 2.8 5.7 5.5 6A3 3 0 0 0 7.3 19V22.5\"/>",
+  "globe": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18\"/><path d=\"M12 3a14 14 0 0 1 4 9 14 14 0 0 1-4 9 14 14 0 0 1-4-9 14 14 0 0 1 4-9Z\"/>",
+  "search": "<circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"m20.5 20.5-4.5-4.5\"/>",
+  "eye": "<path d=\"M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>",
+  "eye-off": "<path d=\"m3 3 18 18\"/><path d=\"M10.6 6.1A9.6 9.6 0 0 1 12 6c6 0 9.5 6 9.5 6a14 14 0 0 1-3 3.7\"/><path d=\"M6.6 6.6A14 14 0 0 0 2.5 12s3.5 6.5 9.5 6.5a9 9 0 0 0 4.4-1.1\"/><path d=\"M9.9 9.9a3 3 0 0 0 4.2 4.2\"/>",
+  "alert-triangle": "<path d=\"M10.3 3.9 2 18.3a2 2 0 0 0 1.7 3h16.5a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z\"/><path d=\"M12 9.5v4.5\"/><path d=\"M12 17.5h.01\"/>",
+  "building-2": "<path d=\"M4 20.5V8.5l6-4 6 4V20.5\"/><path d=\"M3 20.5h18\"/><path d=\"M16 13l4 1.5v6\"/><path d=\"M7 10h.01\"/><path d=\"M11 10h.01\"/><path d=\"M7 13.5h.01\"/><path d=\"M11 13.5h.01\"/><path d=\"M8.5 20.5v-3a1.5 1.5 0 0 1 3 0v3\"/>",
+  "in-progress": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7.5v4.5l3 2\"/>"
+};
+
+export const FLAG_ICONS = {
+  "ru": "<rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"1.5\" fill=\"#fff\"/> <rect x=\"2\" y=\"10\" width=\"20\" height=\"4\" fill=\"#0039A6\"/> <rect x=\"2\" y=\"14\" width=\"20\" height=\"4\" rx=\"0\" fill=\"#D52B1E\"/> <path d=\"M22 16.5V7.5a1.5 1.5 0 0 0-1.5-1.5h-17A1.5 1.5 0 0 0 2 7.5v9A1.5 1.5 0 0 0 3.5 18h17a1.5 1.5 0 0 0 1.5-1.5Z\" fill=\"none\" stroke=\"#E5E7EB\" stroke-width=\".75\"/>",
+  "kz": "<rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"1.5\" fill=\"#00ABC2\"/> <circle cx=\"12\" cy=\"11.5\" r=\"2.2\" fill=\"#FEC50C\"/> <g stroke=\"#FEC50C\" stroke-width=\".6\" stroke-linecap=\"round\"> <path d=\"M12 8.5v-1\"/><path d=\"M12 15v-1\"/><path d=\"M9 11.5h-.8\"/><path d=\"M15.8 11.5H15\"/> <path d=\"m10 9.5-.6-.6\"/><path d=\"m14 9.5.6-.6\"/><path d=\"m10 13.5-.6.6\"/><path d=\"m14 13.5.6.6\"/> </g> <path d=\"M9 16c1-.5 2-.5 3 0s2 .5 3 0\" stroke=\"#FEC50C\" stroke-width=\".7\" fill=\"none\" stroke-linecap=\"round\"/> <path d=\"M4 7.5c.5.5 1 1.5 1 2.5s-.5 2-1 2.5M4 12.5c.5.5 1 1.5 1 2.5s-.5 2-1 2.5\" stroke=\"#FEC50C\" stroke-width=\".5\" fill=\"none\"/> <path d=\"M22 16.5V7.5a1.5 1.5 0 0 0-1.5-1.5h-17A1.5 1.5 0 0 0 2 7.5v9A1.5 1.5 0 0 0 3.5 18h17a1.5 1.5 0 0 0 1.5-1.5Z\" fill=\"none\" stroke=\"#E5E7EB\" stroke-width=\".75\"/>",
+  "gb": "<defs><clipPath id=\"gb-clip\"><rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"1.5\"/></clipPath></defs> <g clip-path=\"url(#gb-clip)\"> <rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" fill=\"#012169\"/> <path d=\"M2 6 22 18M22 6 2 18\" stroke=\"#fff\" stroke-width=\"2.4\"/> <path d=\"M2 6 22 18M22 6 2 18\" stroke=\"#C8102E\" stroke-width=\"1.2\"/> <path d=\"M12 6v12M2 12h20\" stroke=\"#fff\" stroke-width=\"3.2\"/> <path d=\"M12 6v12M2 12h20\" stroke=\"#C8102E\" stroke-width=\"1.8\"/> </g> <rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"1.5\" fill=\"none\" stroke=\"#E5E7EB\" stroke-width=\".75\"/>"
+};
+
+// Usage (React):
+// <svg viewBox="0 0 24 24" width="24" height="24" fill="none"
+//   stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
+//   dangerouslySetInnerHTML={{__html: STROKE_ICONS.home}}/>

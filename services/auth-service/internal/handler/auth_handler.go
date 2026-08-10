@@ -179,6 +179,26 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	})
 }
 
+// Logout отзывает refresh токен пользователя
+func (h *AuthHandler) Logout(c *gin.Context) {
+	var req dto.RefreshRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Ошибка валидации",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.Logout(req.RefreshToken); err != nil {
+		handleServiceError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Выход выполнен успешно"})
+}
+
 // ResetPassword сбрасывает пароль по коду
 func (h *AuthHandler) ResetPassword(c *gin.Context) {
 	var req dto.ResetPasswordRequest
@@ -199,6 +219,91 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.SuccessResponse{
 		Message: "Пароль успешно изменён",
 	})
+}
+
+// UpdateUserRole меняет роль пользователя (только для admin)
+func (h *AuthHandler) UpdateUserRole(c *gin.Context) {
+	if c.GetString("user_role") != "admin" {
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "Доступ запрещён", Message: "Только для администраторов"})
+		return
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "Ошибка валидации", Message: "Некорректный UUID"})
+		return
+	}
+	var req struct {
+		Role string `json:"role" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "Ошибка валидации", Message: err.Error()})
+		return
+	}
+	user, err := h.authService.UpdateUserRole(id, req.Role)
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+// ToggleUserActive активирует или деактивирует пользователя (только для admin)
+func (h *AuthHandler) ToggleUserActive(c *gin.Context) {
+	if c.GetString("user_role") != "admin" {
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "Доступ запрещён", Message: "Только для администраторов"})
+		return
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "Ошибка валидации", Message: "Некорректный UUID"})
+		return
+	}
+	var req struct {
+		IsActive bool `json:"is_active"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "Ошибка валидации", Message: err.Error()})
+		return
+	}
+	user, err := h.authService.ToggleUserActive(id, req.IsActive)
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+// ListUsers возвращает всех пользователей (только для admin)
+func (h *AuthHandler) ListUsers(c *gin.Context) {
+	if c.GetString("user_role") != "admin" {
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "Доступ запрещён", Message: "Только для администраторов"})
+		return
+	}
+	role := c.Query("role")
+	users, err := h.authService.ListUsers(role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Ошибка сервера", Message: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"users": users, "total": len(users)})
+}
+
+// DeleteUser удаляет пользователя по ID (только для admin)
+func (h *AuthHandler) DeleteUser(c *gin.Context) {
+	if c.GetString("user_role") != "admin" {
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "Доступ запрещён", Message: "Только для администраторов"})
+		return
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "Ошибка валидации", Message: "Некорректный UUID"})
+		return
+	}
+	if err := h.authService.DeleteUser(id); err != nil {
+		handleServiceError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Пользователь удалён"})
 }
 
 // handleServiceError обрабатывает ошибки сервиса
@@ -228,6 +333,11 @@ func handleServiceError(c *gin.Context, err error) {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error:   "Ошибка валидации",
 			Message: "Недопустимая роль пользователя",
+		})
+	case errors.Is(err, service.ErrAdminRoleForbidden):
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{
+			Error:   "Доступ запрещён",
+			Message: "Роль администратора нельзя назначать через API",
 		})
 	case errors.Is(err, service.ErrEmailNotVerified):
 		c.JSON(http.StatusForbidden, dto.ErrorResponse{

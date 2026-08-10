@@ -22,6 +22,7 @@ type UserRepository interface {
 	Update(user *models.User) error
 	Delete(id uuid.UUID) error
 	ExistsByEmail(email string) (bool, error)
+	ListAll(role string) ([]models.User, error)
 }
 
 // userRepository реализует UserRepository
@@ -99,6 +100,19 @@ func (r *userRepository) Delete(id uuid.UUID) error {
 		return ErrUserNotFound
 	}
 	return nil
+}
+
+// ListAll возвращает всех пользователей, опционально фильтрует по роли
+func (r *userRepository) ListAll(role string) ([]models.User, error) {
+	var users []models.User
+	q := r.db.Order("created_at DESC")
+	if role != "" {
+		q = q.Where("role = ?", role)
+	}
+	if err := q.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 // ExistsByEmail проверяет существование пользователя с указанным email

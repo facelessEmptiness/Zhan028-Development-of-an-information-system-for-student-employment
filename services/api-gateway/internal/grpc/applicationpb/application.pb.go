@@ -183,6 +183,7 @@ type ApplicationMessage struct {
 	StudentIin       string                 `protobuf:"bytes,10,opt,name=student_iin,json=studentIin,proto3" json:"student_iin,omitempty"`
 	UniversityId     string                 `protobuf:"bytes,11,opt,name=university_id,json=universityId,proto3" json:"university_id,omitempty"`
 	MatchScore       int32                  `protobuf:"varint,12,opt,name=match_score,json=matchScore,proto3" json:"match_score,omitempty"`
+	EmployerId       string                 `protobuf:"bytes,13,opt,name=employer_id,json=employerId,proto3" json:"employer_id,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -301,12 +302,20 @@ func (x *ApplicationMessage) GetMatchScore() int32 {
 	return 0
 }
 
+func (x *ApplicationMessage) GetEmployerId() string {
+	if x != nil {
+		return x.EmployerId
+	}
+	return ""
+}
+
 type ApplyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StudentId     string                 `protobuf:"bytes,1,opt,name=student_id,json=studentId,proto3" json:"student_id,omitempty"`
 	VacancyId     string                 `protobuf:"bytes,2,opt,name=vacancy_id,json=vacancyId,proto3" json:"vacancy_id,omitempty"`
 	CoverLetter   string                 `protobuf:"bytes,3,opt,name=cover_letter,json=coverLetter,proto3" json:"cover_letter,omitempty"`
 	MatchScore    int32                  `protobuf:"varint,4,opt,name=match_score,json=matchScore,proto3" json:"match_score,omitempty"`
+	EmployerId    string                 `protobuf:"bytes,5,opt,name=employer_id,json=employerId,proto3" json:"employer_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -367,6 +376,13 @@ func (x *ApplyRequest) GetMatchScore() int32 {
 		return x.MatchScore
 	}
 	return 0
+}
+
+func (x *ApplyRequest) GetEmployerId() string {
+	if x != nil {
+		return x.EmployerId
+	}
+	return ""
 }
 
 type GetMyApplicationsRequest struct {
@@ -677,7 +693,7 @@ const file_application_proto_rawDesc = "" +
 	"\x18ApplicationStatsResponse\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x05R\x05total\x12#\n" +
 	"\roffered_count\x18\x02 \x01(\x05R\fofferedCount\x125\n" +
-	"\tby_status\x18\x03 \x03(\v2\x18.application.StatusCountR\bbyStatus\"\x9c\x03\n" +
+	"\tby_status\x18\x03 \x03(\v2\x18.application.StatusCountR\bbyStatus\"\xbd\x03\n" +
 	"\x12ApplicationMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -697,7 +713,9 @@ const file_application_proto_rawDesc = "" +
 	"studentIin\x12#\n" +
 	"\runiversity_id\x18\v \x01(\tR\funiversityId\x12\x1f\n" +
 	"\vmatch_score\x18\f \x01(\x05R\n" +
-	"matchScore\"\x90\x01\n" +
+	"matchScore\x12\x1f\n" +
+	"\vemployer_id\x18\r \x01(\tR\n" +
+	"employerId\"\xb1\x01\n" +
 	"\fApplyRequest\x12\x1d\n" +
 	"\n" +
 	"student_id\x18\x01 \x01(\tR\tstudentId\x12\x1d\n" +
@@ -705,7 +723,9 @@ const file_application_proto_rawDesc = "" +
 	"vacancy_id\x18\x02 \x01(\tR\tvacancyId\x12!\n" +
 	"\fcover_letter\x18\x03 \x01(\tR\vcoverLetter\x12\x1f\n" +
 	"\vmatch_score\x18\x04 \x01(\x05R\n" +
-	"matchScore\"9\n" +
+	"matchScore\x12\x1f\n" +
+	"\vemployer_id\x18\x05 \x01(\tR\n" +
+	"employerId\"9\n" +
 	"\x18GetMyApplicationsRequest\x12\x1d\n" +
 	"\n" +
 	"student_id\x18\x01 \x01(\tR\tstudentId\"_\n" +

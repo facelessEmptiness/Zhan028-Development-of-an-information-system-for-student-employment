@@ -3,7 +3,9 @@ package handler
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"api-gateway/internal/grpc/applicationpb"
@@ -37,7 +39,7 @@ func NewApplicationHandler(
 	}
 }
 
-// POST /api/applications - student applies to a vacancy
+// POST /api/applications — student applies to a vacancy
 func (h *ApplicationHandler) Apply(c *gin.Context) {
 	studentID := c.GetHeader("X-User-ID")
 	role := c.GetHeader("X-User-Role")
@@ -55,7 +57,6 @@ func (h *ApplicationHandler) Apply(c *gin.Context) {
 		return
 	}
 
-	// Fetch student skills
 	var studentSkills string
 	sCtx, sCancel := context.WithTimeout(context.Background(), 3*time.Second)
 	studentResp, sErr := h.studentClient.GetProfile(sCtx, &studentpb.GetProfileRequest{UserId: studentID})
@@ -64,7 +65,6 @@ func (h *ApplicationHandler) Apply(c *gin.Context) {
 		studentSkills = studentResp.Skills
 	}
 
-	// Fetch vacancy skills
 	var vacancySkills string
 	vCtx, vCancel := context.WithTimeout(context.Background(), 3*time.Second)
 	vacancyResp, vErr := h.vacancyClient.GetVacancyByID(vCtx, &vacancypb.GetByIDRequest{Id: req.VacancyID})
@@ -73,15 +73,24 @@ func (h *ApplicationHandler) Apply(c *gin.Context) {
 		vacancySkills = vacancyResp.Skills
 	}
 
-	// Calculate match score
 	matchScore := match.CalculateMatchIndex(studentSkills, vacancySkills)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	employerID := ""
+	if vErr == nil && vacancyResp != nil {
+		employerID = vacancyResp.GetEmployerId()
+	}
+	if employerID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "vacancy not found"})
+		return
+	}
+
 	resp, err := h.appClient.Apply(ctx, &applicationpb.ApplyRequest{
 		StudentId:   studentID,
 		VacancyId:   req.VacancyID,
+		EmployerId:  employerID,
 		CoverLetter: req.CoverLetter,
 		MatchScore:  matchScore,
 	})
@@ -90,7 +99,6 @@ func (h *ApplicationHandler) Apply(c *gin.Context) {
 		return
 	}
 
-	// Notify student: application submitted successfully
 	go h.notif.Send(
 		studentID,
 		"application_submitted",
@@ -102,9 +110,18 @@ func (h *ApplicationHandler) Apply(c *gin.Context) {
 	c.JSON(http.StatusCreated, resp)
 }
 
-// GET /api/applications/my - student sees their own applications
+// GET /api/applications/my — student sees their own applications (paginated)
 func (h *ApplicationHandler) GetMyApplications(c *gin.Context) {
 	studentID := c.GetHeader("X-User-ID")
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -116,10 +133,63 @@ func (h *ApplicationHandler) GetMyApplications(c *gin.Context) {
 		handleGRPCError(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, resp)
+
+	type EnrichedApp struct {
+		ID           string `json:"id"`
+		StudentID    string `json:"student_id"`
+		VacancyID    string `json:"vacancy_id"`
+		EmployerID   string `json:"employer_id"`
+		Status       string `json:"status"`
+		CoverLetter  string `json:"cover_letter"`
+		MatchScore   int32  `json:"match_score"`
+		CreatedAt    string `json:"created_at"`
+		UpdatedAt    string `json:"updated_at"`
+		VacancyTitle string `json:"vacancy_title"`
+		CompanyName  string `json:"company_name"`
+	}
+
+	all := resp.Applications
+	total := len(all)
+	start := (page - 1) * pageSize
+	end := start + pageSize
+	if start > total {
+		start = total
+	}
+	if end > total {
+		end = total
+	}
+
+	enriched := make([]EnrichedApp, 0, end-start)
+	for _, a := range all[start:end] {
+		app := EnrichedApp{
+			ID:          a.GetId(),
+			StudentID:   a.GetStudentId(),
+			VacancyID:   a.GetVacancyId(),
+			EmployerID:  a.GetEmployerId(),
+			Status:      a.GetStatus(),
+			CoverLetter: a.GetCoverLetter(),
+			MatchScore:  a.GetMatchScore(),
+			CreatedAt:   a.GetCreatedAt(),
+			UpdatedAt:   a.GetUpdatedAt(),
+		}
+		vCtx, vCancel := context.WithTimeout(context.Background(), 3*time.Second)
+		if vResp, vErr := h.vacancyClient.GetVacancyByID(vCtx, &vacancypb.GetByIDRequest{Id: a.GetVacancyId()}); vErr == nil && vResp != nil {
+			app.VacancyTitle = vResp.GetTitle()
+			app.CompanyName = vResp.GetCompanyName()
+		}
+		vCancel()
+		enriched = append(enriched, app)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"applications": enriched,
+		"total":        total,
+		"page":         page,
+		"page_size":    pageSize,
+	})
 }
 
-// GET /api/applications/vacancy/:vacancy_id - employer sees applications for their vacancy (enriched with student data)
+// GET /api/applications/vacancy/:vacancy_id — employer sees applications for their vacancy (paginated)
 func (h *ApplicationHandler) GetVacancyApplications(c *gin.Context) {
 	employerID := c.GetHeader("X-User-ID")
 	role := c.GetHeader("X-User-Role")
@@ -128,6 +198,16 @@ func (h *ApplicationHandler) GetVacancyApplications(c *gin.Context) {
 		return
 	}
 	vacancyID := c.Param("vacancy_id")
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
+	statusFilter := c.Query("status")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -141,13 +221,12 @@ func (h *ApplicationHandler) GetVacancyApplications(c *gin.Context) {
 		return
 	}
 
-	// Enrich with student data
 	type StudentInfo struct {
-		FirstName    string `json:"first_name"`
-		LastName     string `json:"last_name"`
-		IIN          string `json:"iin"`
-		UniversityID string `json:"university_id"`
-		Skills       string `json:"skills"`
+		FirstName    string   `json:"first_name"`
+		LastName     string   `json:"last_name"`
+		IIN          string   `json:"iin"`
+		UniversityID string   `json:"university_id"`
+		Skills       []string `json:"skills"`
 	}
 	type EnrichedApplication struct {
 		ID          string      `json:"id"`
@@ -160,8 +239,30 @@ func (h *ApplicationHandler) GetVacancyApplications(c *gin.Context) {
 		Student     StudentInfo `json:"student"`
 	}
 
+	// Filter by status if requested
+	source := appsResp.Applications
+	if statusFilter != "" {
+		filtered := source[:0]
+		for _, a := range source {
+			if a.Status == statusFilter {
+				filtered = append(filtered, a)
+			}
+		}
+		source = filtered
+	}
+
+	total := len(source)
+	start := (page - 1) * pageSize
+	end := start + pageSize
+	if start > total {
+		start = total
+	}
+	if end > total {
+		end = total
+	}
+
 	var enriched []EnrichedApplication
-	for _, app := range appsResp.Applications {
+	for _, app := range source[start:end] {
 		ea := EnrichedApplication{
 			ID:          app.Id,
 			StudentID:   app.StudentId,
@@ -172,7 +273,6 @@ func (h *ApplicationHandler) GetVacancyApplications(c *gin.Context) {
 			CreatedAt:   app.CreatedAt,
 		}
 
-		// Try to get student profile
 		studentCtx, studentCancel := context.WithTimeout(context.Background(), 3*time.Second)
 		studentResp, studentErr := h.studentClient.GetProfile(studentCtx, &studentpb.GetProfileRequest{
 			UserId: app.StudentId,
@@ -183,7 +283,7 @@ func (h *ApplicationHandler) GetVacancyApplications(c *gin.Context) {
 			ea.Student.LastName = studentResp.LastName
 			ea.Student.IIN = studentResp.Iin
 			ea.Student.UniversityID = studentResp.UniversityId
-			ea.Student.Skills = studentResp.Skills
+			ea.Student.Skills = splitSkills(studentResp.Skills)
 		}
 
 		enriched = append(enriched, ea)
@@ -192,10 +292,15 @@ func (h *ApplicationHandler) GetVacancyApplications(c *gin.Context) {
 	if enriched == nil {
 		enriched = []EnrichedApplication{}
 	}
-	c.JSON(http.StatusOK, gin.H{"applications": enriched})
+	c.JSON(http.StatusOK, gin.H{
+		"applications": enriched,
+		"total":        total,
+		"page":         page,
+		"page_size":    pageSize,
+	})
 }
 
-// PUT /api/applications/:id/status - employer updates application status
+// PUT /api/applications/:id/status — employer updates application status
 func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 	employerID := c.GetHeader("X-User-ID")
 	role := c.GetHeader("X-User-Role")
@@ -226,7 +331,6 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 		return
 	}
 
-	// Notify student about status change
 	statusLabels := map[string]string{
 		"interview":   "Вас приглашают на интервью 🎯",
 		"shortlisted": "Вы попали в шорт-лист 📋",
@@ -235,13 +339,15 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 	}
 	if title, ok := statusLabels[req.Status]; ok {
 		body := "Работодатель изменил статус вашей заявки на «" + req.Status + "»."
-		go h.notif.Send(resp.GetStudentId(), "application_status", title, body, id)
+		go h.notif.Send(resp.GetStudentId(), "application_status", title, body, id+"|"+req.Status)
 	}
 
-	// When employer offers a job — create employment record for grant monitoring
+	if req.Status == "rejected" && h.appHTTPURL != "" {
+		go EndEmploymentByApplicationID(h.appHTTPURL, id)
+	}
+
 	if req.Status == "offered" && h.appHTTPURL != "" {
 		go func() {
-			// Fetch vacancy info to get company name and job title
 			companyName := ""
 			jobTitle := ""
 			vCtx, vCancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -252,13 +358,25 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 				jobTitle = vacancyResp.GetTitle()
 			}
 
-			payload := map[string]interface{}{
-				"student_id":     resp.GetStudentId(),
-				"employer_id":    employerID,
-				"application_id": id,
-				"vacancy_id":     resp.GetVacancyId(),
-				"company_name":   companyName,
-				"job_title":      jobTitle,
+			universityID := ""
+			graduationYear := 0
+			sCtx, sCancel := context.WithTimeout(context.Background(), 3*time.Second)
+			studentResp, sErr := h.studentClient.GetProfile(sCtx, &studentpb.GetProfileRequest{UserId: resp.GetStudentId()})
+			sCancel()
+			if sErr == nil && studentResp != nil {
+				universityID = studentResp.GetUniversityId()
+				graduationYear = int(studentResp.GetGraduationYear())
+			}
+
+			payload := map[string]any{
+				"student_id":      resp.GetStudentId(),
+				"employer_id":     employerID,
+				"application_id":  id,
+				"vacancy_id":      resp.GetVacancyId(),
+				"company_name":    companyName,
+				"job_title":       jobTitle,
+				"university_id":   universityID,
+				"graduation_year": graduationYear,
 			}
 			CreateEmploymentRecord(h.appHTTPURL, payload)
 		}()
@@ -267,7 +385,32 @@ func (h *ApplicationHandler) UpdateStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// DELETE /api/applications/:id - student withdraws application
+// GET /api/applications/:id — get single application by ID (student or employer)
+func (h *ApplicationHandler) GetByID(c *gin.Context) {
+	id := c.Param("id")
+	url := fmt.Sprintf("%s/api/applications/%s", h.appHTTPURL, id)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "proxy error"})
+		return
+	}
+	req.Header.Set("X-User-ID", c.GetHeader("X-User-ID"))
+	req.Header.Set("X-User-Role", c.GetHeader("X-User-Role"))
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"error": "application service unavailable"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	c.Data(resp.StatusCode, "application/json", body)
+}
+
+// DELETE /api/applications/:id — student withdraws application
 func (h *ApplicationHandler) Withdraw(c *gin.Context) {
 	studentID := c.GetHeader("X-User-ID")
 	id := c.Param("id")

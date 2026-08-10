@@ -1,7 +1,9 @@
-// Job Service - Shared service for all roles to search and view jobs
+import { apiFetch } from '../utils/apiClient';
+import type { JobPosting } from './employerService';
+import { parseSkills, calculateSkillMatch } from '../utils';
 
 export interface Job {
-  id: number;
+  id: string;
   title: string;
   company: string;
   location: string;
@@ -22,129 +24,123 @@ export interface JobSearchFilters {
   minSalary?: number;
   maxSalary?: number;
   skills?: string[];
+  page?: number;
+  pageSize?: number;
 }
 
-// Job Service Functions
+interface VacancyListResponse {
+  vacancies: JobPosting[];
+  total: number;
+}
+
+function toJob(v: JobPosting): Job {
+  return {
+    id: v.id,
+    title: v.title,
+    company: v.company_name || 'Работодатель',
+    location: v.location || '',
+    salary: { min: v.salary_min, max: v.salary_max },
+    type: v.job_type as Job['type'],
+    description: v.description,
+    requirements: [],
+    skills: parseSkills(v.skills),
+    postedDate: v.created_at ? new Date(v.created_at).toLocaleDateString('ru-RU') : '',
+    applicants: 0,
+  };
+}
+
 export const jobService = {
-  // Get all jobs
   getAllJobs: async (filters?: JobSearchFilters): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    console.log('Fetching jobs with filters:', filters);
-    return [
-      {
-        id: 1,
-        title: 'Senior Software Developer',
-        company: 'Tech Innovators Inc',
-        location: 'Astana',
-        salary: { min: 4000, max: 6000 },
-        type: 'Full-time',
-        description: 'Looking for an experienced developer with React and Node.js expertise',
-        requirements: [
-          '5+ years of professional software development experience',
-          'Expertise in React, Node.js, and TypeScript',
-          'Strong knowledge of SQL and NoSQL databases',
-        ],
-        skills: ['React', 'Node.js', 'TypeScript', 'PostgreSQL', 'Docker'],
-        postedDate: '2024-02-01',
-        applicants: 45,
-        matchIndex: 85,
-      },
-    ];
+    const params = new URLSearchParams();
+    params.set('page', String(filters?.page ?? 1));
+    params.set('page_size', String(filters?.pageSize ?? 20));
+    if (filters?.searchTerm) params.set('search', filters.searchTerm);
+    if (filters?.jobType) params.set('job_type', filters.jobType);
+    if (filters?.location) params.set('location', filters.location);
+    if (filters?.minSalary) params.set('salary_min', String(filters.minSalary));
+    if (filters?.maxSalary) params.set('salary_max', String(filters.maxSalary));
+    if (filters?.skills?.length) params.set('skills', filters.skills.join(','));
+
+    const res = await apiFetch(`/api/vacancies/?${params.toString()}`);
+    if (!res.ok) return [];
+    const data: VacancyListResponse = await res.json();
+    return (data.vacancies ?? []).map(toJob);
   },
 
-  // Get job by ID
-  getJobById: async (jobId: number): Promise<Job> => {
-    // TODO: Replace with actual API call
-    return {
-      id: jobId,
-      title: 'Senior Software Developer',
-      company: 'Tech Innovators Inc',
-      location: 'Astana',
-      salary: { min: 4000, max: 6000 },
-      type: 'Full-time',
-      description: 'Looking for an experienced developer',
-      requirements: [],
-      skills: ['React', 'Node.js', 'TypeScript'],
-      postedDate: '2024-02-01',
-      applicants: 45,
-    };
+  getJobById: async (jobId: string): Promise<Job | null> => {
+    const res = await apiFetch(`/api/vacancies/${jobId}`);
+    if (!res.ok) return null;
+    const v: JobPosting = await res.json();
+    return toJob(v);
   },
 
-  // Search jobs
   searchJobs: async (searchTerm: string, filters?: JobSearchFilters): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    console.log('Searching jobs:', searchTerm, filters);
-    return [];
+    return jobService.getAllJobs({ ...filters, searchTerm });
   },
 
-  // Get recommended jobs for student (using Match-Index)
-  getRecommendedJobs: async (studentId: string, _limit: number = 5): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    // This should use the Match-Index algorithm to find best matching jobs
-    console.log('Fetching recommended jobs for student:', studentId);
-    return [];
+  getRecommendedJobs: async (_studentId: string, limit: number = 5): Promise<Job[]> => {
+    const jobs = await jobService.getAllJobs({ pageSize: limit * 3 });
+    return jobs.slice(0, limit);
   },
 
-  // Get trending jobs
-  getTrendingJobs: async (_limit: number = 6): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    return [];
+  getTrendingJobs: async (limit: number = 6): Promise<Job[]> => {
+    const jobs = await jobService.getAllJobs({ pageSize: limit });
+    return jobs.slice(0, limit);
   },
 
-  // Get jobs by category
   getJobsByCategory: async (category: string): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    console.log('Fetching jobs for category:', category);
-    return [];
+    return jobService.getAllJobs({ searchTerm: category });
   },
 
-  // Get jobs by location
   getJobsByLocation: async (location: string): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    console.log('Fetching jobs for location:', location);
-    return [];
+    return jobService.getAllJobs({ location });
   },
 
-  // Get jobs by company
   getJobsByCompany: async (companyId: string): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    console.log('Fetching jobs for company:', companyId);
-    return [];
+    return jobService.getAllJobs({ searchTerm: companyId });
   },
 
-  // Calculate Match-Index for a job and candidate
-  calculateMatchIndex: async (jobId: number, candidateId?: string): Promise<number> => {
-    // TODO: Replace with actual API call
-    // This implements the Match-Index algorithm
-    console.log('Calculating match index for job:', jobId, 'candidate:', candidateId);
-    return 75;
+  calculateMatchIndex: async (jobId: string, candidateId?: string): Promise<number> => {
+    const job = await jobService.getJobById(jobId);
+    if (!job || job.skills.length === 0) return 50;
+
+    let studentSkills: string[] = [];
+    try {
+      const url = candidateId ? `/api/students/${candidateId}` : '/api/students/profile';
+      const res = await apiFetch(url);
+      if (res.ok) {
+        const profile = await res.json();
+        studentSkills = parseSkills(profile.skills);
+      }
+    } catch {
+      // fall through — return low score if profile unavailable
+    }
+
+    return calculateSkillMatch(studentSkills, job.skills);
   },
 
-  // Get similar jobs
-  getSimilarJobs: async (jobId: number, _limit: number = 3): Promise<Job[]> => {
-    // TODO: Replace with actual API call
-    console.log('Fetching similar jobs to:', jobId);
-    return [];
+  getSimilarJobs: async (jobId: string, limit: number = 3): Promise<Job[]> => {
+    const job = await jobService.getJobById(jobId);
+    if (!job) return [];
+    const skill = job.skills[0] ?? '';
+    const jobs = await jobService.getAllJobs({ searchTerm: skill, pageSize: limit + 1 });
+    return jobs.filter(j => j.id !== jobId).slice(0, limit);
   },
 
-  // Get skill statistics for jobs
   getSkillStatistics: async (): Promise<{ skill: string; demand: number }[]> => {
-    // TODO: Replace with actual API call
-    return [
-      { skill: 'JavaScript', demand: 156 },
-      { skill: 'Python', demand: 142 },
-      { skill: 'React', demand: 128 },
-    ];
+    const res = await apiFetch('/api/analytics/summary');
+    if (!res.ok) return [];
+    const data = await res.json();
+    const skills: { name: string; count: number }[] = data?.vacancies?.demanded_skills ?? [];
+    return skills.map(s => ({ skill: s.name, demand: s.count }));
   },
 
-  // Get job statistics
   getJobStatistics: async () => {
-    // TODO: Replace with actual API call
-    return {
-      totalJobs: 487,
-      newJobsThisWeek: 45,
-      averageSalary: 4500,
-      topLocation: 'Astana',
-    };
+    const res = await apiFetch('/api/analytics/summary');
+    if (!res.ok) return { totalJobs: 0, newJobsThisWeek: 0, averageSalary: 0, topLocation: '' };
+    const data = await res.json();
+    const total = data?.vacancies?.total ?? 0;
+    const topLocation = data?.vacancies?.by_location?.[0]?.name ?? '';
+    return { totalJobs: total, newJobsThisWeek: 0, averageSalary: 0, topLocation };
   },
 };

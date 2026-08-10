@@ -11,6 +11,8 @@ import (
 	"student-service/internal/http/router"
 	"student-service/internal/repository"
 	"student-service/internal/service"
+	"student-service/internal/sse"
+	"student-service/internal/storage"
 
 	"google.golang.org/grpc"
 )
@@ -26,10 +28,24 @@ func main() {
 		log.Fatalf("db error: %v", err)
 	}
 
+	// MinIO object storage
+	minioStorage, err := storage.NewMinIOStorage(
+		cfg.MinIOEndpoint,
+		cfg.MinIOAccessKey,
+		cfg.MinIOSecretKey,
+		cfg.MinIOBucket,
+		cfg.MinIOUseSSL,
+	)
+	if err != nil {
+		log.Fatalf("minio error: %v", err)
+	}
+	log.Println("✅ MinIO connection established")
+
 	// Repositories
 	studentRepo := repository.NewStudentRepository(db)
 	docRepo := repository.NewDocumentRepository(db)
 	notifRepo := repository.NewNotificationRepository(db)
+	pushTokenRepo := repository.NewPushTokenRepository(db)
 
 	// Services
 	studentSvc := service.NewStudentService(studentRepo)
@@ -50,11 +66,12 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterStudentServiceServer(s, grpcSrv)
 
-	// HTTP server (documents + student REST) in background
+	// HTTP server in background
 	go func() {
+		sseHub := sse.NewHub()
 		studentHandler := handler.NewStudentHandler(studentSvc)
-		docHandler := handler.NewDocumentHandler(docRepo, notifRepo)
-		notifHandler := handler.NewNotificationHandler(notifRepo)
+		docHandler := handler.NewDocumentHandler(docRepo, notifRepo, minioStorage)
+		notifHandler := handler.NewNotificationHandler(notifRepo, pushTokenRepo, sseHub)
 		r := router.SetupRouter(studentHandler, docHandler, notifHandler)
 
 		httpPort := cfg.ServerPort

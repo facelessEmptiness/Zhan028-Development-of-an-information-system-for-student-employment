@@ -14,11 +14,11 @@ var ErrDocumentNotFound = errors.New("document not found")
 type DocumentRepository interface {
 	Create(doc *models.Document) error
 	FindByID(id uuid.UUID) (*models.Document, error)
-	FindByIDWithData(id uuid.UUID) (*models.Document, error)
 	FindByUserID(userID uuid.UUID) ([]*models.Document, error)
 	Update(doc *models.Document) error
 	Delete(id uuid.UUID) error
 	VerifyAllPendingByUserID(userID uuid.UUID, verifierID uuid.UUID) ([]*models.Document, error)
+	CountPendingDiplomaByUniversityID(universityID uuid.UUID) (int64, error)
 }
 
 type documentRepository struct {
@@ -35,15 +35,6 @@ func (r *documentRepository) Create(doc *models.Document) error {
 
 func (r *documentRepository) FindByID(id uuid.UUID) (*models.Document, error) {
 	var doc models.Document
-	err := r.db.Omit("file_data").Where("id = ?", id).First(&doc).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, ErrDocumentNotFound
-	}
-	return &doc, err
-}
-
-func (r *documentRepository) FindByIDWithData(id uuid.UUID) (*models.Document, error) {
-	var doc models.Document
 	err := r.db.Where("id = ?", id).First(&doc).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, ErrDocumentNotFound
@@ -53,12 +44,12 @@ func (r *documentRepository) FindByIDWithData(id uuid.UUID) (*models.Document, e
 
 func (r *documentRepository) FindByUserID(userID uuid.UUID) ([]*models.Document, error) {
 	var docs []*models.Document
-	err := r.db.Omit("file_data").Where("user_id = ?", userID).Order("created_at desc").Find(&docs).Error
+	err := r.db.Where("user_id = ?", userID).Order("created_at desc").Find(&docs).Error
 	return docs, err
 }
 
 func (r *documentRepository) Update(doc *models.Document) error {
-	return r.db.Omit("file_data").Save(doc).Error
+	return r.db.Save(doc).Error
 }
 
 func (r *documentRepository) Delete(id uuid.UUID) error {
@@ -69,14 +60,25 @@ func (r *documentRepository) Delete(id uuid.UUID) error {
 	return result.Error
 }
 
+// CountPendingDiplomaByUniversityID returns the count of pending diploma documents
+// for all students belonging to the given university.
+func (r *documentRepository) CountPendingDiplomaByUniversityID(universityID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Document{}).
+		Joins("JOIN students ON students.user_id = documents.user_id").
+		Where("students.university_id = ? AND documents.status = ? AND documents.type = ?",
+			universityID, models.DocStatusPending, models.DocTypeDiploma).
+		Count(&count).Error
+	return count, err
+}
+
 // VerifyAllPendingByUserID verifies all pending non-CV documents for a student
 // and returns the updated documents.
 func (r *documentRepository) VerifyAllPendingByUserID(userID uuid.UUID, verifierID uuid.UUID) ([]*models.Document, error) {
 	now := time.Now()
 
-	// Find all pending non-CV documents for this user
 	var docs []*models.Document
-	if err := r.db.Omit("file_data").
+	if err := r.db.
 		Where("user_id = ? AND status = ? AND type != ?", userID, models.DocStatusPending, models.DocTypeCV).
 		Find(&docs).Error; err != nil {
 		return nil, err
@@ -86,7 +88,6 @@ func (r *documentRepository) VerifyAllPendingByUserID(userID uuid.UUID, verifier
 		return docs, nil
 	}
 
-	// Bulk update status
 	if err := r.db.Model(&models.Document{}).
 		Where("user_id = ? AND status = ? AND type != ?", userID, models.DocStatusPending, models.DocTypeCV).
 		Updates(map[string]interface{}{
@@ -97,7 +98,6 @@ func (r *documentRepository) VerifyAllPendingByUserID(userID uuid.UUID, verifier
 		return nil, err
 	}
 
-	// Return updated docs
 	for _, d := range docs {
 		d.Status = models.DocStatusVerified
 		d.VerifiedBy = &verifierID

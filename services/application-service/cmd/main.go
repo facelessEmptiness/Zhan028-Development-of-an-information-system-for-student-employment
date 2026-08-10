@@ -1,51 +1,66 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 
+	"application-service/internal/config"
+	"application-service/internal/facts"
 	grpcserver "application-service/internal/grpc"
 	"application-service/internal/grpc/pb"
-	"application-service/internal/config"
 	httphandler "application-service/internal/http/handler"
 	httprouter "application-service/internal/http/router"
-	"application-service/internal/models"
+	"application-service/internal/notify"
 	"application-service/internal/repository"
+	"application-service/internal/scheduler"
 	"application-service/internal/service"
+	"application-service/internal/ws"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
-	// 1. Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("config error: %v", err)
 	}
 
-	// 2. Connect to database
 	db, err := config.ConnectDatabase(cfg)
 	if err != nil {
 		log.Fatalf("db error: %v", err)
 	}
 
-	// 3. Auto-migrate schema
-	if err := db.AutoMigrate(&models.Application{}, &models.Interview{}, &models.EmploymentRecord{}); err != nil {
+	if err := config.RunMigrations(cfg); err != nil {
 		log.Fatalf("migration error: %v", err)
 	}
 
-	// 4. Initialize layers
 	appRepo := repository.NewApplicationRepository(db)
 	interviewRepo := repository.NewInterviewRepository(db)
 	employmentRepo := repository.NewEmploymentRepository(db)
 	appSvc := service.NewApplicationService(appRepo)
 	grpcSrv := grpcserver.NewApplicationGRPCServer(appSvc, appRepo)
 
-	// 5. Start HTTP server for interviews and employment in background
+	// Compliance state machine (Article 47).
+	complianceRepo := repository.NewComplianceRepository(db)
+	complianceNotifier := notify.NewHTTPNotifier(cfg.StudentServiceURL)
+	complianceSvc := service.NewComplianceService(complianceRepo, complianceNotifier)
+	factProvider := facts.NewEmploymentFactProvider(employmentRepo, facts.Policy{})
+	if cfg.ComplianceSchedulerEnabled {
+		sched := scheduler.NewComplianceScheduler(complianceSvc, factProvider, cfg.ComplianceSchedulerInterval)
+		go sched.Start(context.Background())
+		log.Printf("Compliance scheduler enabled (interval=%s)", cfg.ComplianceSchedulerInterval)
+	}
+
 	go func() {
+		chatRepo := repository.NewChatRepository(db)
+		hub := ws.NewHub()
 		interviewHandler := httphandler.NewInterviewHandler(interviewRepo, appRepo)
 		employmentHandler := httphandler.NewEmploymentHandler(employmentRepo)
-		r := httprouter.SetupRouter(interviewHandler, employmentHandler)
+		chatHandler := httphandler.NewChatHandler(chatRepo, appRepo)
+		wsHandler := httphandler.NewWSChatHandler(hub, chatRepo, appRepo)
+		complianceHandler := httphandler.NewComplianceHandler(complianceSvc, factProvider)
+		r := httprouter.SetupRouter(interviewHandler, employmentHandler, chatHandler, wsHandler, complianceHandler)
 
 		httpPort := cfg.HTTPPort
 		if httpPort == "" {
@@ -57,13 +72,11 @@ func main() {
 		}
 	}()
 
-	// 6. Determine gRPC port
 	grpcPort := cfg.GRPCPort
 	if grpcPort == "" {
 		grpcPort = "50054"
 	}
 
-	// 7. Start gRPC server
 	lis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
